@@ -9,6 +9,7 @@ using namespace std;
 
 enum class enMenuChoice {ShowClients=1, AddClient=2, DeleteClient=3, UpdateClient=4, FindClient=5, Exit=6};
 const string UI_LINE_BOUNDS(44, '=');
+const int SCREEN_WIDTH = 120;
 
 struct stNumericInputData
 {
@@ -46,6 +47,12 @@ int ReadNumber(const stNumericInputData& input)
     return Number;
 }
 
+void ResetScreen()
+{
+    system("cls");
+    system("color 0f");
+}
+
 void ShowMainMenu()
 {
     cout << UI_LINE_BOUNDS << "\n";
@@ -62,6 +69,18 @@ void ShowMainMenu()
     cout << UI_LINE_BOUNDS << "\n";
 }
 
+void PrintFileInfoHeader(const vector<stClientData>& clients)
+{
+    cout << setw(60) << "Client list: (" << clients.size() << ") client(s)" << "\n";
+    cout << string(SCREEN_WIDTH, '-') << "\n";
+    cout << "|" << setw(20) << left << " Account Number " << "|";
+    cout << setw(15) << left << " PIN Number " << "|";
+    cout << setw(50) << left << " Client Name " << "|";
+    cout << setw(15) << left << "Phone Number" << "|";
+    cout << setw(14) << left << " Balance " << "|" << "\n";
+    cout << string(SCREEN_WIDTH, '-') << "\n";
+}
+
 void EvaluateMenuChoice(enMenuChoice &menuChoice)
 {
     stNumericInputData inputData;
@@ -71,6 +90,15 @@ void EvaluateMenuChoice(enMenuChoice &menuChoice)
     inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-6)!\n";
 
     menuChoice = enMenuChoice(ReadNumber(inputData));
+}
+
+void PrintIndividualUserInfo(const stClientData& client)
+{
+    cout << "|" << setw(20) << left << client.accountNumber << "|";
+    cout << setw(15) << left << client.PIN_Number << "|";
+    cout << setw(50) << left << client.user_name << "|";
+    cout << setw(15) << left << client.phoneNumber << "|";
+    cout << setw(14) << left << client.balanceEGP << "|" << "\n";
 }
 
 vector<string> SplitString(string& S1, string delimiter = " ")
@@ -137,9 +165,17 @@ vector<stClientData> LoadFileContentsToVector(string fileName, string delimiter)
     return clients;
 }
 
-void ShowClientList()
+void ShowClientList(vector<stClientData> &clients)
 {
+    {
+        PrintFileInfoHeader(clients);
 
+        for (stClientData& client : clients)
+        {
+            PrintIndividualUserInfo(client);
+        }
+        cout << string(SCREEN_WIDTH, '-') << "\n";
+    }
 }
 
 void RunRestOfMenuOptions(const enMenuChoice choice)
@@ -149,7 +185,7 @@ void RunRestOfMenuOptions(const enMenuChoice choice)
     switch (choice)
     {
     case enMenuChoice::ShowClients:
-        
+        ShowClientList(clients);
         break;
     case enMenuChoice::AddClient:
 
@@ -174,6 +210,9 @@ void StartBankSystem()
     enMenuChoice RunningState = enMenuChoice::Exit;
     do
     {
+        ResetScreen();
+        ShowMainMenu();
+
         EvaluateMenuChoice(RunningState);
 
         if (RunningState != enMenuChoice::Exit)
@@ -186,5 +225,5 @@ void StartBankSystem()
 
 int main()
 {
-
+    StartBankSystem();
 }
