@@ -8,6 +8,8 @@
 using namespace std;
 
 enum class enMenuChoice {ShowClients=1, AddClient=2, DeleteClient=3, UpdateClient=4, FindClient=5, Exit=6};
+
+const string CLIENTS_FILE_NAME = "clients.txt";
 const string UI_LINE_BOUNDS(44, '=');
 const int SCREEN_WIDTH = 125;
 
@@ -322,8 +324,10 @@ void SaveVectorContentsToFile(string fileName, const vector<stClientData>& clien
     }
 }
 
-void ShowClientList(vector<stClientData> &clients)
+void ShowClientList()
 {
+    vector<stClientData> clients = LoadFileContentsToVector("clients.txt", "#//#");
+
     PrintFileInfoHeader(clients);
 
     if (clients.size() == 0)
@@ -337,8 +341,9 @@ void ShowClientList(vector<stClientData> &clients)
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
 
-void AddClients(string fileName, vector<stClientData> &clients)
+void AddClients(string fileName)
 {
+    vector<stClientData> clients = LoadFileContentsToVector("clients.txt", "#//#");
     do
     {
         cout << "Adding new client:\n\n";
@@ -348,8 +353,10 @@ void AddClients(string fileName, vector<stClientData> &clients)
     } while (toupper(DetermineAgain("do you want to add more clients (Y/N)? \n")) == 'Y');
 }
 
-void DeleteClientByAccountNumber(vector <stClientData>& clients)
+void DeleteClientByAccountNumber(string fileName)
 {
+    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+
     stClientData Client;
     string accountNumber = readAccountNumber();
 
@@ -400,8 +407,9 @@ void UpdateClientData(vector<stClientData>& clients, int indexNumber)
     clients[indexNumber] = client;
 }
 
-void UpdateClientByAccountNumber(vector<stClientData>& clients)
+void UpdateClientByAccountNumber(string fileName)
 {
+    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
     stClientData Client;
     string accountNumber = readAccountNumber();
 
@@ -426,9 +434,9 @@ void UpdateClientByAccountNumber(vector<stClientData>& clients)
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
 
-void FindClientByAccountNumber(const vector<stClientData>& clients)
+void FindClientByAccountNumber(string fileName)
 {
-    ResetScreen();
+    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
     string userInput = readAccountNumber();
 
     for (int i = 0; i < clients.size(); i++)
@@ -446,39 +454,38 @@ void FindClientByAccountNumber(const vector<stClientData>& clients)
     }
 
     cout << "\nClient with the account number: " << userInput << " is not found!";
-    PromptUserToGetMenu();
 }
 
 void RunRestOfMenuOptions(const enMenuChoice choice)
 {
-    vector<stClientData> clients = LoadFileContentsToVector("clients.txt", "#//#");
+    vector<stClientData> clients = LoadFileContentsToVector(CLIENTS_FILE_NAME, "#//#");
 
     //SOME OF THE CRUD OPERATIONS WORK BY ASKING FOR THE ACCOUNT NUMBER
     switch (choice)
     {
     case enMenuChoice::ShowClients:
         ResetScreen();
-        ShowClientList(clients);
+        ShowClientList();
         PromptUserToGetMenu();
         break;
     case enMenuChoice::AddClient:
         ResetScreen();
-        AddClients("clients.txt", clients);
+        AddClients(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
     case enMenuChoice::DeleteClient:
         ResetScreen();
-        DeleteClientByAccountNumber(clients);
+        DeleteClientByAccountNumber(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
     case enMenuChoice::UpdateClient:
         ResetScreen();
-        UpdateClientByAccountNumber(clients);
+        UpdateClientByAccountNumber(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
     case enMenuChoice::FindClient:
         ResetScreen();
-        FindClientByAccountNumber(clients);
+        FindClientByAccountNumber(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
     case enMenuChoice::Exit:
