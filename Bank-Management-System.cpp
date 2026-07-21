@@ -324,7 +324,6 @@ void SaveVectorContentsToFile(string fileName, const vector<stClientData>& clien
 
 void ShowClientList(vector<stClientData> &clients)
 {
-    ResetScreen();
     PrintFileInfoHeader(clients);
 
     if (clients.size() == 0)
@@ -336,27 +335,21 @@ void ShowClientList(vector<stClientData> &clients)
             PrintIndividualUserInfo(client);
     }
     cout << string(SCREEN_WIDTH, '-') << "\n";
-    PromptUserToGetMenu();
 }
 
 void AddClients(string fileName, vector<stClientData> &clients)
 {
     do
     {
-        ResetScreen();
         cout << "Adding new client:\n\n";
         AddNewClient(fileName, clients);
         cout << "Client added successfully, ";
 
     } while (toupper(DetermineAgain("do you want to add more clients (Y/N)? \n")) == 'Y');
-
-    PromptUserToGetMenu();
 }
 
 void DeleteClientByAccountNumber(vector <stClientData>& clients)
 {
-    ResetScreen();
-
     stClientData Client;
     string accountNumber = readAccountNumber();
 
@@ -380,8 +373,6 @@ void DeleteClientByAccountNumber(vector <stClientData>& clients)
     }
     else
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
-
-    PromptUserToGetMenu();
 }
 
 void readClientDataUpdates(stClientData& data)
@@ -411,8 +402,6 @@ void UpdateClientData(vector<stClientData>& clients, int indexNumber)
 
 void UpdateClientByAccountNumber(vector<stClientData>& clients)
 {
-    ResetScreen();
-
     stClientData Client;
     string accountNumber = readAccountNumber();
 
@@ -435,8 +424,6 @@ void UpdateClientByAccountNumber(vector<stClientData>& clients)
     }
     else
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
-
-    PromptUserToGetMenu();
 }
 
 void FindClientByAccountNumber(const vector<stClientData>& clients)
@@ -470,19 +457,29 @@ void RunRestOfMenuOptions(const enMenuChoice choice)
     switch (choice)
     {
     case enMenuChoice::ShowClients:
+        ResetScreen();
         ShowClientList(clients);
+        PromptUserToGetMenu();
         break;
     case enMenuChoice::AddClient:
+        ResetScreen();
         AddClients("clients.txt", clients);
+        PromptUserToGetMenu();
         break;
     case enMenuChoice::DeleteClient:
+        ResetScreen();
         DeleteClientByAccountNumber(clients);
+        PromptUserToGetMenu();
         break;
     case enMenuChoice::UpdateClient:
+        ResetScreen();
         UpdateClientByAccountNumber(clients);
+        PromptUserToGetMenu();
         break;
     case enMenuChoice::FindClient:
+        ResetScreen();
         FindClientByAccountNumber(clients);
+        PromptUserToGetMenu();
         break;
     case enMenuChoice::Exit:
         break;
@@ -500,11 +497,7 @@ void StartBankSystem()
         EvaluateMenuChoice(RunningState);
 
         if (RunningState != enMenuChoice::Exit)
-        {
             RunRestOfMenuOptions(RunningState);
-            system("pause>0");
-            cout << "Press any button to get back to the main menu\n";
-        }
 
     } while (RunningState != enMenuChoice::Exit);
 }
