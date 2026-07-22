@@ -131,6 +131,13 @@ string readAccountNumber()
     return userInput;
 }
 
+void PrintScreenHeader(string ScreenTitle)
+{
+    cout << "---------------------------------------------\n";
+    cout << right << setw(30) << ScreenTitle << "\n";
+    cout << "---------------------------------------------\n\n";
+}
+
 char DetermineAgain(string message)
 {
     char PlayAgain;
@@ -153,7 +160,7 @@ char DetermineAgain(string message)
 
 bool FindClientByAccountNumber(const string& userInputAccNumber, stClientData& client)
 {
-    vector<stClientData> clients = LoadFileContentsToVector("user_data.txt", "#//#");
+    vector<stClientData> clients = LoadFileContentsToVector(CLIENTS_FILE_NAME, "#//#");
 
     for (stClientData C : clients)
     {
@@ -179,6 +186,21 @@ bool CheckClientExistByAccNumber(string accountNumber, vector <stClientData>& cl
             return true;
     }
     return false;
+}
+
+void readClientDataUpdates(stClientData& data)
+{
+    cout << "\nEnter PIN code: ";
+    getline(cin >> ws, data.PIN_Number);
+
+    cout << "\nEnter name: ";
+    getline(cin, data.user_name);
+
+    cout << "\nEnter phone number: ";
+    getline(cin, data.phoneNumber);
+
+    cout << "\nEnter account balance: ";
+    cin >> data.balanceEGP;
 }
 
 void readClientData(stClientData& data, vector <stClientData> &clients)
@@ -324,9 +346,10 @@ void SaveVectorContentsToFile(string fileName, const vector<stClientData>& clien
     }
 }
 
-void ShowClientList()
+void ShowClientListScreen(string fileName)
 {
-    vector<stClientData> clients = LoadFileContentsToVector("clients.txt", "#//#");
+    PrintScreenHeader("SHOW CLIENT LIST");
+    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
 
     PrintFileInfoHeader(clients);
 
@@ -341,22 +364,44 @@ void ShowClientList()
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
 
-void AddClients(string fileName)
+void UpdateClientData(vector<stClientData>& clients, int indexNumber)
 {
-    vector<stClientData> clients = LoadFileContentsToVector("clients.txt", "#//#");
-    do
-    {
-        cout << "Adding new client:\n\n";
-        AddNewClient(fileName, clients);
-        cout << "Client added successfully, ";
+    stClientData client;
 
-    } while (toupper(DetermineAgain("do you want to add more clients (Y/N)? \n")) == 'Y');
+    // The optionality of updating individual fields in the client info should be added instead of
+    // prompting the user to type each field again. This would require him to retype data it doesn't want to update
+    readClientDataUpdates(client);
+    clients[indexNumber] = client;
 }
 
-void DeleteClientByAccountNumber(string fileName)
+void UpdateClientByAccountNumber(vector<stClientData>& clients, string fileName)
 {
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    stClientData Client;
+    string accountNumber = readAccountNumber();
 
+    if (FindClientByAccountNumber(accountNumber, Client))
+    {
+        PrintClientRecord(Client);
+        if (toupper(DetermineAgain("\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
+        {
+            for (int i = 0; i < clients.size(); i++)
+            {
+                if (clients[i].accountNumber == accountNumber)
+                {
+                    UpdateClientData(clients, i);
+                    break;
+                }
+            }
+            SaveVectorContentsToFile(fileName, clients);
+            cout << "\nClient data updated successfully\n ";
+        }
+    }
+    else
+        cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
+}
+
+void DeleteClientByAccountNumber(vector<stClientData>& clients, string fileName)
+{
     stClientData Client;
     string accountNumber = readAccountNumber();
 
@@ -374,7 +419,7 @@ void DeleteClientByAccountNumber(string fileName)
                     break;
                 }
             }
-            SaveVectorContentsToFile("user_data.txt", clients);
+            SaveVectorContentsToFile(fileName, clients);
             cout << "\nClient deleted successfully\n ";
         }
     }
@@ -382,61 +427,37 @@ void DeleteClientByAccountNumber(string fileName)
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
 
-void readClientDataUpdates(stClientData& data)
+void AddClientsScreen(string fileName)
 {
-    cout << "\nEnter PIN code: ";
-    getline(cin >> ws, data.PIN_Number);
+    PrintScreenHeader("ADD NEW CLIENT");
 
-    cout << "\nEnter name: ";
-    getline(cin, data.user_name);
-
-    cout << "\nEnter phone number: ";
-    getline(cin, data.phoneNumber);
-
-    cout << "\nEnter account balance: ";
-    cin >> data.balanceEGP;
-}
-
-void UpdateClientData(vector<stClientData>& clients, int indexNumber)
-{
-    stClientData client;
-
-    // The optionality of updating individual fields in the client info should be added instead of
-    // prompting the user to type each field again. This would require him to retype data it doesn't want to update
-    readClientDataUpdates(client);
-    clients[indexNumber] = client;
-}
-
-void UpdateClientByAccountNumber(string fileName)
-{
     vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
-    stClientData Client;
-    string accountNumber = readAccountNumber();
-
-    if (FindClientByAccountNumber(accountNumber, Client))
+    do
     {
-        PrintClientRecord(Client);
-        if (toupper(DetermineAgain("\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
-        {
-            for (int i = 0; i < clients.size(); i++)
-            {
-                if (clients[i].accountNumber == accountNumber)
-                {
-                    UpdateClientData(clients, i);
-                    break;
-                }
-            }
-            SaveVectorContentsToFile("user_data.txt", clients);
-            cout << "\nClient data updated successfully\n ";
-        }
-    }
-    else
-        cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
+        AddNewClient(fileName, clients);
+        cout << "Client added successfully, ";
+
+    } while (toupper(DetermineAgain("do you want to add more clients (Y/N)? \n")) == 'Y');
+
+    SaveVectorContentsToFile(fileName, clients);
 }
 
-void FindClientByAccountNumber(string fileName)
+void DeleteClientScreen(string fileName)
 {
+    PrintScreenHeader("DELETE CLIENT");
     vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    DeleteClientByAccountNumber(clients, fileName);
+}
+
+void UpdateClientScreen(string fileName)
+{
+    PrintScreenHeader("UPDATE CLIENT INFO");
+    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    UpdateClientByAccountNumber(clients, fileName);
+}
+
+void FindClientByAccountNumber(vector<stClientData>& clients)
+{
     string userInput = readAccountNumber();
 
     for (int i = 0; i < clients.size(); i++)
@@ -447,7 +468,6 @@ void FindClientByAccountNumber(string fileName)
             stClientData client = clients[i];
 
             PrintClientRecord(client);
-            PromptUserToGetMenu();
 
             return;
         }
@@ -456,38 +476,56 @@ void FindClientByAccountNumber(string fileName)
     cout << "\nClient with the account number: " << userInput << " is not found!";
 }
 
+void FindClientScreen(string fileName)
+{
+    PrintScreenHeader("FIND CLIENT");
+    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    FindClientByAccountNumber(clients);
+}
+
+
+void ShowDeleteClientScreen()
+{
+    PrintScreenHeader("DELETE CLIENT");
+    vector<stClientData> clients = LoadFileContentsToVector(CLIENTS_FILE_NAME, "#//#");
+    DeleteClientByAccountNumber(clients, CLIENTS_FILE_NAME);
+}
+
 void RunRestOfMenuOptions(const enMenuChoice choice)
 {
-    vector<stClientData> clients = LoadFileContentsToVector(CLIENTS_FILE_NAME, "#//#");
-
     //SOME OF THE CRUD OPERATIONS WORK BY ASKING FOR THE ACCOUNT NUMBER
     switch (choice)
     {
     case enMenuChoice::ShowClients:
         ResetScreen();
-        ShowClientList();
+        ShowClientListScreen(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
+
     case enMenuChoice::AddClient:
         ResetScreen();
-        AddClients(CLIENTS_FILE_NAME);
+        AddClientsScreen(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
+
     case enMenuChoice::DeleteClient:
         ResetScreen();
-        DeleteClientByAccountNumber(CLIENTS_FILE_NAME);
+        ShowDeleteClientScreen();
         PromptUserToGetMenu();
         break;
+
     case enMenuChoice::UpdateClient:
         ResetScreen();
-        UpdateClientByAccountNumber(CLIENTS_FILE_NAME);
+        UpdateClientScreen(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
+
     case enMenuChoice::FindClient:
         ResetScreen();
-        FindClientByAccountNumber(CLIENTS_FILE_NAME);
+        FindClientScreen(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
+
     case enMenuChoice::Exit:
         break;
     }
