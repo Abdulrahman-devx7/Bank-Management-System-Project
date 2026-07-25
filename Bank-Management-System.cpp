@@ -502,6 +502,30 @@ void ShowClientsBalances(string fileName)
     cout << right << setw(42) << "Total Balances = " << AccumulateBalances(clients) << " USD\n";
 }
 
+void VerifyBalanceForWithdraw(unordered_map<string, stClientData>::iterator &clientIt, int withdrawAmount)
+{
+    if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
+    {
+        while (!CheckBalanceForWithdrawal(clientIt->second, withdrawAmount))
+            withdrawAmount = ReadWithdrawNumber();
+
+        clientIt->second.balanceUSD -= withdrawAmount;
+        cout << "\n\nDone! Your deposit of " << withdrawAmount << " has been added successfully. Your new balance is: "
+            << clientIt->second.balanceUSD << " USD\n\n";
+    }
+}
+
+void VerifyDeposit(unordered_map<string, stClientData>::iterator& clientIt, int depositAmount)
+{
+    if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
+    {
+        clientIt->second.balanceUSD += depositAmount;
+
+        cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
+            << clientIt->second.balanceUSD << " USD\n\n";
+    }
+}
+
 void UpdateClientData(unordered_map<string, stClientData>::iterator clientIt)
 {
     // The optionality of updating individual fields in the client info should be added instead of
@@ -644,9 +668,8 @@ void DepositByAccNumber(unordered_map<string,stClientData> &clients, string file
 
         cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
             << clientIt->second.balanceUSD << " USD\n\n";
-         SaveToFile(fileName, clients);
-
     }
+    SaveToFile(fileName, clients);
 }
 
 void WithdrawByAccNumber(unordered_map<string, stClientData> &clients, string fileName)
@@ -671,16 +694,8 @@ void WithdrawByAccNumber(unordered_map<string, stClientData> &clients, string fi
     int withdrawAmount = ReadWithdrawNumber();
 
     // A PIN-based verification would be better here. This'll be a place holder until I add PIN verification
-    if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
-    {
-        while (!CheckBalanceForWithdrawal(clientIt->second, withdrawAmount))
-            withdrawAmount = ReadWithdrawNumber();
-        
-        clientIt->second.balanceUSD -= withdrawAmount;
-        cout << "\n\nDone! Your deposit of " << withdrawAmount << " has been added successfully. Your new balance is: "
-            << clientIt->second.balanceUSD << " USD\n\n";
-        SaveToFile(fileName, clients);
-    }
+    VerifyBalanceForWithdraw(clientIt, withdrawAmount);
+    SaveToFile(fileName, clients);
 }
 
 void DepositScreen(string fileName)
