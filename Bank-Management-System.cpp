@@ -618,12 +618,12 @@ void FindClientScreen(string fileName)
     DetermineAccountFind(clients);
 }
 
-void ShowDeleteClientScreen()
+void ShowDeleteClientScreen(string fileName)
 {
     PrintScreenHeader("DELETE CLIENT");
     std::unordered_map<std::string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME , clients,  "#//#");
+    LoadClientsFromFile(fileName, clients,  "#//#");
     DeleteClientByAccountNumber(clients, CLIENTS_FILE_NAME);
 }
 
@@ -770,7 +770,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
 
     case enMenuChoice::DeleteClient:
         ResetScreen();
-        ShowDeleteClientScreen();
+        ShowDeleteClientScreen(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
 
