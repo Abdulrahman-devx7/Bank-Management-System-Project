@@ -795,7 +795,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
         break;
     }
 }
-
+//fix
 void StartBankSystem()
 {
     enMenuChoice RunningState = enMenuChoice::Exit;
@@ -816,3 +816,4 @@ int main()
 {
     StartBankSystem();
 }
+
