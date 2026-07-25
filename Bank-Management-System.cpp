@@ -4,9 +4,9 @@
 #include <string>
 #include <cctype>
 #include <iomanip>
+#include <unordered_map>
 
 using namespace std;
-
 enum class enMenuChoice {ShowClients=1, AddClient=2, DeleteClient=3, UpdateClient=4, FindClient=5, Transactions=6, Exit=7};
 enum class enTransactionsMenuChoice {Deposit=1, Withdraw=2, TotalBalances=3, MainMenu=4};
 
@@ -80,11 +80,9 @@ stClientData ConvertLineToRecord(string Line, string delimiter = "#//#")
     return client;
 }
 
-vector<stClientData> LoadFileContentsToVector(string fileName, string delimiter)
+void LoadClientsFromFile(string fileName, vector<stClientData>& clients, string delimiter = "#//#")
 {
-    vector<stClientData> clients;
     fstream file;
-
     file.open(fileName, ios::in);
 
     if (file.is_open())
@@ -99,10 +97,26 @@ vector<stClientData> LoadFileContentsToVector(string fileName, string delimiter)
         }
         file.close();
     }
-
-    return clients;
 }
 
+void LoadClientsFromFile(string fileName, unordered_map<string, stClientData>& clients, string delimiter = "#//#")
+{
+    fstream file;
+    file.open(fileName, ios::in);
+
+    if (file.is_open())
+    {
+        string line = "";
+        stClientData client;
+
+        while (getline(file, line))
+        {
+            client = ConvertLineToRecord(line, delimiter);
+            clients.insert({ client.accountNumber, client });
+        }
+        file.close();
+    }
+}
 int ReadNumber(const stNumericInputData& input)
 {
     int Number = 0;
@@ -157,22 +171,42 @@ char DetermineAgain(string message)
     return PlayAgain;
 }
 
-bool FindClientByAccountNumber(const string& userInputAccNumber, stClientData& client, vector<stClientData> &clients)
+auto FindClientByAccountNumber(const string& userInputAccNumber,unordered_map<string, stClientData> &clients)
 {
-    for (stClientData C : clients)
-    {
-        if (C.accountNumber == userInputAccNumber)
-        {
-            client = C;
-            return true;
-        }
-    }
-    return false;
+    return clients.find(userInputAccNumber);
 }
 
-void MarkClientForDeleteByAccountNumber(const int indexNumber,  vector<stClientData>& clients)
+void PrintClientRecord(const stClientData& data)
 {
-    clients[indexNumber].MarkForDelete = true;
+    cout << UI_LINE_BOUNDS;
+
+    cout << "\n" << left << setw(20) << "Account Number: " << data.accountNumber << "\n";
+    cout << left << setw(20) << "PIN code: " << data.PIN_Number << "\n";
+    cout << left << setw(20) << "Name: " << data.user_name << "\n";
+    cout << left << setw(20) << "Phone Number: " << data.phoneNumber << "\n";
+    cout << left << setw(20) << "Account Balance: " << data.balanceUSD << "\n";
+
+    cout << UI_LINE_BOUNDS;
+}
+
+void DetermineAccountFind(unordered_map<string, stClientData>& clients)
+{
+    string accountNumber = readAccountNumber();
+
+    auto clientIt = FindClientByAccountNumber(accountNumber, clients);
+
+    if (clientIt != clients.end())
+    {
+        cout << "\n";
+        PrintClientRecord(clientIt->second);
+    }
+    else 
+        cout << "\nClient with the account number: " << accountNumber << " is not found!";
+}
+
+void MarkClientForDeleteByAccountNumber(unordered_map<string, stClientData> &clients, string accountNumber)
+{
+    clients[accountNumber].MarkForDelete = true;
 }
 
 bool CheckClientExistByAccNumber(string accountNumber, vector <stClientData>& clients)
@@ -286,6 +320,8 @@ void AddNewClient(string fileName, vector<stClientData> &clients)
 {
     stClientData userData;
     readClientData(userData, clients);
+
+    clients.push_back(userData);
     AddDataLineToFile(fileName, ConvertRecordToLine(userData));
 }
 
@@ -330,7 +366,7 @@ void PrintFileInfoHeader(const vector<stClientData>& clients)
     cout << setw(15) << " PIN Number " << "| ";
     cout << setw(50) << " Client Name " << "| ";
     cout << setw(15) << "Phone Number" << "| ";
-    cout << setw(14) << " Balance " << "|" << "\n";
+    cout << setw(14) << " Balance - USD" << "|" << "\n";
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
 
@@ -340,24 +376,12 @@ void PrintClientBalancesHeader(const vector<stClientData>& clients)
     cout << string(SCREEN_WIDTH-34, '-') << "\n";
 
     cout << left << "| " << setw(20) << " Account Number " << "| ";
-    cout << setw(50) << " Client Name " << "| ";
-    cout << setw(14) << " Balance " << "|" << "\n";
+    cout << setw(50) << " Client Name " << "|";
+    cout << setw(14) << "Balance " << "|" << "\n";
 
     cout << string(SCREEN_WIDTH-34, '-') << "\n";
 }
 
-void PrintClientRecord(const stClientData& data)
-{
-    cout << UI_LINE_BOUNDS;
-
-    cout << "\n" << left << setw(20) << "Account Number: " << data.accountNumber << "\n";
-    cout << left << setw(20) << "PIN code: " << data.PIN_Number << "\n";
-    cout << left << setw(20) << "Name: " << data.user_name << "\n";
-    cout << left << setw(20) << "Phone Number: " << data.phoneNumber << "\n";
-    cout << left << setw(20) << "Account Balance: " << data.balanceUSD << "\n";
-    
-    cout << UI_LINE_BOUNDS;
-}
 
 void EvaluateMenuChoice(enMenuChoice &menuChoice)
 {
@@ -397,7 +421,8 @@ void PrintUserInfoInBalancesTable(const stClientData &client)
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
 }
 
-void SaveVectorContentsToFile(string fileName, const vector<stClientData>& clients)
+//WE MIGHT NOT NEED THIS LATER ON 
+void SaveToFile(string fileName, const vector<stClientData>& clients)
 {
     fstream file;
     file.open(fileName, ios::out);
@@ -414,9 +439,27 @@ void SaveVectorContentsToFile(string fileName, const vector<stClientData>& clien
     }
 }
 
+void SaveToFile(string fileName, unordered_map<string, stClientData>& clients)
+{
+    fstream file;
+    file.open(fileName, ios::out);
+
+    if (file.is_open())
+    {
+        for (auto& [accountNumber, client] : clients)
+        {
+            string line = ConvertRecordToLine(client);
+
+            file << line << "\n";
+        }
+        file.close();
+    }
+}
+
 void ShowClientListScreen(string fileName)
 {
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    vector<stClientData> clients;
+    LoadClientsFromFile(fileName, clients);
 
     PrintFileInfoHeader(clients);
 
@@ -431,9 +474,20 @@ void ShowClientListScreen(string fileName)
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
 
+void SafeDelete(unordered_map<string, stClientData>& clients, string accountNumber)
+{
+    int elementsRemoved = clients.erase(accountNumber);
+
+    if(elementsRemoved>0)
+        cout << "Account successfully deleted\n";
+    else cout << "Error: Account not found.\n";
+}
+
 void ShowClientsBalances(string fileName)
 {
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    vector<stClientData> clients;
+    LoadClientsFromFile(fileName, clients);
+
     PrintClientBalancesHeader(clients);
 
     if (clients.size() == 0)
@@ -448,35 +502,28 @@ void ShowClientsBalances(string fileName)
     cout << right << setw(42) << "Total Balances = " << AccumulateBalances(clients) << " USD\n";
 }
 
-void UpdateClientData(vector<stClientData>& clients, int indexNumber)
+void UpdateClientData(unordered_map<string, stClientData>::iterator clientIt)
 {
-    stClientData client;
-
     // The optionality of updating individual fields in the client info should be added instead of
     // prompting the user to type each field again. This would require him to retype data it doesn't want to update
-    readClientDataUpdates(client);
-    clients[indexNumber] = client;
+    readClientDataUpdates(clientIt->second);
 }
 
-void UpdateClientByAccountNumber(vector<stClientData>& clients, string fileName)
+void UpdateClientByAccountNumber(unordered_map<string, stClientData> &clients, string fileName)
 {
     stClientData Client;
     string accountNumber = readAccountNumber();
 
-    if (FindClientByAccountNumber(accountNumber, Client, clients))
+    auto clientIt = FindClientByAccountNumber(accountNumber, clients);
+
+    if (clientIt!=clients.end())
     {
         PrintClientRecord(Client);
         if (toupper(DetermineAgain("\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
         {
-            for (int i = 0; i < clients.size(); i++)
-            {
-                if (clients[i].accountNumber == accountNumber)
-                {
-                    UpdateClientData(clients, i);
-                    break;
-                }
-            }
-            SaveVectorContentsToFile(fileName, clients);
+            UpdateClientData(clientIt);
+
+            SaveToFile(fileName, clients);
             cout << "\nClient data updated successfully\n ";
         }
     }
@@ -484,93 +531,75 @@ void UpdateClientByAccountNumber(vector<stClientData>& clients, string fileName)
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
 
-void DeleteClientByAccountNumber(vector<stClientData>& clients, string fileName)
+void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
     stClientData Client;
     string accountNumber = readAccountNumber();
 
-    if (FindClientByAccountNumber(accountNumber, Client, clients))
+    if (FindClientByAccountNumber(accountNumber, clients)!=clients.end())
     {
         PrintClientRecord(Client);
         if (toupper(DetermineAgain("Are you sure you want to delete this client (Y/N)?\n")) == 'Y')
         {
-            for (int i = 0; i < clients.size(); i++)
-            {
-                if (clients[i].accountNumber == accountNumber)
-                {
-                    MarkClientForDeleteByAccountNumber(i, clients);
-                    clients.erase(clients.begin() + i);
-                    break;
-                }
-            }
-            SaveVectorContentsToFile(fileName, clients);
-            cout << "\nClient deleted successfully\n ";
+            MarkClientForDeleteByAccountNumber(clients, accountNumber);
+            SafeDelete(clients, accountNumber);
+
+            SaveToFile(fileName, clients);
         }
     }
     else
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
 
+
 void AddClientsScreen(string fileName)
 {
     PrintScreenHeader("ADD NEW CLIENT");
 
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    vector<stClientData> clients;
+    LoadClientsFromFile(fileName, clients);
+
     do
     {
         AddNewClient(fileName, clients);
         cout << "Client added successfully, ";
 
     } while (toupper(DetermineAgain("do you want to add more clients (Y/N)? \n")) == 'Y');
-
-    SaveVectorContentsToFile(fileName, clients);
 }
 
 void DeleteClientScreen(string fileName)
 {
     PrintScreenHeader("DELETE CLIENT");
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    unordered_map<string, stClientData> clients;
+
+    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DeleteClientByAccountNumber(clients, fileName);
 }
 
 void UpdateClientScreen(string fileName)
 {
     PrintScreenHeader("UPDATE CLIENT INFO");
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    unordered_map<string, stClientData> clients;
+
+    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     UpdateClientByAccountNumber(clients, fileName);
-}
-
-void FindClientByAccountNumber(vector<stClientData>& clients)
-{
-    string userInput = readAccountNumber();
-
-    for (int i = 0; i < clients.size(); i++)
-    {
-        if (clients[i].accountNumber == userInput)
-        {
-            cout << "\n";
-            stClientData client = clients[i];
-
-            PrintClientRecord(client);
-
-            return;
-        }
-    }
-
-    cout << "\nClient with the account number: " << userInput << " is not found!";
 }
 
 void FindClientScreen(string fileName)
 {
     PrintScreenHeader("FIND CLIENT");
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
-    FindClientByAccountNumber(clients);
+    unordered_map<string, stClientData> clients;
+
+    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    DetermineAccountFind(clients);
 }
 
 void ShowDeleteClientScreen()
 {
     PrintScreenHeader("DELETE CLIENT");
-    vector<stClientData> clients = LoadFileContentsToVector(CLIENTS_FILE_NAME, "#//#");
+    std::unordered_map<std::string, stClientData> clients;
+
+    LoadClientsFromFile(CLIENTS_FILE_NAME , clients,  "#//#");
     DeleteClientByAccountNumber(clients, CLIENTS_FILE_NAME);
 }
 
@@ -588,103 +617,87 @@ void ShowTransactionsMenu()
     cout << UI_LINE_BOUNDS << "\n";
 }
 
-void DepositByAccNumber(vector<stClientData> &clients, string fileName)
+void DepositByAccNumber(unordered_map<string,stClientData> &clients, string fileName)
 {
-    stClientData client;
     string accountNumber = "";
-    // Could this logic be abstracted in a dedicated function because it exists in another function?
 
-    cout << "Enter account number: ";
-    bool isExistent = false;
+    unordered_map<string, stClientData>::iterator clientIt;
     do
     {
-        getline(cin >> ws, accountNumber);
-        isExistent = CheckClientExistByAccNumber(accountNumber, clients);
+        accountNumber = readAccountNumber();
+        clientIt = FindClientByAccountNumber(accountNumber, clients);
 
-        if (!isExistent)
+        if (clientIt==clients.end())
             cout << "\nThe client with the account number[" << accountNumber << "] doesn't exist. Enter a different account number: ";
-        else
-            FindClientByAccountNumber(accountNumber, client, clients);
 
-    } while (!isExistent);
+    } while (clientIt==clients.end());
 
     cout << "\nThe following are the client data: \n\n";
-    PrintClientRecord(client);
+    PrintClientRecord(clientIt->second);
 
     int depositAmount = ReadDepositNumber();
     
     // A PIN-based verification would be better here. This'll be a place holder until I add PIN verification
     if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
     {
-        for (int i = 0; i < clients.size();)
-        {
-            if (clients[i].accountNumber == accountNumber)
-            {
-                clients[i].balanceUSD += depositAmount;
-                cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
-                    << clients[i].balanceUSD << " USD\n\n";
-                SaveVectorContentsToFile(fileName, clients);
+        clientIt->second.balanceUSD += depositAmount;
 
-                break;
-             }
-        }
+        cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
+            << clientIt->second.balanceUSD << " USD\n\n";
+         SaveToFile(fileName, clients);
+
     }
 }
 
-void WithdrawByAccNumber(vector <stClientData> &clients, string fileName)
+void WithdrawByAccNumber(unordered_map<string, stClientData> &clients, string fileName)
 {
-    stClientData client;
     string accountNumber = "";
     // Could this logic be abstracted in a dedicated function because it exists in another function?
 
-    cout << "Enter account number: ";
-    bool isExistent = false;
+    unordered_map<string, stClientData>::iterator clientIt;
     do
     {
-        getline(cin >> ws, accountNumber);
-        isExistent = CheckClientExistByAccNumber(accountNumber, clients);
+        accountNumber = readAccountNumber();
+        clientIt = FindClientByAccountNumber(accountNumber, clients);
 
-        if (!isExistent)
+        if (clientIt == clients.end())
             cout << "\nThe client with the account number[" << accountNumber << "] doesn't exist. Enter a different account number: ";
-        else
-            FindClientByAccountNumber(accountNumber, client, clients);
 
-    } while (!isExistent);
+    } while (clientIt == clients.end());
 
     cout << "\nThe following are the client data: \n\n";
-    PrintClientRecord(client);
+    PrintClientRecord(clientIt->second);
 
     int withdrawAmount = ReadWithdrawNumber();
 
     // A PIN-based verification would be better here. This'll be a place holder until I add PIN verification
     if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
     {
-        for (int i = 0; i < clients.size();)
-        {
-            while ((clients[i].accountNumber == accountNumber) && !CheckBalanceForWithdrawal(client, withdrawAmount))
-                withdrawAmount = ReadWithdrawNumber();
-
-                clients[i].balanceUSD += -withdrawAmount;
-                cout << "\n\nDone! Your withdrawal of " << withdrawAmount << " has been made successfully. Your new balance is: "
-                    << clients[i].balanceUSD << " USD\n\n";
-                SaveVectorContentsToFile(fileName, clients);
-
-                break;
-        }
+        while (!CheckBalanceForWithdrawal(clientIt->second, withdrawAmount))
+            withdrawAmount = ReadWithdrawNumber();
+        
+        clientIt->second.balanceUSD -= withdrawAmount;
+        cout << "\n\nDone! Your deposit of " << withdrawAmount << " has been added successfully. Your new balance is: "
+            << clientIt->second.balanceUSD << " USD\n\n";
+        SaveToFile(fileName, clients);
     }
 }
 
 void DepositScreen(string fileName)
 {
     PrintScreenHeader("DEPOSIT MONEY");
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    unordered_map<string, stClientData> clients;
+
+    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DepositByAccNumber(clients, fileName);
 }
 
 void WithdrawScreen(string fileName)
 {
     PrintScreenHeader("WITHDRAW MONEY");
-    vector<stClientData> clients = LoadFileContentsToVector(fileName, "#//#");
+    unordered_map<string, stClientData> clients;
+
+    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     WithdrawByAccNumber(clients, fileName);
 }
 
