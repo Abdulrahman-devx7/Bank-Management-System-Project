@@ -662,20 +662,13 @@ void DepositByAccNumber(unordered_map<string,stClientData> &clients, string file
     int depositAmount = ReadDepositNumber();
     
     // A PIN-based verification would be better here. This'll be a place holder until I add PIN verification
-    if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
-    {
-        clientIt->second.balanceUSD += depositAmount;
-
-        cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
-            << clientIt->second.balanceUSD << " USD\n\n";
-    }
+    VerifyDeposit(clientIt, depositAmount);
     SaveToFile(fileName, clients);
 }
 
 void WithdrawByAccNumber(unordered_map<string, stClientData> &clients, string fileName)
 {
     string accountNumber = "";
-    // Could this logic be abstracted in a dedicated function because it exists in another function?
 
     unordered_map<string, stClientData>::iterator clientIt;
     do
@@ -693,7 +686,6 @@ void WithdrawByAccNumber(unordered_map<string, stClientData> &clients, string fi
 
     int withdrawAmount = ReadWithdrawNumber();
 
-    // A PIN-based verification would be better here. This'll be a place holder until I add PIN verification
     VerifyBalanceForWithdraw(clientIt, withdrawAmount);
     SaveToFile(fileName, clients);
 }
