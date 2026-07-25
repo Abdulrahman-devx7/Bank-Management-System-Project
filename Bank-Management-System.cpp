@@ -7,8 +7,8 @@
 #include <unordered_map>
 
 using namespace std;
-enum class enMenuChoice {ShowClients=1, AddClient=2, DeleteClient=3, UpdateClient=4, FindClient=5, Transactions=6, Exit=7};
-enum class enTransactionsMenuChoice {Deposit=1, Withdraw=2, TotalBalances=3, MainMenu=4};
+enum class enMenuChoice { ShowClients = 1, AddClient = 2, DeleteClient = 3, UpdateClient = 4, FindClient = 5, Transactions = 6, Exit = 7 };
+enum class enTransactionsMenuChoice { Deposit = 1, Withdraw = 2, TotalBalances = 3, MainMenu = 4 };
 
 const string CLIENTS_FILE_NAME = "clients.txt";
 const string UI_LINE_BOUNDS(44, '=');
@@ -75,6 +75,9 @@ stClientData ConvertLineToRecord(string Line, string delimiter = "#//#")
         client.user_name = vClientData[2];
         client.phoneNumber = vClientData[3];
         client.balanceUSD = stold(vClientData[4]);
+
+        if (vClientData.size() >= 6)
+            client.MarkForDelete = (vClientData[5] == "1");
     }
 
     return client;
@@ -171,9 +174,14 @@ char DetermineAgain(string message)
     return PlayAgain;
 }
 
-auto FindClientByAccountNumber(const string& userInputAccNumber,unordered_map<string, stClientData> &clients)
+auto FindClientByAccountNumber(const string& userInputAccNumber, unordered_map<string, stClientData>& clients)
 {
-    return clients.find(userInputAccNumber);
+    auto clientIt = clients.find(userInputAccNumber);
+
+    if (clientIt != clients.end() && clientIt->second.MarkForDelete)
+        return clients.end();
+
+    return clientIt;
 }
 
 void PrintClientRecord(const stClientData& data)
@@ -200,18 +208,18 @@ void DetermineAccountFind(unordered_map<string, stClientData>& clients)
         cout << "\n";
         PrintClientRecord(clientIt->second);
     }
-    else 
+    else
         cout << "\nClient with the account number: " << accountNumber << " is not found!";
 }
 
-void MarkClientForDeleteByAccountNumber(unordered_map<string, stClientData> &clients, string accountNumber)
+void MarkClientForDeleteByAccountNumber(unordered_map<string, stClientData>& clients, string accountNumber)
 {
     clients[accountNumber].MarkForDelete = true;
 }
 
 bool CheckClientExistByAccNumber(string accountNumber, vector <stClientData>& clients)
 {
-    for(stClientData &client : clients)
+    for (stClientData& client : clients)
     {
         if (client.accountNumber == accountNumber)
             return true;
@@ -234,7 +242,7 @@ void readClientDataUpdates(stClientData& data)
     cin >> data.balanceUSD;
 }
 
-void readClientData(stClientData& client, vector <stClientData> &clients)
+void readClientData(stClientData& client, vector <stClientData>& clients)
 {
     cout << "Enter account number: ";
     bool isExistent = false;
@@ -279,6 +287,17 @@ int ReadWithdrawNumber()
     return ReadNumber(inputData);
 }
 
+vector<stClientData> GetVisibleClients(const vector<stClientData>& clients)
+{
+    vector<stClientData> visibleClients;
+    for (const stClientData& client : clients)
+    {
+        if (!client.MarkForDelete)
+            visibleClients.push_back(client);
+    }
+    return visibleClients;
+}
+
 long long AccumulateBalances(const vector<stClientData>& clients)
 {
     long long sumBalances = 0;
@@ -299,7 +318,8 @@ string ConvertRecordToLine(const stClientData& data, string delimiter = "#//#")
     recordLine += data.PIN_Number + delimiter;
     recordLine += data.user_name + delimiter;
     recordLine += data.phoneNumber + delimiter;
-    recordLine += to_string(data.balanceUSD);
+    recordLine += to_string(data.balanceUSD) + delimiter;
+    recordLine += (data.MarkForDelete ? "1" : "0");
 
     return recordLine;
 }
@@ -316,7 +336,7 @@ void AddDataLineToFile(string fileName, string dataLine)
     }
 }
 
-void AddNewClient(string fileName, vector<stClientData> &clients)
+void AddNewClient(string fileName, vector<stClientData>& clients)
 {
     stClientData userData;
     readClientData(userData, clients);
@@ -354,7 +374,7 @@ void ShowMainMenu()
     cout << right << setw(10) << "[5]" << " Find Client" << "\n";
     cout << right << setw(10) << "[6]" << " Transactions" << "\n";
     cout << right << setw(10) << "[7]" << " Exit" << "\n";
-   
+
     cout << UI_LINE_BOUNDS << "\n";
 }
 
@@ -373,17 +393,17 @@ void PrintFileInfoHeader(const vector<stClientData>& clients)
 void PrintClientBalancesHeader(const vector<stClientData>& clients)
 {
     cout << right << setw(42) << "Balances List for (" << clients.size() << ") client(s)" << "\n";
-    cout << string(SCREEN_WIDTH-34, '-') << "\n";
+    cout << string(SCREEN_WIDTH - 34, '-') << "\n";
 
     cout << left << "| " << setw(20) << " Account Number " << "| ";
     cout << setw(50) << " Client Name " << "|";
     cout << setw(14) << "Balance " << "|" << "\n";
 
-    cout << string(SCREEN_WIDTH-34, '-') << "\n";
+    cout << string(SCREEN_WIDTH - 34, '-') << "\n";
 }
 
 
-void EvaluateMenuChoice(enMenuChoice &menuChoice)
+void EvaluateMenuChoice(enMenuChoice& menuChoice)
 {
     stNumericInputData inputData;
     inputData.inputMessage = "Choose the operation you'd like to do (1-7)\n";
@@ -414,7 +434,7 @@ void PrintIndividualUserInfo(const stClientData& client)
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
 }
 
-void PrintUserInfoInBalancesTable(const stClientData &client)
+void PrintUserInfoInBalancesTable(const stClientData& client)
 {
     cout << "| " << setw(20) << left << client.accountNumber << "| ";
     cout << setw(50) << left << client.user_name << "| ";
@@ -461,26 +481,18 @@ void ShowClientListScreen(string fileName)
     vector<stClientData> clients;
     LoadClientsFromFile(fileName, clients);
 
-    PrintFileInfoHeader(clients);
+    vector<stClientData> visibleClients = GetVisibleClients(clients);
 
-    if (clients.size() == 0)
+    PrintFileInfoHeader(visibleClients);
+
+    if (visibleClients.size() == 0)
         cout << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!";
 
-    for (stClientData& client : clients)
+    for (const stClientData& client : visibleClients)
     {
-        if (client.MarkForDelete == false)
-            PrintIndividualUserInfo(client);
+        PrintIndividualUserInfo(client);
     }
     cout << string(SCREEN_WIDTH, '-') << "\n";
-}
-
-void SafeDelete(unordered_map<string, stClientData>& clients, string accountNumber)
-{
-    int elementsRemoved = clients.erase(accountNumber);
-
-    if(elementsRemoved>0)
-        cout << "Account successfully deleted\n";
-    else cout << "Error: Account not found.\n";
 }
 
 void ShowClientsBalances(string fileName)
@@ -488,21 +500,22 @@ void ShowClientsBalances(string fileName)
     vector<stClientData> clients;
     LoadClientsFromFile(fileName, clients);
 
-    PrintClientBalancesHeader(clients);
+    vector<stClientData> visibleClients = GetVisibleClients(clients);
 
-    if (clients.size() == 0)
+    PrintClientBalancesHeader(visibleClients);
+
+    if (visibleClients.size() == 0)
         cout << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!";
 
-    for (stClientData& client : clients)
+    for (const stClientData& client : visibleClients)
     {
-        if (client.MarkForDelete == false)
-            PrintUserInfoInBalancesTable(client);
+        PrintUserInfoInBalancesTable(client);
     }
-    cout << string(SCREEN_WIDTH-34, '-') << "\n";
-    cout << right << setw(42) << "Total Balances = " << AccumulateBalances(clients) << " USD\n";
+    cout << string(SCREEN_WIDTH - 34, '-') << "\n";
+    cout << right << setw(42) << "Total Balances = " << AccumulateBalances(visibleClients) << " USD\n";
 }
 
-void VerifyBalanceForWithdraw(unordered_map<string, stClientData>::iterator &clientIt, int withdrawAmount)
+void VerifyBalanceForWithdraw(unordered_map<string, stClientData>::iterator& clientIt, int withdrawAmount)
 {
     if (toupper(DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
     {
@@ -533,17 +546,20 @@ void UpdateClientData(unordered_map<string, stClientData>::iterator clientIt)
     readClientDataUpdates(clientIt->second);
 }
 
-void UpdateClientByAccountNumber(unordered_map<string, stClientData> &clients, string fileName)
+void UpdateClientByAccountNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
     stClientData Client;
     string accountNumber = readAccountNumber();
 
     auto clientIt = FindClientByAccountNumber(accountNumber, clients);
 
-    if (clientIt!=clients.end())
+    if (clientIt != clients.end())
     {
+        auto ClientIt = FindClientByAccountNumber(accountNumber, clients);
+        Client = ClientIt->second;
+
         PrintClientRecord(Client);
-        if (toupper(DetermineAgain("\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
+        if (toupper(DetermineAgain("\n\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
         {
             UpdateClientData(clientIt);
 
@@ -560,21 +576,23 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
     stClientData Client;
     string accountNumber = readAccountNumber();
 
-    if (FindClientByAccountNumber(accountNumber, clients)!=clients.end())
+    if (FindClientByAccountNumber(accountNumber, clients) != clients.end())
     {
+        auto ClientIt = FindClientByAccountNumber(accountNumber, clients);
+        Client = ClientIt->second;
+
         PrintClientRecord(Client);
-        if (toupper(DetermineAgain("Are you sure you want to delete this client (Y/N)?\n")) == 'Y')
+        if (toupper(DetermineAgain("\n\nAre you sure you want to delete this client (Y/N)?\n")) == 'Y')
         {
             MarkClientForDeleteByAccountNumber(clients, accountNumber);
-            SafeDelete(clients, accountNumber);
-
             SaveToFile(fileName, clients);
+
+            cout << "\nAccount successfully deleted\n";
         }
     }
     else
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
-
 
 void AddClientsScreen(string fileName)
 {
@@ -618,12 +636,12 @@ void FindClientScreen(string fileName)
     DetermineAccountFind(clients);
 }
 
-void ShowDeleteClientScreen(string fileName)
+void ShowDeleteClientScreen()
 {
     PrintScreenHeader("DELETE CLIENT");
     std::unordered_map<std::string, stClientData> clients;
 
-    LoadClientsFromFile(fileName, clients,  "#//#");
+    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DeleteClientByAccountNumber(clients, CLIENTS_FILE_NAME);
 }
 
@@ -641,7 +659,7 @@ void ShowTransactionsMenu()
     cout << UI_LINE_BOUNDS << "\n";
 }
 
-void DepositByAccNumber(unordered_map<string,stClientData> &clients, string fileName)
+void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
     string accountNumber = "";
 
@@ -651,22 +669,22 @@ void DepositByAccNumber(unordered_map<string,stClientData> &clients, string file
         accountNumber = readAccountNumber();
         clientIt = FindClientByAccountNumber(accountNumber, clients);
 
-        if (clientIt==clients.end())
+        if (clientIt == clients.end())
             cout << "\nThe client with the account number[" << accountNumber << "] doesn't exist. Enter a different account number: ";
 
-    } while (clientIt==clients.end());
+    } while (clientIt == clients.end());
 
     cout << "\nThe following are the client data: \n\n";
     PrintClientRecord(clientIt->second);
 
     int depositAmount = ReadDepositNumber();
-    
+
     // A PIN-based verification would be better here. This'll be a place holder until I add PIN verification
     VerifyDeposit(clientIt, depositAmount);
     SaveToFile(fileName, clients);
 }
 
-void WithdrawByAccNumber(unordered_map<string, stClientData> &clients, string fileName)
+void WithdrawByAccNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
     string accountNumber = "";
 
@@ -770,7 +788,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
 
     case enMenuChoice::DeleteClient:
         ResetScreen();
-        ShowDeleteClientScreen(CLIENTS_FILE_NAME);
+        ShowDeleteClientScreen();
         PromptUserToGetMenu();
         break;
 
@@ -795,7 +813,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
         break;
     }
 }
-//fix
+
 void StartBankSystem()
 {
     enMenuChoice RunningState = enMenuChoice::Exit;
@@ -816,4 +834,3 @@ int main()
 {
     StartBankSystem();
 }
-
