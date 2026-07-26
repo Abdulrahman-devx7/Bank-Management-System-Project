@@ -120,6 +120,7 @@ void LoadClientsFromFile(string fileName, unordered_map<string, stClientData>& c
         file.close();
     }
 }
+
 int ReadNumber(const stNumericInputData& input)
 {
     int Number = 0;
