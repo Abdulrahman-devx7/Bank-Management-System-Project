@@ -230,19 +230,30 @@ bool CheckClientExistByAccNumber(string accountNumber, vector <stClientData>& cl
 
 void readClientDataUpdates(stClientData& data)
 {
-    cout << "\nEnter PIN code: ";
-    getline(cin >> ws, data.PIN_Number);
+    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter PIN code: ";
+        getline(cin, data.PIN_Number);
+    }
 
-    cout << "\nEnter name: ";
-    getline(cin, data.user_name);
+    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter name: ";
+        getline(cin, data.user_name);
+    }
 
-    cout << "\nEnter phone number: ";
-    getline(cin, data.phoneNumber);
+    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter phone number: ";
+        getline(cin, data.phoneNumber);
+    }
 
-    cout << "\nEnter account balance: ";
-    cin >> data.balanceUSD;
+    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter account balance: ";
+        cin >> data.balanceUSD;
+    }
 }
-
 void readClientData(stClientData& client, vector <stClientData>& clients)
 {
     cout << "Enter account number: ";
