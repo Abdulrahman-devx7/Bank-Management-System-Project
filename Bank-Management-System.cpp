@@ -5,6 +5,8 @@
 #include <cctype>
 #include <iomanip>
 #include <unordered_map>
+#include <algorithm>
+#include <regex>
 
 using namespace std;
 enum class enMenuChoice { ShowClients = 1, AddClient = 2, DeleteClient = 3, UpdateClient = 4, FindClient = 5, Transactions = 6, Exit = 7 };
@@ -254,28 +256,102 @@ void readClientDataUpdates(stClientData& data)
         cin >> data.balanceUSD;
     }
 }
+
+bool IsValidPIN(const string& PIN)
+{
+    return PIN.length() == 6 &&
+        all_of(PIN.begin(), PIN.end(), ::isdigit);
+}
+
+bool isValidPhoneNumber(const string &phoneNumber)
+{
+    static const regex pattern("(010|011|012|015)[0-9]{8}");
+    return regex_match(phoneNumber, pattern);
+}
+
+bool isValidAccountNumber(const string &accountNumber)
+{
+    static const regex pattern("[A-Z]{3}[0-9]{4}");
+    return regex_match(accountNumber, pattern);
+}
+
+bool AreNamesOnlyLetters(const vector<string> &names)
+{
+    for (const string& name : names)
+    {
+        if (!all_of(name.begin(), name.end(), ::isalpha))
+            return false;
+    }
+    return true;
+}
+
+void isValidFullName(stClientData& client)
+{
+    bool is4Names = true;
+    bool isAllLetters = true;
+
+    do
+    {
+        getline(cin, client.user_name);
+
+        vector<string> Words = SplitString(client.user_name, " ");
+
+        is4Names = (Words.size() == 4);
+        isAllLetters = AreNamesOnlyLetters(Words);
+
+        if (!is4Names || !isAllLetters)
+            cout << "\nPlease, enter a valid full name form consisting of 4 names without any number or special characters!\n\n";
+
+    } while (!isAllLetters || !is4Names);
+}
+
 void readClientData(stClientData& client, vector <stClientData>& clients)
 {
     cout << "Enter account number: ";
+
     bool isExistent = false;
+    bool isAccNumberValid = true;
     do
     {
         getline(cin >> ws, client.accountNumber);
         isExistent = CheckClientExistByAccNumber(client.accountNumber, clients);
+        isAccNumberValid = isValidAccountNumber(client.accountNumber);
 
-        if (isExistent)
-            cout << "\nThe client with the account number[" << client.accountNumber << "] already exists, enter a different account number: ";
+        if (isAccNumberValid)
+        {
+            if(isExistent)
+                cout << "\nThe client with the account number[" << client.accountNumber << "] already exists, enter a different account number: ";
+        }
+        else 
+            cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
 
-    } while (isExistent);
+    } while (isExistent || !isAccNumberValid);
 
     cout << "\nEnter PIN code: ";
-    getline(cin, client.PIN_Number);
+    bool isValid = true;
+    do
+    {
+        getline(cin, client.PIN_Number);
+        isValid = IsValidPIN(client.PIN_Number);
+
+        if (!isValid)
+            cout << "\nPlease enter a valid PIN (6 digits, numbers only)\n";
+        
+    } while (!isValid);
 
     cout << "\nEnter name: ";
-    getline(cin, client.user_name);
+    isValidFullName(client);
 
     cout << "\nEnter phone number: ";
-    getline(cin, client.phoneNumber);
+    isValid = true;
+    do
+    {
+        getline(cin, client.phoneNumber);
+        isValid = isValidPhoneNumber(client.phoneNumber);
+
+        if (!isValid)
+            cout << "\nPlease enter a valid Egyptian phone number (11 digits, e.g. 01012345678)!\n";
+    } while (!isValid);
 
     cout << "\nEnter account balance: ";
     cin >> client.balanceUSD;
