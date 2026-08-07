@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <regex>
 #include <cstdint>
+#include <climits>
+#include <limits>
 
 using namespace std;
 const string CLIENTS_FILE_NAME = "clients.txt";
@@ -22,7 +24,8 @@ enum class enMenuChoice{
     UpdateClient = 4,
     FindClient = 5,
     Transactions = 6,
-    Logout = 7
+    ManagerUsers = 7,
+    Logout = 8
 };
 
 enum class enTransactionsMenuChoice {
@@ -32,12 +35,21 @@ enum class enTransactionsMenuChoice {
     MainMenu = 4
 };
 
+enum class enManageUsersMenuChoice {
+    ListUsers = 1,
+    AddUser = 2,
+    DeleteUser = 3,
+    UpdateUser = 4,
+    FindUser = 5,
+    MainMenu = 6
+};
+
 enum class enRunningState {
     LoginScreen,
     InsideBankSystem
 };
 
-enum enUserPermissions {
+enum class enUserPermissions : short {
     None = 0,  
     ListClients = 1,  
     AddClient = 2,  
@@ -315,7 +327,8 @@ void HandleUnauthorizedAccess()
 
 bool VerifyPermission(const short userPermissions, enUserPermissions permissionToVerify)
 {
-    return (userPermissions & permissionToVerify) == permissionToVerify;
+    short permVal = static_cast<short>(permissionToVerify);
+    return (userPermissions & permVal) == permVal;
 }
 
 void PrintScreenHeader(string ScreenTitle)
@@ -623,7 +636,24 @@ void ShowMainMenu()
     cout << right << setw(10) << "[4]" << " Update Client Info" << "\n";
     cout << right << setw(10) << "[5]" << " Find Client" << "\n";
     cout << right << setw(10) << "[6]" << " Transactions" << "\n";
-    cout << right << setw(10) << "[7]" << " Logout" << "\n";
+    cout << right << setw(10) << "[7]" << " Manage Users" << "\n";
+    cout << right << setw(10) << "[8]" << " Logout" << "\n";
+
+    cout << UI_LINE_BOUNDS << "\n";
+}
+
+void ShowManageUsersMenu()
+{
+    cout << UI_LINE_BOUNDS << "\n";
+    cout << right << setw(30) << "Manage Users Menu" << "\n";
+    cout << UI_LINE_BOUNDS << "\n";
+
+    cout << right << setw(10) << "[1]" << " List Users" << "\n";
+    cout << right << setw(10) << "[2]" << " Add User" << "\n";
+    cout << right << setw(10) << "[3]" << " Delete User" << "\n";
+    cout << right << setw(10) << "[4]" << " Update User" << "\n";
+    cout << right << setw(10) << "[5]" << " Find User" << "\n";
+    cout << right << setw(10) << "[6]" << " Return to Main Menu" << "\n";
 
     cout << UI_LINE_BOUNDS << "\n";
 }
@@ -656,10 +686,10 @@ void PrintClientBalancesHeader(const vector<stClientData>& clients)
 void EvaluateMenuChoice(enMenuChoice& menuChoice)
 {
     stNumericInputData inputData;
-    inputData.inputMessage = "Choose the operation you'd like to do (1-7)\n";
+    inputData.inputMessage = "Choose the operation you'd like to do (1-8)\n";
     inputData.from = 1;
-    inputData.to = 7;
-    inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-7)!\n";
+    inputData.to = 8;
+    inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-8)!\n";
 
     menuChoice = enMenuChoice(ReadNumber(inputData));
 }
@@ -673,6 +703,17 @@ void EvaluateMenuChoice(enTransactionsMenuChoice& menuChoice)
     inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-4)!\n";
 
     menuChoice = enTransactionsMenuChoice(ReadNumber(inputData));
+}
+
+void EvaluateMenuChoice(enManageUsersMenuChoice& menuChoice)
+{
+    stNumericInputData inputData;
+    inputData.inputMessage = "Choose the operation you'd like to do (1-6)\n";
+    inputData.from = 1;
+    inputData.to = 6;
+    inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-6)!\n";
+
+    menuChoice = enManageUsersMenuChoice(ReadNumber(inputData));
 }
 
 void PrintIndividualUserInfo(const stClientData& client)
@@ -927,7 +968,7 @@ void ShowDeleteClientScreen(string fileName)
 void ShowTransactionsMenu()
 {
     cout << UI_LINE_BOUNDS << "\n";
-    cout << right << setw(22) << "Transaction Menu" << "\n";
+    cout << right << setw(30) << "Transaction Menu" << "\n";
     cout << UI_LINE_BOUNDS << "\n";
 
     cout << right << setw(10) << "[1]" << " Deposit" << "\n";
@@ -1049,6 +1090,20 @@ void StartTransactionsMenu()
 
 }
 
+void StartManageUsers()
+{
+    enManageUsersMenuChoice RunningState = enManageUsersMenuChoice::MainMenu;
+    do
+    {
+        ResetScreen();
+        ShowManageUsersMenu();
+
+        EvaluateMenuChoice(RunningState);
+
+    } while (RunningState != enManageUsersMenuChoice::MainMenu);
+
+}
+
 void PerformMainMenuOption(const enMenuChoice choice)
 {
     switch (choice)
@@ -1085,6 +1140,12 @@ void PerformMainMenuOption(const enMenuChoice choice)
     case enMenuChoice::Transactions:
         ResetScreen();
         StartTransactionsMenu();
+        PromptUserToGetMenu();
+        break;
+
+    case enMenuChoice::ManagerUsers:
+        ResetScreen();
+        StartManageUsers();
         PromptUserToGetMenu();
         break;
 
