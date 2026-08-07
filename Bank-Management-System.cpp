@@ -825,7 +825,7 @@ void DeleteClientScreen(string fileName)
     PrintScreenHeader("DELETE CLIENT");
     unordered_map<string, stClientData> clients;
 
-    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(fileName, clients, "#//#");
     DeleteClientByAccountNumber(clients, fileName);
 }
 
@@ -834,7 +834,7 @@ void UpdateClientScreen(string fileName)
     PrintScreenHeader("UPDATE CLIENT INFO");
     unordered_map<string, stClientData> clients;
 
-    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(fileName, clients, "#//#");
     UpdateClientByAccountNumber(clients, fileName);
 }
 
@@ -843,17 +843,17 @@ void FindClientScreen(string fileName)
     PrintScreenHeader("FIND CLIENT");
     unordered_map<string, stClientData> clients;
 
-    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(fileName, clients, "#//#");
     DetermineAccountFind(clients);
 }
 
-void ShowDeleteClientScreen()
+void ShowDeleteClientScreen(string fileName)
 {
     PrintScreenHeader("DELETE CLIENT");
     std::unordered_map<std::string, stClientData> clients;
 
-    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
-    DeleteClientByAccountNumber(clients, CLIENTS_FILE_NAME);
+    LoadFromFile(fileName, clients, "#//#");
+    DeleteClientByAccountNumber(clients, fileName);
 }
 
 void ShowTransactionsMenu()
@@ -924,7 +924,7 @@ void DepositScreen(string fileName)
     PrintScreenHeader("DEPOSIT MONEY");
     unordered_map<string, stClientData> clients;
 
-    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(fileName, clients, "#//#");
     DepositByAccNumber(clients, fileName);
 }
 
@@ -933,7 +933,7 @@ void WithdrawScreen(string fileName)
     PrintScreenHeader("WITHDRAW MONEY");
     unordered_map<string, stClientData> clients;
 
-    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(fileName, clients, "#//#");
     WithdrawByAccNumber(clients, fileName);
 }
 
@@ -999,7 +999,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
 
     case enMenuChoice::DeleteClient:
         ResetScreen();
-        ShowDeleteClientScreen();
+        ShowDeleteClientScreen(CLIENTS_FILE_NAME);
         PromptUserToGetMenu();
         break;
 
