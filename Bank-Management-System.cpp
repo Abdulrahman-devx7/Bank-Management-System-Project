@@ -22,7 +22,7 @@ enum class enMenuChoice{
     UpdateClient = 4,
     FindClient = 5,
     Transactions = 6,
-    Exit = 7
+    Logout = 7
 };
 
 enum class enTransactionsMenuChoice {
@@ -35,6 +35,18 @@ enum class enTransactionsMenuChoice {
 enum class enRunningState {
     LoginScreen,
     InsideBankSystem
+};
+
+enum enUserPermissions {
+    None = 0,  
+    ListClients = 1,  
+    AddClient = 2,  
+    DeleteClient = 4,  
+    UpdateClient = 8,  
+    FindClient = 16, 
+    Transactions = 32, 
+    ManageUsers = 64, 
+    All = -1  
 };
 
 struct stNumericInputData
@@ -60,7 +72,7 @@ struct stUserData
 {
     string user_name = "";
     string user_password = "";
-    uint16_t permissions = 0;
+    short permissions = 0;
 };
 
 struct stLoginCredentials
@@ -210,6 +222,12 @@ int ReadNumber(const stNumericInputData& input)
     return Number;
 }
 
+void ResetScreen()
+{
+    system("cls");
+    system("color 0f");
+}
+
 string readAccountNumber()
 {
     cout << "Please enter the account number: ";
@@ -243,6 +261,61 @@ bool VerifyLogin(const stLoginCredentials &loginData, const unordered_map<string
         auto fetchedPassword = users.find(loginData.inputUsername);
         return loginData.inputPassword == fetchedPassword->second.user_password;
     }
+}
+
+enUserPermissions GetRequiredPermissionForMenuChoice(const enMenuChoice menuChoice)
+{
+
+    switch (menuChoice)
+    {
+    case enMenuChoice::ShowClients:
+        return enUserPermissions::ListClients;
+
+    case enMenuChoice::AddClient:
+        return enUserPermissions::AddClient;
+
+    case enMenuChoice::DeleteClient:
+        return enUserPermissions::DeleteClient;
+
+    case enMenuChoice::UpdateClient:
+        return enUserPermissions::UpdateClient;
+
+    case enMenuChoice::FindClient:
+        return enUserPermissions::FindClient;
+
+    case enMenuChoice::Transactions:
+        return enUserPermissions::Transactions;
+
+    case enMenuChoice::Logout:
+        return enUserPermissions::None;
+
+    default:
+        return enUserPermissions::None;
+    }
+}
+
+void DisplayAccessDenyMessage()
+{
+    cout << string(50, '-') << "\n";
+    cout << setw(30) << right << "ACCESS DENIED\n";
+    cout << setw(50) << right  << "You do NOT have a permission to use this utility\n";
+    cout << setw(37) << right << " Please, contact your admin\n";
+    cout << string(50, '-') << "\n";
+}
+
+void HandleUnauthorizedAccess()
+{
+    // A modular solution for everything
+    // This can later scale up to do complex stuff to maybe the database, or lock an account 
+    // after some actions
+    ResetScreen();
+    DisplayAccessDenyMessage();
+    PromptUserToGetMenu();
+}
+
+bool VerifyPermission(const short userPermissions, enUserPermissions permissionToVerify)
+{
+    return (userPermissions & permissionToVerify) == permissionToVerify;
 }
 
 void PrintScreenHeader(string ScreenTitle)
@@ -538,12 +611,6 @@ bool CheckBalanceForWithdrawal(const stClientData& client, int withdrawalAmount)
     else return true;
 }
 
-void ResetScreen()
-{
-    system("cls");
-    system("color 0f");
-}
-
 void ShowMainMenu()
 {
     cout << UI_LINE_BOUNDS << "\n";
@@ -777,7 +844,7 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
 
 
 
-void LoginScreen(string fileName, enRunningState &runningState)
+void LoginScreen(string fileName, enRunningState &runningState, stUserData &runningUser)
 {
     unordered_map<string, stUserData> users;
     LoadFromFile(fileName, users, "#//#");
@@ -802,6 +869,7 @@ void LoginScreen(string fileName, enRunningState &runningState)
 
     } while (!(isValidUsernameOrPass = VerifyLogin(loginDetails, users)));
 
+    runningUser = users.find(loginDetails.inputUsername)->second;
     runningState = enRunningState::InsideBankSystem;
 }
 
@@ -1020,42 +1088,48 @@ void PerformMainMenuOption(const enMenuChoice choice)
         PromptUserToGetMenu();
         break;
 
-    case enMenuChoice::Exit:
+    case enMenuChoice::Logout:
         break;
     }
 }
 
-void RunBankServices(enRunningState &state)
+void RunBankServices(enRunningState &state, const stUserData &runningUser)
 {
-    enMenuChoice RunningUtility = enMenuChoice::Exit;
+    enMenuChoice runningUtility = enMenuChoice::Logout;
+
     do
     {
         ResetScreen();
         ShowMainMenu();
 
-        EvaluateMenuChoice(RunningUtility);
+        EvaluateMenuChoice(runningUtility);
 
-        if (RunningUtility != enMenuChoice::Exit)
-            PerformMainMenuOption(RunningUtility);
+        if (runningUtility != enMenuChoice::Logout)
+        {
+            enUserPermissions requiredPermission = GetRequiredPermissionForMenuChoice(runningUtility);
+            if (VerifyPermission(runningUser.permissions, requiredPermission))
+                PerformMainMenuOption(runningUtility);
+            else
+                HandleUnauthorizedAccess();
+        }
 
-    } while (RunningUtility != enMenuChoice::Exit);
+    } while (runningUtility != enMenuChoice::Logout);
 
     state = enRunningState::LoginScreen;
-
 }
 
 void StartBankSystem()
 {
     //Default Start
     enRunningState RunningState = enRunningState::LoginScreen;
-
+    stUserData RunningUser;
     do
     {
         if (RunningState == enRunningState::LoginScreen)
-            LoginScreen(USERS_FILE_NAME, RunningState);
+            LoginScreen(USERS_FILE_NAME, RunningState, RunningUser);
 
         if(RunningState== enRunningState::InsideBankSystem)
-            RunBankServices(RunningState);
+            RunBankServices(RunningState, RunningUser);
 
     } while (true);
 }
@@ -1063,5 +1137,4 @@ void StartBankSystem()
 int main()
 {
     StartBankSystem();
-
 }
