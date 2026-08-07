@@ -37,7 +37,6 @@ enum class enRunningState {
     InsideBankSystem
 };
 
-
 struct stNumericInputData
 {
     string inputMessage;
@@ -154,7 +153,7 @@ void LoadFromFile(string fileName, vector<stClientData>& clients, string delimit
     }
 }
 
-void LoadClientsFromFile(string fileName, unordered_map<string, stClientData>& clients, string delimiter = "#//#")
+void LoadFromFile(string fileName, unordered_map<string, stClientData>& clients, string delimiter = "#//#")
 {
     fstream file;
     file.open(fileName, ios::in);
@@ -173,7 +172,7 @@ void LoadClientsFromFile(string fileName, unordered_map<string, stClientData>& c
     }
 }
 
-void LoadClientsFromFile(string fileName, unordered_map<string, stUserData>& clients, string delimiter = "#//#")
+void LoadFromFile(string fileName, unordered_map<string, stUserData>& clients, string delimiter = "#//#")
 {
     fstream file;
     file.open(fileName, ios::in);
@@ -557,7 +556,7 @@ void ShowMainMenu()
     cout << right << setw(10) << "[4]" << " Update Client Info" << "\n";
     cout << right << setw(10) << "[5]" << " Find Client" << "\n";
     cout << right << setw(10) << "[6]" << " Transactions" << "\n";
-    cout << right << setw(10) << "[7]" << " Exit" << "\n";
+    cout << right << setw(10) << "[7]" << " Logout" << "\n";
 
     cout << UI_LINE_BOUNDS << "\n";
 }
@@ -781,7 +780,7 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
 void LoginScreen(string fileName, enRunningState &runningState)
 {
     unordered_map<string, stUserData> users;
-    LoadClientsFromFile(fileName, users, "#//#");
+    LoadFromFile(fileName, users, "#//#");
 
     bool isValidUsernameOrPass = true;
     stLoginCredentials loginDetails;
@@ -826,7 +825,7 @@ void DeleteClientScreen(string fileName)
     PrintScreenHeader("DELETE CLIENT");
     unordered_map<string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DeleteClientByAccountNumber(clients, fileName);
 }
 
@@ -835,7 +834,7 @@ void UpdateClientScreen(string fileName)
     PrintScreenHeader("UPDATE CLIENT INFO");
     unordered_map<string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     UpdateClientByAccountNumber(clients, fileName);
 }
 
@@ -844,7 +843,7 @@ void FindClientScreen(string fileName)
     PrintScreenHeader("FIND CLIENT");
     unordered_map<string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DetermineAccountFind(clients);
 }
 
@@ -853,7 +852,7 @@ void ShowDeleteClientScreen()
     PrintScreenHeader("DELETE CLIENT");
     std::unordered_map<std::string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DeleteClientByAccountNumber(clients, CLIENTS_FILE_NAME);
 }
 
@@ -925,7 +924,7 @@ void DepositScreen(string fileName)
     PrintScreenHeader("DEPOSIT MONEY");
     unordered_map<string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     DepositByAccNumber(clients, fileName);
 }
 
@@ -934,7 +933,7 @@ void WithdrawScreen(string fileName)
     PrintScreenHeader("WITHDRAW MONEY");
     unordered_map<string, stClientData> clients;
 
-    LoadClientsFromFile(CLIENTS_FILE_NAME, clients, "#//#");
+    LoadFromFile(CLIENTS_FILE_NAME, clients, "#//#");
     WithdrawByAccNumber(clients, fileName);
 }
 
