@@ -7,14 +7,36 @@
 #include <unordered_map>
 #include <algorithm>
 #include <regex>
+#include <cstdint>
 
 using namespace std;
-enum class enMenuChoice { ShowClients = 1, AddClient = 2, DeleteClient = 3, UpdateClient = 4, FindClient = 5, Transactions = 6, Exit = 7 };
-enum class enTransactionsMenuChoice { Deposit = 1, Withdraw = 2, TotalBalances = 3, MainMenu = 4 };
-
 const string CLIENTS_FILE_NAME = "clients.txt";
+const string USERS_FILE_NAME = "users.txt";
 const string UI_LINE_BOUNDS(44, '=');
 const int SCREEN_WIDTH = 125;
+
+enum class enMenuChoice{
+    ShowClients = 1,
+    AddClient = 2,
+    DeleteClient = 3,
+    UpdateClient = 4,
+    FindClient = 5,
+    Transactions = 6,
+    Exit = 7
+};
+
+enum class enTransactionsMenuChoice {
+    Deposit = 1,
+    Withdraw = 2,
+    TotalBalances = 3,
+    MainMenu = 4
+};
+
+enum class enRunningState {
+    LoginScreen,
+    InsideBankSystem
+};
+
 
 struct stNumericInputData
 {
@@ -33,6 +55,19 @@ struct stClientData
 
     long long balanceUSD = 0;
     bool MarkForDelete = false;
+};
+
+struct stUserData 
+{
+    string user_name = "";
+    string user_password = "";
+    uint16_t permissions = 0;
+};
+
+struct stLoginCredentials
+{
+    string inputUsername;
+    string inputPassword;
 };
 
 void PromptUserToGetMenu()
@@ -65,7 +100,7 @@ vector<string> SplitString(string& S1, string delimiter = "#//#")
     return Words;
 }
 
-stClientData ConvertLineToRecord(string Line, string delimiter = "#//#")
+stClientData ConvertClientLineToRecord(string Line, string delimiter = "#//#")
 {
     stClientData client;
     vector<string> vClientData = SplitString(Line, delimiter);
@@ -85,7 +120,22 @@ stClientData ConvertLineToRecord(string Line, string delimiter = "#//#")
     return client;
 }
 
-void LoadClientsFromFile(string fileName, vector<stClientData>& clients, string delimiter = "#//#")
+stUserData ConvertUserLineToRecord(string line, string delimiter = "#//#")
+{
+    stUserData user;
+    vector<string> userDataElements = SplitString(line, delimiter);
+
+    if(userDataElements.size()>=3)
+    {
+        user.user_name = userDataElements[0];
+        user.user_password = userDataElements[1];
+        user.permissions = static_cast<uint16_t>(stoi(userDataElements[2]));
+    }
+
+    return user;
+}
+
+void LoadFromFile(string fileName, vector<stClientData>& clients, string delimiter = "#//#")
 {
     fstream file;
     file.open(fileName, ios::in);
@@ -97,7 +147,7 @@ void LoadClientsFromFile(string fileName, vector<stClientData>& clients, string 
 
         while (getline(file, line))
         {
-            client = ConvertLineToRecord(line, delimiter);
+            client = ConvertClientLineToRecord(line, delimiter);
             clients.push_back(client);
         }
         file.close();
@@ -116,12 +166,32 @@ void LoadClientsFromFile(string fileName, unordered_map<string, stClientData>& c
 
         while (getline(file, line))
         {
-            client = ConvertLineToRecord(line, delimiter);
+            client = ConvertClientLineToRecord(line, delimiter);
             clients.insert({ client.accountNumber, client });
         }
         file.close();
     }
 }
+
+void LoadClientsFromFile(string fileName, unordered_map<string, stUserData>& clients, string delimiter = "#//#")
+{
+    fstream file;
+    file.open(fileName, ios::in);
+
+    if (file.is_open())
+    {
+        string line = "";
+        stUserData user;
+
+        while (getline(file, line))
+        {
+            user = ConvertUserLineToRecord(line, delimiter);
+            clients.insert({ user.user_name, user });
+        }
+        file.close();
+    }
+}
+
 
 int ReadNumber(const stNumericInputData& input)
 {
@@ -148,6 +218,32 @@ string readAccountNumber()
     cin >> userInput;
 
     return userInput;
+}
+
+stLoginCredentials ReadLoginCredentials()
+{
+    stLoginCredentials loginData;
+
+    cout << "Username: ";
+    cin >> loginData.inputUsername;
+
+    cout << "\nPassword: ";
+    cin >> loginData.inputPassword;
+
+    return loginData;
+}
+
+// Instead of using a bool, why not introduce an Enum and a handful of checks inside this function for more state management over
+// what has been attempted to take different actions depending on the state?
+bool VerifyLogin(const stLoginCredentials &loginData, const unordered_map<string, stUserData> &users)
+{
+    if (users.find(loginData.inputUsername) == users.end())
+        return false;
+    else
+    {
+        auto fetchedPassword = users.find(loginData.inputUsername);
+        return loginData.inputPassword == fetchedPassword->second.user_password;
+    }
 }
 
 void PrintScreenHeader(string ScreenTitle)
@@ -567,7 +663,7 @@ void SaveToFile(string fileName, unordered_map<string, stClientData>& clients)
 void ShowClientListScreen(string fileName)
 {
     vector<stClientData> clients;
-    LoadClientsFromFile(fileName, clients);
+    LoadFromFile(fileName, clients);
 
     vector<stClientData> visibleClients = GetVisibleClients(clients);
 
@@ -586,7 +682,7 @@ void ShowClientListScreen(string fileName)
 void ShowClientsBalances(string fileName)
 {
     vector<stClientData> clients;
-    LoadClientsFromFile(fileName, clients);
+    LoadFromFile(fileName, clients);
 
     vector<stClientData> visibleClients = GetVisibleClients(clients);
 
@@ -629,8 +725,6 @@ void VerifyDeposit(unordered_map<string, stClientData>::iterator& clientIt, int 
 
 void UpdateClientData(unordered_map<string, stClientData>::iterator clientIt)
 {
-    // The optionality of updating individual fields in the client info should be added instead of
-    // prompting the user to type each field again. This would require him to retype data it doesn't want to update
     readClientDataUpdates(clientIt->second);
 }
 
@@ -682,12 +776,42 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
 
+
+
+void LoginScreen(string fileName, enRunningState &runningState)
+{
+    unordered_map<string, stUserData> users;
+    LoadClientsFromFile(fileName, users, "#//#");
+
+    bool isValidUsernameOrPass = true;
+    stLoginCredentials loginDetails;
+
+    do
+    {
+        ResetScreen();
+        if (!isValidUsernameOrPass)
+        {
+            PrintScreenHeader("LOGIN SCREEN");
+            cout << "Invalid Username or Password!\n";
+            loginDetails = ReadLoginCredentials();
+        }
+        else
+        {
+            PrintScreenHeader("LOGIN SCREEN");
+            loginDetails = ReadLoginCredentials();
+        }
+
+    } while (!(isValidUsernameOrPass = VerifyLogin(loginDetails, users)));
+
+    runningState = enRunningState::InsideBankSystem;
+}
+
 void AddClientsScreen(string fileName)
 {
     PrintScreenHeader("ADD NEW CLIENT");
 
     vector<stClientData> clients;
-    LoadClientsFromFile(fileName, clients);
+    LoadFromFile(fileName, clients);
 
     do
     {
@@ -902,23 +1026,43 @@ void PerformMainMenuOption(const enMenuChoice choice)
     }
 }
 
-void StartBankSystem()
+void RunBankServices(enRunningState &state)
 {
-    enMenuChoice RunningState = enMenuChoice::Exit;
+    enMenuChoice RunningUtility = enMenuChoice::Exit;
     do
     {
         ResetScreen();
         ShowMainMenu();
 
-        EvaluateMenuChoice(RunningState);
+        EvaluateMenuChoice(RunningUtility);
 
-        if (RunningState != enMenuChoice::Exit)
-            PerformMainMenuOption(RunningState);
+        if (RunningUtility != enMenuChoice::Exit)
+            PerformMainMenuOption(RunningUtility);
 
-    } while (RunningState != enMenuChoice::Exit);
+    } while (RunningUtility != enMenuChoice::Exit);
+
+    state = enRunningState::LoginScreen;
+
+}
+
+void StartBankSystem()
+{
+    //Default Start
+    enRunningState RunningState = enRunningState::LoginScreen;
+
+    do
+    {
+        if (RunningState == enRunningState::LoginScreen)
+            LoginScreen(USERS_FILE_NAME, RunningState);
+
+        if(RunningState== enRunningState::InsideBankSystem)
+            RunBankServices(RunningState);
+
+    } while (true);
 }
 
 int main()
 {
     StartBankSystem();
+
 }
