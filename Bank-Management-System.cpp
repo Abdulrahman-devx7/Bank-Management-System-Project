@@ -215,6 +215,25 @@ void LoadFromFile(string fileName, unordered_map<string, stUserData>& clients, s
     }
 }
 
+void LoadFromFile(string fileName, vector<stUserData>& users, string delimiter = "#//#")
+{
+    fstream file;
+    file.open(fileName, ios::in);
+
+    if (file.is_open())
+    {
+        string line = "";
+        stUserData user;
+
+        while (getline(file, line))
+        {
+            user = ConvertUserLineToRecord(line, delimiter);
+            users.push_back(user);
+        }
+        file.close();
+    }
+}
+
 
 int ReadNumber(const stNumericInputData& input)
 {
@@ -670,6 +689,16 @@ void PrintFileInfoHeader(const vector<stClientData>& clients)
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
 
+void PrintFileInfoHeader(const vector<stUserData>& users)
+{
+    cout << right << setw(50) << "User list: (" << users.size() << ") user(s)" << "\n";
+    cout << string(77, '-') << "\n";
+    cout << left << "| " << setw(20) << " User Name " << "| ";
+    cout << setw(30) << " Password " << "| ";
+    cout << setw(20) << " Permissions " << "|" << "\n";
+    cout << string(77, '-') << "\n";
+}
+
 void PrintClientBalancesHeader(const vector<stClientData>& clients)
 {
     cout << right << setw(42) << "Balances List for (" << clients.size() << ") client(s)" << "\n";
@@ -682,7 +711,7 @@ void PrintClientBalancesHeader(const vector<stClientData>& clients)
     cout << string(SCREEN_WIDTH - 34, '-') << "\n";
 }
 
-
+//POTENTIAL DRY VIOLATION?
 void EvaluateMenuChoice(enMenuChoice& menuChoice)
 {
     stNumericInputData inputData;
@@ -716,13 +745,20 @@ void EvaluateMenuChoice(enManageUsersMenuChoice& menuChoice)
     menuChoice = enManageUsersMenuChoice(ReadNumber(inputData));
 }
 
-void PrintIndividualUserInfo(const stClientData& client)
+void PrintIndividualTableInfo(const stClientData& client)
 {
     cout << "| " << setw(20) << left << client.accountNumber << "| ";
     cout << setw(15) << left << client.PIN_Number << "| ";
     cout << setw(50) << left << client.user_name << "| ";
     cout << setw(15) << left << client.phoneNumber << "| ";
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
+}
+
+void PrintIndividualTableInfo(const stUserData& user)
+{
+    cout << "| " << setw(20) << left << user.user_name << "| ";
+    cout << setw(30) << left << user.user_password << "| ";
+    cout << setw(20) << left << user.permissions << "|" << "\n";
 }
 
 void PrintUserInfoInBalancesTable(const stClientData& client)
@@ -781,10 +817,28 @@ void ShowClientListScreen(string fileName)
 
     for (const stClientData& client : visibleClients)
     {
-        PrintIndividualUserInfo(client);
+        PrintIndividualTableInfo(client);
     }
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
+
+void ListUsersScreen(string fileName)
+{
+    vector<stUserData> users;
+    LoadFromFile(fileName, users);
+
+    PrintFileInfoHeader(users);
+
+    if (users.size() == 0)
+        cout << right << setw(50) << "NO USERS ARE AVAILABLE IN THE SYSTEM!";
+
+    for (const stUserData& user : users)
+    {
+        PrintIndividualTableInfo(user);
+    }
+    cout << string(77, '-') << "\n";
+}
+
 
 void ShowClientsBalances(string fileName)
 {
@@ -882,8 +936,6 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
     else
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
-
-
 
 void LoginScreen(string fileName, enRunningState &runningState, stUserData &runningUser)
 {
@@ -1073,6 +1125,45 @@ void PerformTransactionsMenuOption(const enTransactionsMenuChoice choice)
     }
 }
 
+void PerformManageUsersMenuOption(const enManageUsersMenuChoice choice)
+{
+    switch (choice)
+    {
+    case enManageUsersMenuChoice::ListUsers:
+        ResetScreen();
+        ListUsersScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::AddUser:
+        ResetScreen();
+        // AddUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::DeleteUser:
+        ResetScreen();
+        // DeleteUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::UpdateUser:
+        ResetScreen();
+        // UpdateUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::FindUser:
+        ResetScreen();
+        // FindUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::MainMenu:
+        break;
+    }
+}
+
 void StartTransactionsMenu()
 {
     enTransactionsMenuChoice RunningState = enTransactionsMenuChoice::MainMenu;
@@ -1099,6 +1190,9 @@ void StartManageUsers()
         ShowManageUsersMenu();
 
         EvaluateMenuChoice(RunningState);
+
+        if (RunningState != enManageUsersMenuChoice::MainMenu)
+            PerformManageUsersMenuOption(RunningState);
 
     } while (RunningState != enManageUsersMenuChoice::MainMenu);
 
