@@ -197,6 +197,8 @@ void LoadFromFile(string fileName, vector<stClientData>& clients, string delimit
         }
         file.close();
     }
+    else return;
+
 }
 
 void LoadFromFile(string fileName, unordered_map<string, stClientData>& clients, string delimiter = "#//#")
@@ -216,6 +218,8 @@ void LoadFromFile(string fileName, unordered_map<string, stClientData>& clients,
         }
         file.close();
     }
+    else return;
+
 }
 
 void LoadFromFile(string fileName, unordered_map<string, stUserData>& clients, string delimiter = "#//#")
@@ -235,6 +239,8 @@ void LoadFromFile(string fileName, unordered_map<string, stUserData>& clients, s
         }
         file.close();
     }
+    else return;
+
 }
 
 void LoadFromFile(string fileName, vector<stUserData>& users, string delimiter = "#//#")
@@ -254,6 +260,7 @@ void LoadFromFile(string fileName, vector<stUserData>& users, string delimiter =
         }
         file.close();
     }
+    else return;
 }
 
 
