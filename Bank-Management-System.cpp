@@ -290,18 +290,31 @@ string readAccountNumber()
     return userInput;
 }
 
+string ReadUserName()
+{
+    string username = "";
+    cout << "\nEnter the username: ";
+    cin >> username;
+
+    return username;
+}
+
+string ReadPassword()
+{
+    string password = "";
+    cout << "\nEnter the password: ";
+    cin >> password;
+
+    return password;
+}
+
 stLoginCredentials ReadLoginCredentials()
 {
     stLoginCredentials loginData;
 
-    cout << "Username: ";
-    cin >> loginData.inputUsername;
-
-    //Normalize letter cases in user name
+    loginData.inputUsername = ReadUserName();
     ConvertToLowerCase(loginData.inputUsername);
-
-    cout << "\nPassword: ";
-    cin >> loginData.inputPassword;
+    loginData.inputPassword = ReadPassword();
 
     return loginData;
 }
@@ -423,6 +436,7 @@ auto FindClientByAccountNumber(const string& userInputAccNumber, unordered_map<s
 
 void PrintInfoCard(const stClientData& data)
 {
+    //cout << "The following are the client's details\n";
     cout << UI_LINE_BOUNDS;
 
     cout << "\n" << left << setw(20) << "Account Number: " << data.accountNumber << "\n";
@@ -436,6 +450,7 @@ void PrintInfoCard(const stClientData& data)
 
 void PrintInfoCard(const stUserData& data)
 {
+    //cout << "The following are the user's details\n";
     cout << UI_LINE_BOUNDS;
 
     cout << "\n" << left << setw(20) << "User Name: " << data.user_name << "\n";
@@ -473,90 +488,6 @@ bool CheckExistence(string accountNumber, unordered_map<string, stClientData>& c
 bool CheckExistence(string username, unordered_map<string, stUserData>& clients)
 {
     return clients.contains(username);
-}
-
-void readClientDataUpdates(stClientData& data)
-{
-    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter PIN code: ";
-        getline(cin, data.PIN_Number);
-    }
-
-    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter name: ";
-        getline(cin, data.user_name);
-    }
-
-    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter phone number: ";
-        getline(cin, data.phoneNumber);
-    }
-
-    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter account balance: ";
-        cin >> data.balanceUSD;
-    }
-}
-
-string ReadUserName()
-{
-    string username = "";
-    cout << "Enter the username: ";
-    cin >> username;
-
-    return username;
-}
-
-bool IsValidPIN(const string& PIN)
-{
-    return PIN.length() == 6 &&
-        all_of(PIN.begin(), PIN.end(), ::isdigit);
-}
-
-bool isValidPhoneNumber(const string &phoneNumber)
-{
-    static const regex pattern("(010|011|012|015)[0-9]{8}");
-    return regex_match(phoneNumber, pattern);
-}
-
-bool isValidAccountNumber(const string &accountNumber)
-{
-    static const regex pattern("[A-Z]{3}[0-9]{4}");
-    return regex_match(accountNumber, pattern);
-}
-
-bool AreNamesOnlyLetters(const vector<string> &names)
-{
-    for (const string& name : names)
-    {
-        if (!all_of(name.begin(), name.end(), ::isalpha))
-            return false;
-    }
-    return true;
-}
-
-void isValidFullName(stClientData& client)
-{
-    bool is4Names = true;
-    bool isAllLetters = true;
-
-    do
-    {
-        getline(cin, client.user_name);
-
-        vector<string> Words = SplitString(client.user_name, " ");
-
-        is4Names = (Words.size() == 4);
-        isAllLetters = AreNamesOnlyLetters(Words);
-
-        if (!is4Names || !isAllLetters)
-            cout << "\nPlease, enter a valid full name form consisting of 4 names without any number or special characters!\n\n";
-
-    } while (!isAllLetters || !is4Names);
 }
 
 void AssignPermissionsToUser(stUserData &userData)
@@ -607,6 +538,116 @@ void AssignPermissionsToUser(stUserData &userData)
     cout << "\n";
 
 }
+
+void ReadClientDataUpdates(stClientData& data)
+{
+    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter PIN code: ";
+        getline(cin, data.PIN_Number);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter name: ";
+        getline(cin, data.user_name);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter phone number: ";
+        getline(cin, data.phoneNumber);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter account balance: ";
+        cin >> data.balanceUSD;
+    }
+}
+
+void ReadUserUpdates(stUserData &user)
+{
+    user.user_password = ReadPassword();
+    AssignPermissionsToUser(user);
+}
+
+void readClientDataUpdates(stClientData& data)
+{
+    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter PIN code: ";
+        getline(cin, data.PIN_Number);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter name: ";
+        getline(cin, data.user_name);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter phone number: ";
+        getline(cin, data.phoneNumber);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter account balance: ";
+        cin >> data.balanceUSD;
+    }
+}
+
+
+bool IsValidPIN(const string& PIN)
+{
+    return PIN.length() == 6 &&
+        all_of(PIN.begin(), PIN.end(), ::isdigit);
+}
+
+bool isValidPhoneNumber(const string &phoneNumber)
+{
+    static const regex pattern("(010|011|012|015)[0-9]{8}");
+    return regex_match(phoneNumber, pattern);
+}
+
+bool isValidAccountNumber(const string &accountNumber)
+{
+    static const regex pattern("[A-Z]{3}[0-9]{4}");
+    return regex_match(accountNumber, pattern);
+}
+
+bool AreNamesOnlyLetters(const vector<string> &names)
+{
+    for (const string& name : names)
+    {
+        if (!all_of(name.begin(), name.end(), ::isalpha))
+            return false;
+    }
+    return true;
+}
+
+void isValidFullName(stClientData& client)
+{
+    bool is4Names = true;
+    bool isAllLetters = true;
+
+    do
+    {
+        getline(cin, client.user_name);
+
+        vector<string> Words = SplitString(client.user_name, " ");
+
+        is4Names = (Words.size() == 4);
+        isAllLetters = AreNamesOnlyLetters(Words);
+
+        if (!is4Names || !isAllLetters)
+            cout << "\nPlease, enter a valid full name form consisting of 4 names without any number or special characters!\n\n";
+
+    } while (!isAllLetters || !is4Names);
+}
+
 
 //A lot of SRP and DRY needs to be discussed to remove redundancies here
 void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
@@ -1005,7 +1046,7 @@ void AddUserScreen(string fileName)
     } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n")=='Y'));
 }
 
-void DeleteUser(unordered_map<string, stUserData> &users, const string &filename)
+void DeleteUser(unordered_map<string, stUserData> &users, const string &fileName)
 {
     stUserData userData;
     string username = ReadUserName();
@@ -1021,7 +1062,7 @@ void DeleteUser(unordered_map<string, stUserData> &users, const string &filename
 
         if (foundUserName == "admin1")
         {
-            cout << "You cannot delete this user! \n\n";
+            cout << "\nYou cannot delete this user! \n\n";
             return;
         }
         else
@@ -1030,12 +1071,37 @@ void DeleteUser(unordered_map<string, stUserData> &users, const string &filename
             if (toupper(DetermineAgain("\n\nAre you sure you want to delete this user (Y/N)?\n")) == 'Y')
             {
                 users.erase(foundUserName);
-                SaveToFile(filename, users);
+                SaveToFile(fileName, users);
             }
         }
     }
     else
         cout << "The user with the username: [" << username << "\] is NOT found!\n";
+}
+
+void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName)
+{
+    stUserData userData;
+    string inputUsername = ReadUserName();
+
+    NormalizeUsername(inputUsername);
+
+    if (CheckExistence(inputUsername, users))
+    {
+        userData = users.find(inputUsername)->second;
+        PrintInfoCard(userData);
+
+        if (toupper(DetermineAgain("\n\nAre you sure you want to update this user (Y/N)?\n")) == 'Y')
+        {
+            ReadUserUpdates(userData);
+            users.insert_or_assign(inputUsername, userData);
+            SaveToFile(fileName, users);
+        }
+        else return;
+
+    }
+    else 
+        cout << "The user with the username: [" << inputUsername << "\] is NOT found!\n";
 }
 
 void DeleteUserScreen(string fileName)
@@ -1045,6 +1111,15 @@ void DeleteUserScreen(string fileName)
 
     LoadFromFile(fileName, users);
     DeleteUser(users, fileName);
+}
+
+void UpdateUserScreen(string fileName)
+{
+    PrintScreenHeader("UPDATE USER");
+    unordered_map<string, stUserData> users;
+
+    LoadFromFile(fileName, users);
+    UpdateUser(users, fileName);
 }
 
 void ShowClientsBalances(string fileName)
@@ -1356,7 +1431,7 @@ void PerformManageUsersMenuOption(const enManageUsersMenuChoice choice)
 
     case enManageUsersMenuChoice::UpdateUser:
         ResetScreen();
-        // UpdateUserScreen(USERS_FILE_NAME);
+        UpdateUserScreen(USERS_FILE_NAME);
         PromptUserToGetMenu();
         break;
 
