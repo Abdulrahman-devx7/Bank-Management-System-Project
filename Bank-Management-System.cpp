@@ -152,10 +152,32 @@ stUserData ConvertUserLineToRecord(string line, string delimiter = "#//#")
     {
         user.user_name = userDataElements[0];
         user.user_password = userDataElements[1];
-        user.permissions = static_cast<uint16_t>(stoi(userDataElements[2]));
+        user.permissions = static_cast<short>(stoi(userDataElements[2]));
     }
 
     return user;
+}
+void ConvertToLowerCase(std::string &text)
+{
+    for (char& c : text) {
+        c = tolower(static_cast<unsigned char>(c));
+    }
+}
+
+void Trim(std::string& text, const string &toTrim = " \t\n\r")
+{
+    size_t start = text.find_first_not_of(toTrim);
+
+    if (start == std::string::npos) {
+        text.clear();
+        return;
+    }
+
+    text.erase(0, start);
+
+    size_t end = text.find_last_not_of(toTrim);
+
+    text.erase(end + 1);
 }
 
 void LoadFromFile(string fileName, vector<stClientData>& clients, string delimiter = "#//#")
@@ -275,6 +297,9 @@ stLoginCredentials ReadLoginCredentials()
     cout << "Username: ";
     cin >> loginData.inputUsername;
 
+    //Normalize letter cases in user name
+    ConvertToLowerCase(loginData.inputUsername);
+
     cout << "\nPassword: ";
     cin >> loginData.inputPassword;
 
@@ -347,7 +372,13 @@ void HandleUnauthorizedAccess()
 bool VerifyPermission(const short userPermissions, enUserPermissions permissionToVerify)
 {
     short permVal = static_cast<short>(permissionToVerify);
-    return (userPermissions & permVal) == permVal;
+    return (userPermissions & permVal);
+}
+
+void NormalizeUsername(string& text)
+{
+    Trim(text);
+    ConvertToLowerCase(text);
 }
 
 void PrintScreenHeader(string ScreenTitle)
@@ -420,14 +451,14 @@ void MarkClientForDeleteByAccountNumber(unordered_map<string, stClientData>& cli
     clients[accountNumber].MarkForDelete = true;
 }
 
-bool CheckClientExistByAccNumber(string accountNumber, vector <stClientData>& clients)
+bool CheckExistence(string accountNumber, unordered_map<string, stClientData>& clients)
 {
-    for (stClientData& client : clients)
-    {
-        if (client.accountNumber == accountNumber)
-            return true;
-    }
-    return false;
+    return clients.contains(accountNumber);
+}
+
+bool CheckExistence(string username, unordered_map<string, stUserData>& clients)
+{
+    return clients.contains(username);
 }
 
 void readClientDataUpdates(stClientData& data)
@@ -505,7 +536,57 @@ void isValidFullName(stClientData& client)
     } while (!isAllLetters || !is4Names);
 }
 
-void readClientData(stClientData& client, vector <stClientData>& clients)
+void AssignPermissionsToUser(stUserData &userData)
+{
+    if (toupper(DetermineAgain("Do you want to give this user full access? y/n? ")) == 'Y')
+    {
+        userData.permissions = -1;
+        return;
+    }
+
+    cout << "\n";
+    cout << "Do you want to give access to :\n";
+    cout << "\n";
+
+    if (toupper(DetermineAgain("Do you want to give this user access to showing client list? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::ListClients);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to adding new clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::AddClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to deleting clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::DeleteClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to updating clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::UpdateClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to finding clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::FindClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to transactions? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::Transactions);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to managing users? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::ManageUsers);
+
+    cout << "\n";
+
+}
+
+//A lot of SRP and DRY needs to be discussed to remove redundancies here
+void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
 {
     cout << "Enter account number: ";
 
@@ -514,7 +595,7 @@ void readClientData(stClientData& client, vector <stClientData>& clients)
     do
     {
         getline(cin >> ws, client.accountNumber);
-        isExistent = CheckClientExistByAccNumber(client.accountNumber, clients);
+        isExistent = CheckExistence(client.accountNumber, clients);
         isAccNumberValid = isValidAccountNumber(client.accountNumber);
 
         if (isAccNumberValid)
@@ -612,6 +693,17 @@ string ConvertRecordToLine(const stClientData& data, string delimiter = "#//#")
     return recordLine;
 }
 
+string ConvertRecordToLine(const stUserData& userData, string delimiter = "#//#")
+{
+    string recordLine = "";
+
+    recordLine += userData.user_name + delimiter;
+    recordLine += userData.user_password + delimiter;
+    recordLine += to_string(userData.permissions);
+
+    return recordLine;
+}
+
 void AddDataLineToFile(string fileName, string dataLine)
 {
     fstream file;
@@ -624,12 +716,49 @@ void AddDataLineToFile(string fileName, string dataLine)
     }
 }
 
-void AddNewClient(string fileName, vector<stClientData>& clients)
+void AddNewClient(string fileName, unordered_map<string, stClientData>& clients)
 {
-    stClientData userData;
-    readClientData(userData, clients);
+    stClientData clientData;
+    readClientData(clientData, clients);
 
-    clients.push_back(userData);
+    clients.insert({ clientData.accountNumber, clientData });
+    AddDataLineToFile(fileName, ConvertRecordToLine(clientData));
+}
+
+// We should probably add a type of username validation that checks if the username doesn't contain special characters
+// So only characters, numbers, hyphens, and underscores.
+void readUserData(stUserData &userData, unordered_map<string, stUserData>& users)
+{
+    string inputUsername = "";
+
+    bool isExistent = false;
+    cout << "\nUsername: ";
+
+    do
+    {
+        getline(cin >> ws, inputUsername);
+        NormalizeUsername(inputUsername);
+
+        if ((isExistent = CheckExistence(inputUsername, users)))
+            cout << "\n The user with the username [" << inputUsername << "] already exists\n\n Enter a different username: ";
+
+    } while (isExistent);
+    userData.user_name = inputUsername;
+
+    //Totally fragile for sure. It needs regex to make an obligatory standard form
+    cout << "\nPassword: ";
+    cin >> userData.user_password;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    AssignPermissionsToUser(userData);
+}
+
+void AddNewUser(string fileName, unordered_map<string, stUserData>& users)
+{
+    stUserData userData;
+    readUserData(userData, users);
+
+    users.insert({ userData.user_name, userData });
     AddDataLineToFile(fileName, ConvertRecordToLine(userData));
 }
 
@@ -833,12 +962,26 @@ void ListUsersScreen(string fileName)
         cout << right << setw(50) << "NO USERS ARE AVAILABLE IN THE SYSTEM!";
 
     for (const stUserData& user : users)
-    {
         PrintIndividualTableInfo(user);
-    }
+
     cout << string(77, '-') << "\n";
 }
 
+void AddUserScreen(string fileName)
+{
+    PrintScreenHeader("ADD NEW USER");
+    unordered_map<string, stUserData> users;
+    LoadFromFile(fileName, users);
+
+    do
+    {
+        AddNewUser(fileName, users);
+        
+        //You and I know that this is static and isn't linked into a succeed or fail :D I'll try to get into this if needed
+        cout << "\nClient added successfully, ";
+
+    } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n")=='Y'));
+}
 
 void ShowClientsBalances(string fileName)
 {
@@ -970,7 +1113,7 @@ void AddClientsScreen(string fileName)
 {
     PrintScreenHeader("ADD NEW CLIENT");
 
-    vector<stClientData> clients;
+    unordered_map<string, stClientData> clients;
     LoadFromFile(fileName, clients);
 
     do
@@ -1137,7 +1280,7 @@ void PerformManageUsersMenuOption(const enManageUsersMenuChoice choice)
 
     case enManageUsersMenuChoice::AddUser:
         ResetScreen();
-        // AddUserScreen(USERS_FILE_NAME);
+        AddUserScreen(USERS_FILE_NAME);
         PromptUserToGetMenu();
         break;
 
