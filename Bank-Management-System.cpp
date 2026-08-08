@@ -342,6 +342,9 @@ enUserPermissions GetRequiredPermissionForMenuChoice(const enMenuChoice menuChoi
     case enMenuChoice::Transactions:
         return enUserPermissions::Transactions;
 
+    case enMenuChoice::ManagerUsers:
+        return enUserPermissions::ManageUsers;
+
     case enMenuChoice::Logout:
         return enUserPermissions::None;
 
@@ -418,7 +421,7 @@ auto FindClientByAccountNumber(const string& userInputAccNumber, unordered_map<s
     return clientIt;
 }
 
-void PrintClientRecord(const stClientData& data)
+void PrintInfoCard(const stClientData& data)
 {
     cout << UI_LINE_BOUNDS;
 
@@ -427,6 +430,17 @@ void PrintClientRecord(const stClientData& data)
     cout << left << setw(20) << "Name: " << data.user_name << "\n";
     cout << left << setw(20) << "Phone Number: " << data.phoneNumber << "\n";
     cout << left << setw(20) << "Account Balance: " << data.balanceUSD << "\n";
+
+    cout << UI_LINE_BOUNDS;
+}
+
+void PrintInfoCard(const stUserData& data)
+{
+    cout << UI_LINE_BOUNDS;
+
+    cout << "\n" << left << setw(20) << "User Name: " << data.user_name << "\n";
+    cout << left << setw(20) << "Password: " << data.user_password << "\n";
+    cout << left << setw(20) << "Permissions: " << data.permissions << "\n";
 
     cout << UI_LINE_BOUNDS;
 }
@@ -440,7 +454,7 @@ void DetermineAccountFind(unordered_map<string, stClientData>& clients)
     if (clientIt != clients.end())
     {
         cout << "\n";
-        PrintClientRecord(clientIt->second);
+        PrintInfoCard(clientIt->second);
     }
     else
         cout << "\nClient with the account number: " << accountNumber << " is not found!";
@@ -486,6 +500,15 @@ void readClientDataUpdates(stClientData& data)
         cout << "Enter account balance: ";
         cin >> data.balanceUSD;
     }
+}
+
+string ReadUserName()
+{
+    string username = "";
+    cout << "Enter the username: ";
+    cin >> username;
+
+    return username;
 }
 
 bool IsValidPIN(const string& PIN)
@@ -897,24 +920,6 @@ void PrintUserInfoInBalancesTable(const stClientData& client)
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
 }
 
-//WE MIGHT NOT NEED THIS LATER ON 
-void SaveToFile(string fileName, const vector<stClientData>& clients)
-{
-    fstream file;
-    file.open(fileName, ios::out);
-
-    if (file.is_open())
-    {
-        for (const stClientData& client : clients)
-        {
-            string line = ConvertRecordToLine(client);
-
-            file << line << "\n";
-        }
-        file.close();
-    }
-}
-
 void SaveToFile(string fileName, unordered_map<string, stClientData>& clients)
 {
     fstream file;
@@ -925,6 +930,23 @@ void SaveToFile(string fileName, unordered_map<string, stClientData>& clients)
         for (auto& [accountNumber, client] : clients)
         {
             string line = ConvertRecordToLine(client);
+
+            file << line << "\n";
+        }
+        file.close();
+    }
+}
+
+void SaveToFile(string fileName, unordered_map<string, stUserData>& users)
+{
+    fstream file;
+    file.open(fileName, ios::out);
+
+    if (file.is_open())
+    {
+        for (auto& [username, user] : users)
+        {
+            string line = ConvertRecordToLine(user);
 
             file << line << "\n";
         }
@@ -981,6 +1003,48 @@ void AddUserScreen(string fileName)
         cout << "\nClient added successfully, ";
 
     } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n")=='Y'));
+}
+
+void DeleteUser(unordered_map<string, stUserData> &users, const string &filename)
+{
+    stUserData userData;
+    string username = ReadUserName();
+
+    NormalizeUsername(username);
+
+    if (CheckExistence(username, users))
+    {
+        userData = users.find(username)->second; 
+
+        string foundUserName = users.find(username)->second.user_name;
+        NormalizeUsername(foundUserName);
+
+        if (foundUserName == "admin1")
+        {
+            cout << "You cannot delete this user! \n\n";
+            return;
+        }
+        else
+        {
+            PrintInfoCard(userData);
+            if (toupper(DetermineAgain("\n\nAre you sure you want to delete this user (Y/N)?\n")) == 'Y')
+            {
+                users.erase(foundUserName);
+                SaveToFile(filename, users);
+            }
+        }
+    }
+    else
+        cout << "The user with the username: [" << username << "\] is NOT found!\n";
+}
+
+void DeleteUserScreen(string fileName)
+{
+    PrintScreenHeader("DELETE USER");
+    unordered_map<string, stUserData> users;
+
+    LoadFromFile(fileName, users);
+    DeleteUser(users, fileName);
 }
 
 void ShowClientsBalances(string fileName)
@@ -1044,7 +1108,7 @@ void UpdateClientByAccountNumber(unordered_map<string, stClientData>& clients, s
         auto ClientIt = FindClientByAccountNumber(accountNumber, clients);
         Client = ClientIt->second;
 
-        PrintClientRecord(Client);
+        PrintInfoCard(Client);
         if (toupper(DetermineAgain("\n\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
         {
             UpdateClientData(clientIt);
@@ -1067,7 +1131,7 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
         auto ClientIt = FindClientByAccountNumber(accountNumber, clients);
         Client = ClientIt->second;
 
-        PrintClientRecord(Client);
+        PrintInfoCard(Client);
         if (toupper(DetermineAgain("\n\nAre you sure you want to delete this client (Y/N)?\n")) == 'Y')
         {
             MarkClientForDeleteByAccountNumber(clients, accountNumber);
@@ -1190,7 +1254,7 @@ void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fil
     } while (clientIt == clients.end());
 
     cout << "\nThe following are the client data: \n\n";
-    PrintClientRecord(clientIt->second);
+    PrintInfoCard(clientIt->second);
 
     int depositAmount = ReadDepositNumber();
 
@@ -1215,7 +1279,7 @@ void WithdrawByAccNumber(unordered_map<string, stClientData>& clients, string fi
     } while (clientIt == clients.end());
 
     cout << "\nThe following are the client data: \n\n";
-    PrintClientRecord(clientIt->second);
+    PrintInfoCard(clientIt->second);
 
     int withdrawAmount = ReadWithdrawNumber();
 
@@ -1286,7 +1350,7 @@ void PerformManageUsersMenuOption(const enManageUsersMenuChoice choice)
 
     case enManageUsersMenuChoice::DeleteUser:
         ResetScreen();
-        // DeleteUserScreen(USERS_FILE_NAME);
+        DeleteUserScreen(USERS_FILE_NAME);
         PromptUserToGetMenu();
         break;
 
