@@ -281,6 +281,7 @@ void ResetScreen()
     system("color 0f");
 }
 
+//MORE MODULAR DESIGN FOR READING USERNAME & PASSWORD
 string readAccountNumber()
 {
     cout << "Please enter the account number: ";
@@ -485,6 +486,9 @@ bool CheckExistence(string accountNumber, unordered_map<string, stClientData>& c
     return clients.contains(accountNumber);
 }
 
+// Can we make this probably more usable or similar to DetermineAccountFind, which return a straight iterator to 
+// user's location, which can be then stored in a variable to manipulate directly without needing to 
+// search again to get a pointer
 bool CheckExistence(string username, unordered_map<string, stUserData>& clients)
 {
     return clients.contains(username);
@@ -568,7 +572,12 @@ void ReadClientDataUpdates(stClientData& data)
 
 void ReadUserUpdates(stUserData &user)
 {
-    user.user_password = ReadPassword();
+    if (toupper(DetermineAgain("\n\nDo you want to update the username (Y/N)?\n")) == 'Y')
+        user.user_name = ReadUserName();
+
+    if (toupper(DetermineAgain("\n\nDo you want to update the password (Y/N)?\n")) == 'Y')
+        user.user_password = ReadPassword();
+
     AssignPermissionsToUser(user);
 }
 
@@ -1104,6 +1113,16 @@ void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName
         cout << "The user with the username: [" << inputUsername << "\] is NOT found!\n";
 }
 
+void FindUser(unordered_map<string, stUserData>& users)
+{
+    string inputUsername = ReadUserName();
+
+    if (CheckExistence(inputUsername, users))
+        PrintInfoCard(users.find(inputUsername)->second);
+    else
+        cout << "The username: [" << inputUsername << "] has not been found!\n";
+}
+
 void DeleteUserScreen(string fileName)
 {
     PrintScreenHeader("DELETE USER");
@@ -1120,6 +1139,15 @@ void UpdateUserScreen(string fileName)
 
     LoadFromFile(fileName, users);
     UpdateUser(users, fileName);
+}
+
+void FindUserScreen(string fileName)
+{
+    PrintScreenHeader("FIND USER");
+    unordered_map<string, stUserData> users;
+
+    LoadFromFile(fileName, users);
+    FindUser(users);
 }
 
 void ShowClientsBalances(string fileName)
@@ -1437,7 +1465,7 @@ void PerformManageUsersMenuOption(const enManageUsersMenuChoice choice)
 
     case enManageUsersMenuChoice::FindUser:
         ResetScreen();
-        // FindUserScreen(USERS_FILE_NAME);
+        FindUserScreen(USERS_FILE_NAME);
         PromptUserToGetMenu();
         break;
 
