@@ -1054,6 +1054,7 @@ void AddUserScreen(string fileName)
 
     do
     {
+        //Should the two lines after the PrintScreenHeader be added to the AddNewUser function?
         AddNewUser(fileName, users);
         
         //You and I know that this is static and isn't linked into a succeed or fail :D I'll try to get into this if needed
@@ -1273,7 +1274,9 @@ void LoginScreen(string fileName, enRunningState &runningState, stUserData &runn
             loginDetails = ReadLoginCredentials();
         }
         else
+        {
             loginDetails = ReadLoginCredentials();
+        }
 
     } while (!(isValidUsernameOrPass = VerifyLogin(loginDetails, users)));
 
@@ -1559,6 +1562,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
         PromptUserToGetMenu();
         break;
 
+        // Should this route the user to the login screen directly from here instead of the routing in StartBankSystem?
     case enMenuChoice::Logout:
         break;
     }
