@@ -396,7 +396,7 @@ void HandleUnauthorizedAccess()
 bool VerifyPermission(const short userPermissions, enUserPermissions permissionToVerify)
 {
     short permVal = static_cast<short>(permissionToVerify);
-    return (userPermissions & permVal);
+    return (userPermissions & permVal) == permVal;
 }
 
 void NormalizeUsername(string& text)
