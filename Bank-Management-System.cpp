@@ -1265,21 +1265,20 @@ void LoginScreen(string fileName, enRunningState &runningState, stUserData &runn
     do
     {
         ResetScreen();
+        PrintScreenHeader("LOGIN SCREEN");
+
         if (!isValidUsernameOrPass)
         {
-            PrintScreenHeader("LOGIN SCREEN");
             cout << "Invalid Username or Password!\n";
             loginDetails = ReadLoginCredentials();
         }
         else
-        {
-            PrintScreenHeader("LOGIN SCREEN");
             loginDetails = ReadLoginCredentials();
-        }
 
     } while (!(isValidUsernameOrPass = VerifyLogin(loginDetails, users)));
 
     runningUser = users.find(loginDetails.inputUsername)->second;
+
     runningState = enRunningState::InsideBankSystem;
 }
 
