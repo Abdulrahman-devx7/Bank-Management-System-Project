@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <regex>
 #include <cstdint>
+#include <climits>
+#include <limits>
 
 using namespace std;
 const string CLIENTS_FILE_NAME = "clients.txt";
@@ -22,7 +24,8 @@ enum class enMenuChoice{
     UpdateClient = 4,
     FindClient = 5,
     Transactions = 6,
-    Logout = 7
+    ManagerUsers = 7,
+    Logout = 8
 };
 
 enum class enTransactionsMenuChoice {
@@ -32,12 +35,21 @@ enum class enTransactionsMenuChoice {
     MainMenu = 4
 };
 
+enum class enManageUsersMenuChoice {
+    ListUsers = 1,
+    AddUser = 2,
+    DeleteUser = 3,
+    UpdateUser = 4,
+    FindUser = 5,
+    MainMenu = 6
+};
+
 enum class enRunningState {
     LoginScreen,
     InsideBankSystem
 };
 
-enum enUserPermissions {
+enum class enUserPermissions : short {
     None = 0,  
     ListClients = 1,  
     AddClient = 2,  
@@ -140,10 +152,32 @@ stUserData ConvertUserLineToRecord(string line, string delimiter = "#//#")
     {
         user.user_name = userDataElements[0];
         user.user_password = userDataElements[1];
-        user.permissions = static_cast<uint16_t>(stoi(userDataElements[2]));
+        user.permissions = static_cast<short>(stoi(userDataElements[2]));
     }
 
     return user;
+}
+void ConvertToLowerCase(std::string &text)
+{
+    for (char& c : text) {
+        c = tolower(static_cast<unsigned char>(c));
+    }
+}
+
+void Trim(std::string& text, const string &toTrim = " \t\n\r")
+{
+    size_t start = text.find_first_not_of(toTrim);
+
+    if (start == std::string::npos) {
+        text.clear();
+        return;
+    }
+
+    text.erase(0, start);
+
+    size_t end = text.find_last_not_of(toTrim);
+
+    text.erase(end + 1);
 }
 
 void LoadFromFile(string fileName, vector<stClientData>& clients, string delimiter = "#//#")
@@ -163,6 +197,8 @@ void LoadFromFile(string fileName, vector<stClientData>& clients, string delimit
         }
         file.close();
     }
+    else return;
+
 }
 
 void LoadFromFile(string fileName, unordered_map<string, stClientData>& clients, string delimiter = "#//#")
@@ -182,6 +218,8 @@ void LoadFromFile(string fileName, unordered_map<string, stClientData>& clients,
         }
         file.close();
     }
+    else return;
+
 }
 
 void LoadFromFile(string fileName, unordered_map<string, stUserData>& clients, string delimiter = "#//#")
@@ -201,6 +239,28 @@ void LoadFromFile(string fileName, unordered_map<string, stUserData>& clients, s
         }
         file.close();
     }
+    else return;
+
+}
+
+void LoadFromFile(string fileName, vector<stUserData>& users, string delimiter = "#//#")
+{
+    fstream file;
+    file.open(fileName, ios::in);
+
+    if (file.is_open())
+    {
+        string line = "";
+        stUserData user;
+
+        while (getline(file, line))
+        {
+            user = ConvertUserLineToRecord(line, delimiter);
+            users.push_back(user);
+        }
+        file.close();
+    }
+    else return;
 }
 
 
@@ -228,6 +288,7 @@ void ResetScreen()
     system("color 0f");
 }
 
+//MORE MODULAR DESIGN FOR READING USERNAME & PASSWORD
 string readAccountNumber()
 {
     cout << "Please enter the account number: ";
@@ -237,15 +298,31 @@ string readAccountNumber()
     return userInput;
 }
 
+string ReadUserName()
+{
+    string username = "";
+    cout << "\nEnter the username: ";
+    cin >> username;
+
+    return username;
+}
+
+string ReadPassword()
+{
+    string password = "";
+    cout << "\nEnter the password: ";
+    cin >> password;
+
+    return password;
+}
+
 stLoginCredentials ReadLoginCredentials()
 {
     stLoginCredentials loginData;
 
-    cout << "Username: ";
-    cin >> loginData.inputUsername;
-
-    cout << "\nPassword: ";
-    cin >> loginData.inputPassword;
+    loginData.inputUsername = ReadUserName();
+    ConvertToLowerCase(loginData.inputUsername);
+    loginData.inputPassword = ReadPassword();
 
     return loginData;
 }
@@ -286,6 +363,9 @@ enUserPermissions GetRequiredPermissionForMenuChoice(const enMenuChoice menuChoi
     case enMenuChoice::Transactions:
         return enUserPermissions::Transactions;
 
+    case enMenuChoice::ManagerUsers:
+        return enUserPermissions::ManageUsers;
+
     case enMenuChoice::Logout:
         return enUserPermissions::None;
 
@@ -315,7 +395,14 @@ void HandleUnauthorizedAccess()
 
 bool VerifyPermission(const short userPermissions, enUserPermissions permissionToVerify)
 {
-    return (userPermissions & permissionToVerify) == permissionToVerify;
+    short permVal = static_cast<short>(permissionToVerify);
+    return (userPermissions & permVal);
+}
+
+void NormalizeUsername(string& text)
+{
+    Trim(text);
+    ConvertToLowerCase(text);
 }
 
 void PrintScreenHeader(string ScreenTitle)
@@ -355,8 +442,9 @@ auto FindClientByAccountNumber(const string& userInputAccNumber, unordered_map<s
     return clientIt;
 }
 
-void PrintClientRecord(const stClientData& data)
+void PrintInfoCard(const stClientData& data)
 {
+    //cout << "The following are the client's details\n";
     cout << UI_LINE_BOUNDS;
 
     cout << "\n" << left << setw(20) << "Account Number: " << data.accountNumber << "\n";
@@ -364,6 +452,18 @@ void PrintClientRecord(const stClientData& data)
     cout << left << setw(20) << "Name: " << data.user_name << "\n";
     cout << left << setw(20) << "Phone Number: " << data.phoneNumber << "\n";
     cout << left << setw(20) << "Account Balance: " << data.balanceUSD << "\n";
+
+    cout << UI_LINE_BOUNDS;
+}
+
+void PrintInfoCard(const stUserData& data)
+{
+    //cout << "The following are the user's details\n";
+    cout << UI_LINE_BOUNDS;
+
+    cout << "\n" << left << setw(20) << "User Name: " << data.user_name << "\n";
+    cout << left << setw(20) << "Password: " << data.user_password << "\n";
+    cout << left << setw(20) << "Permissions: " << data.permissions << "\n";
 
     cout << UI_LINE_BOUNDS;
 }
@@ -377,7 +477,7 @@ void DetermineAccountFind(unordered_map<string, stClientData>& clients)
     if (clientIt != clients.end())
     {
         cout << "\n";
-        PrintClientRecord(clientIt->second);
+        PrintInfoCard(clientIt->second);
     }
     else
         cout << "\nClient with the account number: " << accountNumber << " is not found!";
@@ -388,14 +488,104 @@ void MarkClientForDeleteByAccountNumber(unordered_map<string, stClientData>& cli
     clients[accountNumber].MarkForDelete = true;
 }
 
-bool CheckClientExistByAccNumber(string accountNumber, vector <stClientData>& clients)
+bool CheckExistence(string accountNumber, unordered_map<string, stClientData>& clients)
 {
-    for (stClientData& client : clients)
+    return clients.contains(accountNumber);
+}
+
+// Can we make this probably more usable or similar to DetermineAccountFind, which return a straight iterator to 
+// user's location, which can be then stored in a variable to manipulate directly without needing to 
+// search again to get a pointer
+bool CheckExistence(string username, unordered_map<string, stUserData>& clients)
+{
+    return clients.contains(username);
+}
+
+void AssignPermissionsToUser(stUserData &userData)
+{
+    if (toupper(DetermineAgain("Do you want to give this user full access? y/n? ")) == 'Y')
     {
-        if (client.accountNumber == accountNumber)
-            return true;
+        userData.permissions = -1;
+        return;
     }
-    return false;
+
+    cout << "\n";
+    cout << "Do you want to give access to :\n";
+    cout << "\n";
+
+    if (toupper(DetermineAgain("Do you want to give this user access to showing client list? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::ListClients);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to adding new clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::AddClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to deleting clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::DeleteClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to updating clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::UpdateClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to finding clients? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::FindClient);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to transactions? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::Transactions);
+
+    cout << "\n";
+
+    if(toupper(DetermineAgain("Do you want to give this user access to managing users? y/n? ")) == 'Y')
+        userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::ManageUsers);
+
+    cout << "\n";
+
+}
+
+void ReadClientDataUpdates(stClientData& data)
+{
+    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter PIN code: ";
+        getline(cin, data.PIN_Number);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter name: ";
+        getline(cin, data.user_name);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter phone number: ";
+        getline(cin, data.phoneNumber);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter account balance: ";
+        cin >> data.balanceUSD;
+    }
+}
+
+void ReadUserUpdates(stUserData &user)
+{
+    if (toupper(DetermineAgain("\n\nDo you want to update the username (Y/N)?\n")) == 'Y')
+        user.user_name = ReadUserName();
+
+    if (toupper(DetermineAgain("\n\nDo you want to update the password (Y/N)?\n")) == 'Y')
+        user.user_password = ReadPassword();
+
+    AssignPermissionsToUser(user);
 }
 
 void readClientDataUpdates(stClientData& data)
@@ -424,6 +614,7 @@ void readClientDataUpdates(stClientData& data)
         cin >> data.balanceUSD;
     }
 }
+
 
 bool IsValidPIN(const string& PIN)
 {
@@ -473,7 +664,9 @@ void isValidFullName(stClientData& client)
     } while (!isAllLetters || !is4Names);
 }
 
-void readClientData(stClientData& client, vector <stClientData>& clients)
+
+//A lot of SRP and DRY needs to be discussed to remove redundancies here
+void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
 {
     cout << "Enter account number: ";
 
@@ -482,7 +675,7 @@ void readClientData(stClientData& client, vector <stClientData>& clients)
     do
     {
         getline(cin >> ws, client.accountNumber);
-        isExistent = CheckClientExistByAccNumber(client.accountNumber, clients);
+        isExistent = CheckExistence(client.accountNumber, clients);
         isAccNumberValid = isValidAccountNumber(client.accountNumber);
 
         if (isAccNumberValid)
@@ -580,6 +773,17 @@ string ConvertRecordToLine(const stClientData& data, string delimiter = "#//#")
     return recordLine;
 }
 
+string ConvertRecordToLine(const stUserData& userData, string delimiter = "#//#")
+{
+    string recordLine = "";
+
+    recordLine += userData.user_name + delimiter;
+    recordLine += userData.user_password + delimiter;
+    recordLine += to_string(userData.permissions);
+
+    return recordLine;
+}
+
 void AddDataLineToFile(string fileName, string dataLine)
 {
     fstream file;
@@ -592,12 +796,49 @@ void AddDataLineToFile(string fileName, string dataLine)
     }
 }
 
-void AddNewClient(string fileName, vector<stClientData>& clients)
+void AddNewClient(string fileName, unordered_map<string, stClientData>& clients)
 {
-    stClientData userData;
-    readClientData(userData, clients);
+    stClientData clientData;
+    readClientData(clientData, clients);
 
-    clients.push_back(userData);
+    clients.insert({ clientData.accountNumber, clientData });
+    AddDataLineToFile(fileName, ConvertRecordToLine(clientData));
+}
+
+// We should probably add a type of username validation that checks if the username doesn't contain special characters
+// So only characters, numbers, hyphens, and underscores.
+void readUserData(stUserData &userData, unordered_map<string, stUserData>& users)
+{
+    string inputUsername = "";
+
+    bool isExistent = false;
+    cout << "\nUsername: ";
+
+    do
+    {
+        getline(cin >> ws, inputUsername);
+        NormalizeUsername(inputUsername);
+
+        if ((isExistent = CheckExistence(inputUsername, users)))
+            cout << "\n The user with the username [" << inputUsername << "] already exists\n\n Enter a different username: ";
+
+    } while (isExistent);
+    userData.user_name = inputUsername;
+
+    //Totally fragile for sure. It needs regex to make an obligatory standard form
+    cout << "\nPassword: ";
+    cin >> userData.user_password;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    AssignPermissionsToUser(userData);
+}
+
+void AddNewUser(string fileName, unordered_map<string, stUserData>& users)
+{
+    stUserData userData;
+    readUserData(userData, users);
+
+    users.insert({ userData.user_name, userData });
     AddDataLineToFile(fileName, ConvertRecordToLine(userData));
 }
 
@@ -623,7 +864,24 @@ void ShowMainMenu()
     cout << right << setw(10) << "[4]" << " Update Client Info" << "\n";
     cout << right << setw(10) << "[5]" << " Find Client" << "\n";
     cout << right << setw(10) << "[6]" << " Transactions" << "\n";
-    cout << right << setw(10) << "[7]" << " Logout" << "\n";
+    cout << right << setw(10) << "[7]" << " Manage Users" << "\n";
+    cout << right << setw(10) << "[8]" << " Logout" << "\n";
+
+    cout << UI_LINE_BOUNDS << "\n";
+}
+
+void ShowManageUsersMenu()
+{
+    cout << UI_LINE_BOUNDS << "\n";
+    cout << right << setw(30) << "Manage Users Menu" << "\n";
+    cout << UI_LINE_BOUNDS << "\n";
+
+    cout << right << setw(10) << "[1]" << " List Users" << "\n";
+    cout << right << setw(10) << "[2]" << " Add User" << "\n";
+    cout << right << setw(10) << "[3]" << " Delete User" << "\n";
+    cout << right << setw(10) << "[4]" << " Update User" << "\n";
+    cout << right << setw(10) << "[5]" << " Find User" << "\n";
+    cout << right << setw(10) << "[6]" << " Return to Main Menu" << "\n";
 
     cout << UI_LINE_BOUNDS << "\n";
 }
@@ -640,6 +898,16 @@ void PrintFileInfoHeader(const vector<stClientData>& clients)
     cout << string(SCREEN_WIDTH, '-') << "\n";
 }
 
+void PrintFileInfoHeader(const vector<stUserData>& users)
+{
+    cout << right << setw(50) << "User list: (" << users.size() << ") user(s)" << "\n";
+    cout << string(77, '-') << "\n";
+    cout << left << "| " << setw(20) << " User Name " << "| ";
+    cout << setw(30) << " Password " << "| ";
+    cout << setw(20) << " Permissions " << "|" << "\n";
+    cout << string(77, '-') << "\n";
+}
+
 void PrintClientBalancesHeader(const vector<stClientData>& clients)
 {
     cout << right << setw(42) << "Balances List for (" << clients.size() << ") client(s)" << "\n";
@@ -652,14 +920,14 @@ void PrintClientBalancesHeader(const vector<stClientData>& clients)
     cout << string(SCREEN_WIDTH - 34, '-') << "\n";
 }
 
-
+//POTENTIAL DRY VIOLATION?
 void EvaluateMenuChoice(enMenuChoice& menuChoice)
 {
     stNumericInputData inputData;
-    inputData.inputMessage = "Choose the operation you'd like to do (1-7)\n";
+    inputData.inputMessage = "Choose the operation you'd like to do (1-8)\n";
     inputData.from = 1;
-    inputData.to = 7;
-    inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-7)!\n";
+    inputData.to = 8;
+    inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-8)!\n";
 
     menuChoice = enMenuChoice(ReadNumber(inputData));
 }
@@ -675,7 +943,18 @@ void EvaluateMenuChoice(enTransactionsMenuChoice& menuChoice)
     menuChoice = enTransactionsMenuChoice(ReadNumber(inputData));
 }
 
-void PrintIndividualUserInfo(const stClientData& client)
+void EvaluateMenuChoice(enManageUsersMenuChoice& menuChoice)
+{
+    stNumericInputData inputData;
+    inputData.inputMessage = "Choose the operation you'd like to do (1-6)\n";
+    inputData.from = 1;
+    inputData.to = 6;
+    inputData.validationErrorMessage = "\nPlease, enter a number in a valid range from the menu (1-6)!\n";
+
+    menuChoice = enManageUsersMenuChoice(ReadNumber(inputData));
+}
+
+void PrintIndividualTableInfo(const stClientData& client)
 {
     cout << "| " << setw(20) << left << client.accountNumber << "| ";
     cout << setw(15) << left << client.PIN_Number << "| ";
@@ -684,29 +963,18 @@ void PrintIndividualUserInfo(const stClientData& client)
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
 }
 
+void PrintIndividualTableInfo(const stUserData& user)
+{
+    cout << "| " << setw(20) << left << user.user_name << "| ";
+    cout << setw(30) << left << user.user_password << "| ";
+    cout << setw(20) << left << user.permissions << "|" << "\n";
+}
+
 void PrintUserInfoInBalancesTable(const stClientData& client)
 {
     cout << "| " << setw(20) << left << client.accountNumber << "| ";
     cout << setw(50) << left << client.user_name << "| ";
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
-}
-
-//WE MIGHT NOT NEED THIS LATER ON 
-void SaveToFile(string fileName, const vector<stClientData>& clients)
-{
-    fstream file;
-    file.open(fileName, ios::out);
-
-    if (file.is_open())
-    {
-        for (const stClientData& client : clients)
-        {
-            string line = ConvertRecordToLine(client);
-
-            file << line << "\n";
-        }
-        file.close();
-    }
 }
 
 void SaveToFile(string fileName, unordered_map<string, stClientData>& clients)
@@ -719,6 +987,23 @@ void SaveToFile(string fileName, unordered_map<string, stClientData>& clients)
         for (auto& [accountNumber, client] : clients)
         {
             string line = ConvertRecordToLine(client);
+
+            file << line << "\n";
+        }
+        file.close();
+    }
+}
+
+void SaveToFile(string fileName, unordered_map<string, stUserData>& users)
+{
+    fstream file;
+    file.open(fileName, ios::out);
+
+    if (file.is_open())
+    {
+        for (auto& [username, user] : users)
+        {
+            string line = ConvertRecordToLine(user);
 
             file << line << "\n";
         }
@@ -740,9 +1025,136 @@ void ShowClientListScreen(string fileName)
 
     for (const stClientData& client : visibleClients)
     {
-        PrintIndividualUserInfo(client);
+        PrintIndividualTableInfo(client);
     }
     cout << string(SCREEN_WIDTH, '-') << "\n";
+}
+
+void ListUsersScreen(string fileName)
+{
+    vector<stUserData> users;
+    LoadFromFile(fileName, users);
+
+    PrintFileInfoHeader(users);
+
+    if (users.size() == 0)
+        cout << right << setw(50) << "NO USERS ARE AVAILABLE IN THE SYSTEM!";
+
+    for (const stUserData& user : users)
+        PrintIndividualTableInfo(user);
+
+    cout << string(77, '-') << "\n";
+}
+
+void AddUserScreen(string fileName)
+{
+    PrintScreenHeader("ADD NEW USER");
+    unordered_map<string, stUserData> users;
+    LoadFromFile(fileName, users);
+
+    do
+    {
+        AddNewUser(fileName, users);
+        
+        //You and I know that this is static and isn't linked into a succeed or fail :D I'll try to get into this if needed
+        cout << "\nClient added successfully, ";
+
+    } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n")=='Y'));
+}
+
+void DeleteUser(unordered_map<string, stUserData> &users, const string &fileName)
+{
+    stUserData userData;
+    string username = ReadUserName();
+
+    NormalizeUsername(username);
+
+    if (CheckExistence(username, users))
+    {
+        userData = users.find(username)->second; 
+
+        string foundUserName = users.find(username)->second.user_name;
+        NormalizeUsername(foundUserName);
+
+        if (foundUserName == "admin1")
+        {
+            cout << "\nYou cannot delete this user! \n\n";
+            return;
+        }
+        else
+        {
+            PrintInfoCard(userData);
+            if (toupper(DetermineAgain("\n\nAre you sure you want to delete this user (Y/N)?\n")) == 'Y')
+            {
+                users.erase(foundUserName);
+                SaveToFile(fileName, users);
+            }
+        }
+    }
+    else
+        cout << "The user with the username: [" << username << "\] is NOT found!\n";
+}
+
+void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName)
+{
+    stUserData userData;
+    string inputUsername = ReadUserName();
+
+    NormalizeUsername(inputUsername);
+
+    if (CheckExistence(inputUsername, users))
+    {
+        userData = users.find(inputUsername)->second;
+        PrintInfoCard(userData);
+
+        if (toupper(DetermineAgain("\n\nAre you sure you want to update this user (Y/N)?\n")) == 'Y')
+        {
+            ReadUserUpdates(userData);
+            users.insert_or_assign(inputUsername, userData);
+            SaveToFile(fileName, users);
+        }
+        else return;
+
+    }
+    else 
+        cout << "The user with the username: [" << inputUsername << "\] is NOT found!\n";
+}
+
+void FindUser(unordered_map<string, stUserData>& users)
+{
+    string inputUsername = ReadUserName();
+
+    if (CheckExistence(inputUsername, users))
+        PrintInfoCard(users.find(inputUsername)->second);
+    else
+        cout << "The username: [" << inputUsername << "] has not been found!\n";
+}
+
+void DeleteUserScreen(string fileName)
+{
+    PrintScreenHeader("DELETE USER");
+    unordered_map<string, stUserData> users;
+
+    LoadFromFile(fileName, users);
+    DeleteUser(users, fileName);
+}
+
+void UpdateUserScreen(string fileName)
+{
+    PrintScreenHeader("UPDATE USER");
+    unordered_map<string, stUserData> users;
+
+    LoadFromFile(fileName, users);
+    UpdateUser(users, fileName);
+}
+
+void FindUserScreen(string fileName)
+{
+    PrintScreenHeader("FIND USER");
+    unordered_map<string, stUserData> users;
+
+    LoadFromFile(fileName, users);
+    FindUser(users);
 }
 
 void ShowClientsBalances(string fileName)
@@ -806,7 +1218,7 @@ void UpdateClientByAccountNumber(unordered_map<string, stClientData>& clients, s
         auto ClientIt = FindClientByAccountNumber(accountNumber, clients);
         Client = ClientIt->second;
 
-        PrintClientRecord(Client);
+        PrintInfoCard(Client);
         if (toupper(DetermineAgain("\n\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
         {
             UpdateClientData(clientIt);
@@ -829,7 +1241,7 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
         auto ClientIt = FindClientByAccountNumber(accountNumber, clients);
         Client = ClientIt->second;
 
-        PrintClientRecord(Client);
+        PrintInfoCard(Client);
         if (toupper(DetermineAgain("\n\nAre you sure you want to delete this client (Y/N)?\n")) == 'Y')
         {
             MarkClientForDeleteByAccountNumber(clients, accountNumber);
@@ -841,8 +1253,6 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
     else
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
-
-
 
 void LoginScreen(string fileName, enRunningState &runningState, stUserData &runningUser)
 {
@@ -877,7 +1287,7 @@ void AddClientsScreen(string fileName)
 {
     PrintScreenHeader("ADD NEW CLIENT");
 
-    vector<stClientData> clients;
+    unordered_map<string, stClientData> clients;
     LoadFromFile(fileName, clients);
 
     do
@@ -927,7 +1337,7 @@ void ShowDeleteClientScreen(string fileName)
 void ShowTransactionsMenu()
 {
     cout << UI_LINE_BOUNDS << "\n";
-    cout << right << setw(22) << "Transaction Menu" << "\n";
+    cout << right << setw(30) << "Transaction Menu" << "\n";
     cout << UI_LINE_BOUNDS << "\n";
 
     cout << right << setw(10) << "[1]" << " Deposit" << "\n";
@@ -954,7 +1364,7 @@ void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fil
     } while (clientIt == clients.end());
 
     cout << "\nThe following are the client data: \n\n";
-    PrintClientRecord(clientIt->second);
+    PrintInfoCard(clientIt->second);
 
     int depositAmount = ReadDepositNumber();
 
@@ -979,7 +1389,7 @@ void WithdrawByAccNumber(unordered_map<string, stClientData>& clients, string fi
     } while (clientIt == clients.end());
 
     cout << "\nThe following are the client data: \n\n";
-    PrintClientRecord(clientIt->second);
+    PrintInfoCard(clientIt->second);
 
     int withdrawAmount = ReadWithdrawNumber();
 
@@ -1032,6 +1442,45 @@ void PerformTransactionsMenuOption(const enTransactionsMenuChoice choice)
     }
 }
 
+void PerformManageUsersMenuOption(const enManageUsersMenuChoice choice)
+{
+    switch (choice)
+    {
+    case enManageUsersMenuChoice::ListUsers:
+        ResetScreen();
+        ListUsersScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::AddUser:
+        ResetScreen();
+        AddUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::DeleteUser:
+        ResetScreen();
+        DeleteUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::UpdateUser:
+        ResetScreen();
+        UpdateUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::FindUser:
+        ResetScreen();
+        FindUserScreen(USERS_FILE_NAME);
+        PromptUserToGetMenu();
+        break;
+
+    case enManageUsersMenuChoice::MainMenu:
+        break;
+    }
+}
+
 void StartTransactionsMenu()
 {
     enTransactionsMenuChoice RunningState = enTransactionsMenuChoice::MainMenu;
@@ -1046,6 +1495,23 @@ void StartTransactionsMenu()
             PerformTransactionsMenuOption(RunningState);
 
     } while (RunningState != enTransactionsMenuChoice::MainMenu);
+
+}
+
+void StartManageUsers()
+{
+    enManageUsersMenuChoice RunningState = enManageUsersMenuChoice::MainMenu;
+    do
+    {
+        ResetScreen();
+        ShowManageUsersMenu();
+
+        EvaluateMenuChoice(RunningState);
+
+        if (RunningState != enManageUsersMenuChoice::MainMenu)
+            PerformManageUsersMenuOption(RunningState);
+
+    } while (RunningState != enManageUsersMenuChoice::MainMenu);
 
 }
 
@@ -1085,6 +1551,12 @@ void PerformMainMenuOption(const enMenuChoice choice)
     case enMenuChoice::Transactions:
         ResetScreen();
         StartTransactionsMenu();
+        PromptUserToGetMenu();
+        break;
+
+    case enMenuChoice::ManagerUsers:
+        ResetScreen();
+        StartManageUsers();
         PromptUserToGetMenu();
         break;
 
