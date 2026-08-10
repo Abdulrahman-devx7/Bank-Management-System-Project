@@ -1,3 +1,20 @@
+# The Bank Management System
+A simple and modular bank management system that simulates basic bank functionalities to interact with clients.
+## 📝 The Objectives
+- Practice clean code principles on a larger, closer to real-world scale.
+- Utilize STLs (e.g., `unordered_map` for `O(1)` lookup by account number) for a more readable, efficient, and scalable code.
+- Take procedural programming to its limits(e.g., scattered client-lookup logic and function overloading) to discover issues that would build up experience for a better understanding of  why OOP patterns exist.
+- Put string manipulation functions into a real practice by integrating them File I/O.
+## 🚀 Core Features
+- A simple login page that authorizes access to the system by fetching existent users from a dedicated file
+- Basic, user-friendly UI menus that gives the user full control over CRUD operations for client records, or UI-related utilities(i.e., finding a user by account number). 
+- The ability to view a comprehensive table for either showing the data fields of all client in a table, or a smaller table showcasing clients' balances and their total sum at the bottom.
+- Full control over adding clients, updating & deleting clients' data, and finding clients (CRUD) via the account number.
+- A dedicated menu to manage users in the system with CRUD operations over the users and custom permission management for the bank utilities in the main menu
+- A normalization of the username form in CRUD operations in the user management menu, which eliminates duplicate usernames differing in letter cases in the system. Thus, making unique usernames in the system and preventing trailing or leading spaces.
+- The ability to do simple transactions (e.g., withdrawal and deposit) for any client via the account number
+- A Permission verification of utility access for authentic users accessing the bank system. It shows a UI header indicating access denial and then a prompt to go to the menu if the user lacks access.
+- A numerical validation that prevents crashes or infinite loops in input fields where a numerical value is expected.
 ## ⚙️ Architecture and engineering choices
 - A state-driven solution that uses Enums with switch cases to route the user to different sub-programs depending on the input.
 - Dedicated Enums for the two menus in the system: the main menu, and the transactions menu, to separate the switch routers in each menu.
@@ -47,15 +64,24 @@ On launch, you'll be presented with a login screen asking for valid login creden
 2️⃣ Password: master67
 
 1. Show Client List
+
 2. Add New Client
+
 3. Delete Client
+
 4. Update Client Info
+
 5. Find Client
+
 6. Transactions
+
 7. Manage Users
+
 8. Logout
 
 All client data is persisted to `clients.txt`, which acts as the system's
 flat-file database. Deleted clients are flagged rather than removed, so
 their records remain in the file for potential future auditing, but are
 filtered out of every UI-facing view and CRUD operation.
+
+The same goes to `users.txt` but merely for users accessing the system and their assigned permissions. The minor difference is that this file **hard-deletes** users from the system.
