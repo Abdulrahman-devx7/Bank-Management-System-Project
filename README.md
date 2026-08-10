@@ -15,6 +15,7 @@ A simple and modular bank management system that simulates basic bank functional
 - The ability to do simple transactions (e.g., withdrawal and deposit) for any client via the account number
 - A Permission verification of utility access for authentic users accessing the bank system. It shows a UI header indicating access denial and then a prompt to go to the menu if the user lacks access.
 - A numerical validation that prevents crashes or infinite loops in input fields where a numerical value is expected.
+- A protection of the base admin from deletion so the system remains accessible by the root account.
 ## ⚙️ Architecture and engineering choices
 - A state-driven solution that uses Enums with switch cases to route the user to different sub-programs depending on the input.
 - Dedicated Enums for the two menus in the system: the main menu, and the transactions menu, to separate the switch routers in each menu.
@@ -34,7 +35,7 @@ A simple and modular bank management system that simulates basic bank functional
 - A modular design for `LoginScreen` that uses a Boolean for UI interactions and verifying the user's access via `VerifyLogin` before initializing the **starting parameters.** Additions regarding security or something else can be added to this function.
 - A robust, centralized function (`RunBankServices`) that handles permission verification, rerouting to the utility, and unauthorized access in one place. Thus, Easing scalability by merely adding or manipulating existing functions for **new menu options or security measurements for the system.** 
 - A separation of concerns led by the `RunBankServices` acting as the router using helper functions like `GetRequiredPermissionForMenuChoice` and `VerifyPermission`. Making the utilities in the switch statement of the main menu blind to any verification, merely handling the intended functionality.
-- A utilization of bit masking for efficient, quick permission verification using `enum class` for its closed scope preventing accidental mixing with unrelated integers. Thus using the `<static_cast>` to verification and assignment of permissions to the user in CRUD.
+- A utilization of bit masking for efficient, quick permission verification using `enum class` for its closed scope preventing accidental mixing with unrelated integers. Thus using the `static_cast` to verification and assignment of permissions to the user in CRUD.
 - A heavy usage of function overloading for several logic, UI, and File I/O purposes (i.e, `CheckExistence`, `PrintInfoCard`, `LoadFromFile`, etc.)  
 ## 📦 Installation & Build
 
@@ -57,11 +58,6 @@ g++ -std=c++17 Bank-Management-System.cpp -o bank
 
 On launch, you'll be presented with a login screen asking for valid login credentials to login to the system.
 
-🟢 After cloning the repo into your local machine, you can log in with full access using these credentials to experiment the whole system
-
-1️⃣ Username: admin1
-
-2️⃣ Password: master67
 
 1. Show Client List: View all existing clients in a formatted table.
 
@@ -78,6 +74,12 @@ On launch, you'll be presented with a login screen asking for valid login creden
 7. Manage Users: Access the administrative sub-menu to list, add, delete, update, and find system users.
 
 8. Logout: Securely log out and return to the initial login screen.
+
+### 🟢 Demo credentials (full acces)
+
+1️⃣ Username: admin1
+
+2️⃣ Password: master67
 
 All client data is persisted to `clients.txt`, which acts as the system's
 flat-file database. Deleted clients are flagged rather than removed, so
