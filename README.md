@@ -1,16 +1,3 @@
-# The Bank Management System
-A simple and modular bank management system that simulates basic bank functionalities to interact with clients.
-## 📝 The Objectives
-- Practice clean code principles on a larger, closer to real-world scale.
-- Utilize STLs (e.g., `unordered_map` for `O(1)` lookup by account number) for a more readable, efficient, and scalable code.
-- Take procedural programming to its limits(e.g., scattered client-lookup logic and function overloading) to discover issues that would build up experience for a better understanding of  why OOP patterns exist.
-- Put string manipulation functions into a real practice by integrating them File I/O.
-## 🚀 Core Features
-- Basic, user-friendly UI menus that gives the user full control over CRUD operations for client records, or UI-related utilities(i.e., finding a user by account number). 
-- The ability to view a comprehensive table for either showing the data fields of all client in a table, or a smaller table showcasing clients' balances and their total sum at the bottom.
-- Full control over adding clients, updating & deleting clients' data, and finding clients (CRUD) via the account number.
-- The ability to do simple transactions (e.g., withdrawal and deposit) for any client via the account number
-- A numerical validation that prevents crashes or infinite loops in input fields where a numerical value is expected.
 ## ⚙️ Architecture and engineering choices
 - A state-driven solution that uses Enums with switch cases to route the user to different sub-programs depending on the input.
 - Dedicated Enums for the two menus in the system: the main menu, and the transactions menu, to separate the switch routers in each menu.
@@ -25,6 +12,13 @@ A simple and modular bank management system that simulates basic bank functional
   soft-deleted client as "not found" for every lookup-based operation.
 - `GetVisibleClients` applies the same principle when preparing the vector
   used by list/balance display utilities.
+- A simple, scalable Finite State Machine(FSM) using `enum class enRunningState` in `StartBankSystem`
+- A login screen function (`LoginScreen`) that acts as an initializer for the running state the bank system is going to start. 
+- A modular design for `LoginScreen` that uses a Boolean for UI interactions and verifying the user's access via `VerifyLogin` before initializing the **starting parameters.** Additions regarding security or something else can be added to this function.
+- A robust, centralized function (`RunBankServices`) that handles permission verification, rerouting to the utility, and unauthorized access in one place. Thus, Easing scalability by merely adding or manipulating existing functions for **new menu options or security measurements for the system.** 
+- A separation of concerns led by the `RunBankServices` acting as the router using helper functions like `GetRequiredPermissionForMenuChoice` and `VerifyPermission`. Making the utilities in the switch statement of the main menu blind to any verification, merely handling the intended functionality.
+- A utilization of bit masking for efficient, quick permission verification using `enum class` for its closed scope preventing accidental mixing with unrelated integers. Thus using the `<static_cast>` to verification and assignment of permissions to the user in CRUD.
+- A heavy usage of function overloading for several logic, UI, and File I/O purposes (i.e, `CheckExistence`, `PrintInfoCard`, `LoadFromFile`, etc.)  
 ## 📦 Installation & Build
 
 This project has no external dependencies — just a C++17-compatible
@@ -44,15 +38,22 @@ g++ -std=c++17 Bank-Management-System.cpp -o bank
 
 ## ▶️ Usage
 
-On launch, you'll be presented with a main menu offering:
+On launch, you'll be presented with a login screen asking for valid login credentials to login to the system.
 
-1. View all clients (table view)
-2. View client balances (with total sum)
-3. Add a new client
-4. Update an existing client's data
-5. Delete a client (soft delete — see below)
-6. Deposit / withdraw funds for a client
-7. Exit
+🟢 After cloning the repo into your local machine, you can log in with full access using these credentials to experiment the whole system
+
+1️⃣ Username: admin1
+
+2️⃣ Password: master67
+
+1. Show Client List
+2. Add New Client
+3. Delete Client
+4. Update Client Info
+5. Find Client
+6. Transactions
+7. Manage Users
+8. Logout
 
 All client data is persisted to `clients.txt`, which acts as the system's
 flat-file database. Deleted clients are flagged rather than removed, so
