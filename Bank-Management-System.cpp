@@ -1124,6 +1124,7 @@ void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName
 void FindUser(unordered_map<string, stUserData>& users)
 {
     string inputUsername = ReadUserName();
+    NormalizeUsername(inputUsername);
 
     if (CheckExistence(inputUsername, users))
         PrintInfoCard(users.find(inputUsername)->second);
