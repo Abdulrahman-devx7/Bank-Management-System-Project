@@ -63,21 +63,21 @@ On launch, you'll be presented with a login screen asking for valid login creden
 
 2️⃣ Password: master67
 
-1. Show Client List
+1. Show Client List: View all existing clients in a formatted table.
 
-2. Add New Client
+2. Add New Client: Register a new client into the system.
 
-3. Delete Client
+3. Delete Client: Remove a client from the system (utilizes soft deletion).
 
-4. Update Client Info
+4. Update Client Info: Modify a client's PIN, name, phone number, or balance.
 
-5. Find Client
+5. Find Client: Search for a specific client card using their account number.
 
-6. Transactions
+6. Transactions: Access the sub-menu to perform deposits, withdrawals, and view the total sum of all balances.
 
-7. Manage Users
+7. Manage Users: Access the administrative sub-menu to list, add, delete, update, and find system users.
 
-8. Logout
+8. Logout: Securely log out and return to the initial login screen.
 
 All client data is persisted to `clients.txt`, which acts as the system's
 flat-file database. Deleted clients are flagged rather than removed, so
