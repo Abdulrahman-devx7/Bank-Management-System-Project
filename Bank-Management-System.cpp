@@ -17,7 +17,7 @@ const string USERS_FILE_NAME = "users.txt";
 const string UI_LINE_BOUNDS(44, '=');
 const int SCREEN_WIDTH = 125;
 
-enum class enMenuChoice{
+enum class enMenuChoice {
     ShowClients = 1,
     AddClient = 2,
     DeleteClient = 3,
@@ -50,22 +50,22 @@ enum class enRunningState {
 };
 
 enum class enUserPermissions : short {
-    None = 0,  
-    ListClients = 1,  
-    AddClient = 2,  
-    DeleteClient = 4,  
-    UpdateClient = 8,  
-    FindClient = 16, 
-    Transactions = 32, 
-    ManageUsers = 64, 
-    All = -1  
+    None = 0,
+    ListClients = 1,
+    AddClient = 2,
+    DeleteClient = 4,
+    UpdateClient = 8,
+    FindClient = 16,
+    Transactions = 32,
+    ManageUsers = 64,
+    All = -1
 };
 
 struct stNumericInputData
 {
     string inputMessage;
-    int from = INT_MIN;
-    int to = INT_MAX;
+    long long from = LLONG_MIN;
+    long long to = LLONG_MAX;
     string validationErrorMessage = "Please, enter a valid input!\n";
 };
 
@@ -80,7 +80,7 @@ struct stClientData
     bool MarkForDelete = false;
 };
 
-struct stUserData 
+struct stUserData
 {
     string user_name = "";
     string user_password = "";
@@ -148,7 +148,7 @@ stUserData ConvertUserLineToRecord(string line, string delimiter = "#//#")
     stUserData user;
     vector<string> userDataElements = SplitString(line, delimiter);
 
-    if(userDataElements.size()>=3)
+    if (userDataElements.size() >= 3)
     {
         user.user_name = userDataElements[0];
         user.user_password = userDataElements[1];
@@ -157,14 +157,14 @@ stUserData ConvertUserLineToRecord(string line, string delimiter = "#//#")
 
     return user;
 }
-void ConvertToLowerCase(std::string &text)
+void ConvertToLowerCase(std::string& text)
 {
     for (char& c : text) {
         c = tolower(static_cast<unsigned char>(c));
     }
 }
 
-void Trim(std::string& text, const string &toTrim = " \t\n\r")
+void Trim(std::string& text, const string& toTrim = " \t\n\r")
 {
     size_t start = text.find_first_not_of(toTrim);
 
@@ -263,10 +263,9 @@ void LoadFromFile(string fileName, vector<stUserData>& users, string delimiter =
     else return;
 }
 
-
-int ReadNumber(const stNumericInputData& input)
+long long ReadNumber(const stNumericInputData& input)
 {
-    int Number = 0;
+    long long Number = 0;
     cout << input.inputMessage << endl;
     cin >> Number;
 
@@ -288,16 +287,15 @@ void ResetScreen()
     system("color 0f");
 }
 
-//MORE MODULAR DESIGN FOR READING USERNAME & PASSWORD
 string readAccountNumber()
 {
-    cout << "Please enter the account number: ";
     string userInput = "";
-    cin >> userInput;
+    getline(cin >> ws, userInput);
 
     return userInput;
 }
 
+//MORE MODULAR DESIGN FOR READING USERNAME & PASSWORD
 string ReadUserName()
 {
     string username = "";
@@ -329,7 +327,7 @@ stLoginCredentials ReadLoginCredentials()
 
 // Instead of using a bool, why not introduce an Enum and a handful of checks inside this function for more state management over
 // what has been attempted to take different actions depending on the state?
-bool VerifyLogin(const stLoginCredentials &loginData, const unordered_map<string, stUserData> &users)
+bool VerifyLogin(const stLoginCredentials& loginData, const unordered_map<string, stUserData>& users)
 {
     if (users.find(loginData.inputUsername) == users.end())
         return false;
@@ -378,7 +376,7 @@ void DisplayAccessDenyMessage()
 {
     cout << string(50, '-') << "\n";
     cout << setw(30) << right << "ACCESS DENIED\n";
-    cout << setw(50) << right  << "You do NOT have a permission to use this utility\n";
+    cout << setw(50) << right << "You do NOT have a permission to use this utility\n";
     cout << setw(37) << right << " Please, contact your admin\n";
     cout << string(50, '-') << "\n";
 }
@@ -386,7 +384,7 @@ void DisplayAccessDenyMessage()
 void HandleUnauthorizedAccess()
 {
     // A modular solution for everything
-    // This can later scale up to do complex stuff to maybe the database, or lock an account 
+    // This can later scale up to do complex stuff to maybe the database, or lock an account
     // after some actions
     ResetScreen();
     DisplayAccessDenyMessage();
@@ -493,15 +491,15 @@ bool CheckExistence(string accountNumber, unordered_map<string, stClientData>& c
     return clients.contains(accountNumber);
 }
 
-// Can we make this probably more usable or similar to DetermineAccountFind, which return a straight iterator to 
-// user's location, which can be then stored in a variable to manipulate directly without needing to 
+// Can we make this probably more usable or similar to DetermineAccountFind, which return a straight iterator to
+// user's location, which can be then stored in a variable to manipulate directly without needing to
 // search again to get a pointer
 bool CheckExistence(string username, unordered_map<string, stUserData>& clients)
 {
     return clients.contains(username);
 }
 
-void AssignPermissionsToUser(stUserData &userData)
+void AssignPermissionsToUser(stUserData& userData)
 {
     if (toupper(DetermineAgain("Do you want to give this user full access? y/n? ")) == 'Y')
     {
@@ -518,32 +516,32 @@ void AssignPermissionsToUser(stUserData &userData)
 
     cout << "\n";
 
-    if(toupper(DetermineAgain("Do you want to give this user access to adding new clients? y/n? ")) == 'Y')
+    if (toupper(DetermineAgain("Do you want to give this user access to adding new clients? y/n? ")) == 'Y')
         userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::AddClient);
 
     cout << "\n";
 
-    if(toupper(DetermineAgain("Do you want to give this user access to deleting clients? y/n? ")) == 'Y')
+    if (toupper(DetermineAgain("Do you want to give this user access to deleting clients? y/n? ")) == 'Y')
         userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::DeleteClient);
 
     cout << "\n";
 
-    if(toupper(DetermineAgain("Do you want to give this user access to updating clients? y/n? ")) == 'Y')
+    if (toupper(DetermineAgain("Do you want to give this user access to updating clients? y/n? ")) == 'Y')
         userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::UpdateClient);
 
     cout << "\n";
 
-    if(toupper(DetermineAgain("Do you want to give this user access to finding clients? y/n? ")) == 'Y')
+    if (toupper(DetermineAgain("Do you want to give this user access to finding clients? y/n? ")) == 'Y')
         userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::FindClient);
 
     cout << "\n";
 
-    if(toupper(DetermineAgain("Do you want to give this user access to transactions? y/n? ")) == 'Y')
+    if (toupper(DetermineAgain("Do you want to give this user access to transactions? y/n? ")) == 'Y')
         userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::Transactions);
 
     cout << "\n";
 
-    if(toupper(DetermineAgain("Do you want to give this user access to managing users? y/n? ")) == 'Y')
+    if (toupper(DetermineAgain("Do you want to give this user access to managing users? y/n? ")) == 'Y')
         userData.permissions = userData.permissions | static_cast<short> (enUserPermissions::ManageUsers);
 
     cout << "\n";
@@ -577,7 +575,7 @@ void ReadClientDataUpdates(stClientData& data)
     }
 }
 
-void ReadUserUpdates(stUserData &user)
+void ReadUserUpdates(stUserData& user)
 {
     if (toupper(DetermineAgain("\n\nDo you want to update the username (Y/N)?\n")) == 'Y')
         user.user_name = ReadUserName();
@@ -622,19 +620,19 @@ bool IsValidPIN(const string& PIN)
         all_of(PIN.begin(), PIN.end(), ::isdigit);
 }
 
-bool isValidPhoneNumber(const string &phoneNumber)
+bool isValidPhoneNumber(const string& phoneNumber)
 {
     static const regex pattern("(010|011|012|015)[0-9]{8}");
     return regex_match(phoneNumber, pattern);
 }
 
-bool isValidAccountNumber(const string &accountNumber)
+bool isValidAccountNumber(const string& accountNumber)
 {
     static const regex pattern("[A-Z]{3}[0-9]{4}");
     return regex_match(accountNumber, pattern);
 }
 
-bool AreNamesOnlyLetters(const vector<string> &names)
+bool AreNamesOnlyLetters(const vector<string>& names)
 {
     for (const string& name : names)
     {
@@ -644,7 +642,7 @@ bool AreNamesOnlyLetters(const vector<string> &names)
     return true;
 }
 
-void isValidFullName(stClientData& client)
+void ReadName(stClientData& client)
 {
     bool is4Names = true;
     bool isAllLetters = true;
@@ -664,58 +662,83 @@ void isValidFullName(stClientData& client)
     } while (!isAllLetters || !is4Names);
 }
 
-
-//A lot of SRP and DRY needs to be discussed to remove redundancies here
-void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
+void ReadAccNumberToAddUser(stClientData& client, unordered_map<string, stClientData>& clients)
 {
-    cout << "Enter account number: ";
-
     bool isExistent = false;
     bool isAccNumberValid = true;
     do
     {
-        getline(cin >> ws, client.accountNumber);
+        client.accountNumber = readAccountNumber();
         isExistent = CheckExistence(client.accountNumber, clients);
         isAccNumberValid = isValidAccountNumber(client.accountNumber);
 
         if (isAccNumberValid)
         {
-            if(isExistent)
+            if (isExistent)
                 cout << "\nThe client with the account number[" << client.accountNumber << "] already exists, enter a different account number: ";
         }
-        else 
+        else
             cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
 
     } while (isExistent || !isAccNumberValid);
+}
 
-    cout << "\nEnter PIN code: ";
+string ReadPIN()
+{
+    string PIN;
     bool isValid = true;
     do
     {
-        getline(cin, client.PIN_Number);
-        isValid = IsValidPIN(client.PIN_Number);
+        getline(cin, PIN);
+        isValid = IsValidPIN(PIN);
 
         if (!isValid)
             cout << "\nPlease enter a valid PIN (6 digits, numbers only)\n";
-        
+
     } while (!isValid);
+}
 
-    cout << "\nEnter name: ";
-    isValidFullName(client);
-
-    cout << "\nEnter phone number: ";
-    isValid = true;
+string ReadPhoneNumber()
+{
+    string PhoneNumber = "";
+    bool isValid = true;
     do
     {
-        getline(cin, client.phoneNumber);
-        isValid = isValidPhoneNumber(client.phoneNumber);
+        getline(cin, PhoneNumber);
+        isValid = isValidPhoneNumber(PhoneNumber);
 
         if (!isValid)
             cout << "\nPlease enter a valid Egyptian phone number (11 digits, e.g. 01012345678)!\n";
     } while (!isValid);
+}
+
+long long ReadBalance()
+{
+    stNumericInputData inputData;
+    inputData.inputMessage = "\n\nPlease, enter the balance amount\n";
+    inputData.from = 0;
+
+    return ReadNumber(inputData);
+}
+
+void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
+{
+    cout << "Enter account number: ";
+    ReadAccNumberToAddUser(client, clients);
+
+    cout << "\nEnter name: ";
+    ReadName(client);
+
+    // Should we abstract one function to be passed the client struct, a message, and a function as both of which are very similar?
+    // Or abstract each one individually on a function ? (I'll use this)
+    cout << "\Enter PIN: ";
+    client.PIN_Number = ReadPIN();
+
+    cout << "\nEnter phone number: ";
+    client.phoneNumber = ReadPhoneNumber();
 
     cout << "\nEnter account balance: ";
-    cin >> client.balanceUSD;
+    client.balanceUSD = ReadBalance();
 }
 
 int ReadDepositNumber()
@@ -807,7 +830,7 @@ void AddNewClient(string fileName, unordered_map<string, stClientData>& clients)
 
 // We should probably add a type of username validation that checks if the username doesn't contain special characters
 // So only characters, numbers, hyphens, and underscores.
-void readUserData(stUserData &userData, unordered_map<string, stUserData>& users)
+void readUserData(stUserData& userData, unordered_map<string, stUserData>& users)
 {
     string inputUsername = "";
 
@@ -1056,14 +1079,14 @@ void AddUserScreen(string fileName)
     {
         //Should the two lines after the PrintScreenHeader be added to the AddNewUser function?
         AddNewUser(fileName, users);
-        
+
         //You and I know that this is static and isn't linked into a succeed or fail :D I'll try to get into this if needed
         cout << "\nClient added successfully, ";
 
-    } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n")=='Y'));
+    } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n") == 'Y'));
 }
 
-void DeleteUser(unordered_map<string, stUserData> &users, const string &fileName)
+void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName)
 {
     stUserData userData;
     string username = ReadUserName();
@@ -1072,7 +1095,7 @@ void DeleteUser(unordered_map<string, stUserData> &users, const string &fileName
 
     if (CheckExistence(username, users))
     {
-        userData = users.find(username)->second; 
+        userData = users.find(username)->second;
 
         string foundUserName = users.find(username)->second.user_name;
         NormalizeUsername(foundUserName);
@@ -1117,7 +1140,7 @@ void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName
         else return;
 
     }
-    else 
+    else
         cout << "The user with the username: [" << inputUsername << "\] is NOT found!\n";
 }
 
@@ -1256,7 +1279,7 @@ void DeleteClientByAccountNumber(unordered_map<string, stClientData>& clients, s
         cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 }
 
-void LoginScreen(string fileName, enRunningState &runningState, stUserData &runningUser)
+void LoginScreen(string fileName, enRunningState& runningState, stUserData& runningUser)
 {
     unordered_map<string, stUserData> users;
     LoadFromFile(fileName, users, "#//#");
@@ -1351,11 +1374,9 @@ void ShowTransactionsMenu()
     cout << UI_LINE_BOUNDS << "\n";
 }
 
-void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fileName)
+void GetClientForTransaction(unordered_map<string, stClientData>::iterator &clientIt, unordered_map<string, stClientData>& clients)
 {
     string accountNumber = "";
-
-    unordered_map<string, stClientData>::iterator clientIt;
     do
     {
         accountNumber = readAccountNumber();
@@ -1365,6 +1386,13 @@ void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fil
             cout << "\nThe client with the account number[" << accountNumber << "] doesn't exist. Enter a different account number: ";
 
     } while (clientIt == clients.end());
+}
+
+void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fileName)
+{
+    unordered_map<string, stClientData>::iterator clientIt;
+
+    GetClientForTransaction(clientIt, clients);
 
     cout << "\nThe following are the client data: \n\n";
     PrintInfoCard(clientIt->second);
@@ -1378,18 +1406,9 @@ void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fil
 
 void WithdrawByAccNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
-    string accountNumber = "";
-
     unordered_map<string, stClientData>::iterator clientIt;
-    do
-    {
-        accountNumber = readAccountNumber();
-        clientIt = FindClientByAccountNumber(accountNumber, clients);
 
-        if (clientIt == clients.end())
-            cout << "\nThe client with the account number[" << accountNumber << "] doesn't exist. Enter a different account number: ";
-
-    } while (clientIt == clients.end());
+    GetClientForTransaction(clientIt, clients);
 
     cout << "\nThe following are the client data: \n\n";
     PrintInfoCard(clientIt->second);
@@ -1569,7 +1588,7 @@ void PerformMainMenuOption(const enMenuChoice choice)
     }
 }
 
-void RunBankServices(enRunningState &state, const stUserData &runningUser)
+void RunBankServices(enRunningState& state, const stUserData& runningUser)
 {
     enMenuChoice runningUtility = enMenuChoice::Logout;
 
@@ -1604,7 +1623,7 @@ void StartBankSystem()
         if (RunningState == enRunningState::LoginScreen)
             LoginScreen(USERS_FILE_NAME, RunningState, RunningUser);
 
-        if(RunningState== enRunningState::InsideBankSystem)
+        if (RunningState == enRunningState::InsideBankSystem)
             RunBankServices(RunningState, RunningUser);
 
     } while (true);
