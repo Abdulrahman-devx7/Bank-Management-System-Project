@@ -123,6 +123,20 @@ vector<string> SplitString(string& S1, string delimiter = "#//#")
     return Words;
 }
 
+string JoinString(const vector<string>& words, string delimiter)
+{
+    string text;
+
+    for (int i = 0; i < words.size(); i++)
+    {
+        text += words[i];
+
+        if (i != words.size() - 1)
+            text.append(delimiter);
+    }
+    return text;
+}
+
 stClientData ConvertClientLineToRecord(string Line, string delimiter = "#//#")
 {
     stClientData client;
@@ -440,6 +454,77 @@ auto FindClientByAccountNumber(const string& userInputAccNumber, unordered_map<s
     return clientIt;
 }
 
+bool IsValidPIN(const string& PIN)
+{
+    return PIN.length() == 6 &&
+        all_of(PIN.begin(), PIN.end(), ::isdigit);
+}
+
+bool isValidPhoneNumber(const string& phoneNumber)
+{
+    static const regex pattern("(010|011|012|015)[0-9]{8}");
+    return regex_match(phoneNumber, pattern);
+}
+
+bool isValidAccountNumber(const string& accountNumber)
+{
+    static const regex pattern("[A-Z]{3}[0-9]{4}");
+    return regex_match(accountNumber, pattern);
+}
+
+bool AreNamesOnlyLetters(const vector<string>& names)
+{
+    for (const string& name : names)
+    {
+        if (!all_of(name.begin(), name.end(), ::isalpha))
+            return false;
+    }
+    return true;
+}
+
+
+string ReadPhoneNumber()
+{
+    string PhoneNumber = "";
+    bool isValid = true;
+    do
+    {
+        getline(cin, PhoneNumber);
+        isValid = isValidPhoneNumber(PhoneNumber);
+
+        if (!isValid)
+            cout << "\nPlease enter a valid Egyptian phone number (11 digits, e.g. 01012345678)!\n";
+    } while (!isValid);
+    return PhoneNumber;
+}
+
+long long ReadBalance()
+{
+    stNumericInputData inputData;
+    inputData.inputMessage = "\n\nPlease, enter the balance amount\n";
+    inputData.from = 0;
+
+    return ReadNumber(inputData);
+}
+
+string ReadPIN()
+{
+    string PIN;
+    bool isValid = true;
+    do
+    {
+        getline(cin, PIN);
+        isValid = IsValidPIN(PIN);
+
+        if (!isValid)
+            cout << "\nPlease enter a valid PIN (6 digits, numbers only)\n";
+
+    } while (!isValid);
+
+    return PIN;
+}
+
+
 void PrintInfoCard(const stClientData& data)
 {
     //cout << "The following are the client's details\n";
@@ -586,72 +671,17 @@ void ReadUserUpdates(stUserData& user)
     AssignPermissionsToUser(user);
 }
 
-void readClientDataUpdates(stClientData& data)
-{
-    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter PIN code: ";
-        getline(cin, data.PIN_Number);
-    }
-
-    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter name: ";
-        getline(cin, data.user_name);
-    }
-
-    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter phone number: ";
-        getline(cin, data.phoneNumber);
-    }
-
-    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
-    {
-        cout << "Enter account balance: ";
-        cin >> data.balanceUSD;
-    }
-}
-
-
-bool IsValidPIN(const string& PIN)
-{
-    return PIN.length() == 6 &&
-        all_of(PIN.begin(), PIN.end(), ::isdigit);
-}
-
-bool isValidPhoneNumber(const string& phoneNumber)
-{
-    static const regex pattern("(010|011|012|015)[0-9]{8}");
-    return regex_match(phoneNumber, pattern);
-}
-
-bool isValidAccountNumber(const string& accountNumber)
-{
-    static const regex pattern("[A-Z]{3}[0-9]{4}");
-    return regex_match(accountNumber, pattern);
-}
-
-bool AreNamesOnlyLetters(const vector<string>& names)
-{
-    for (const string& name : names)
-    {
-        if (!all_of(name.begin(), name.end(), ::isalpha))
-            return false;
-    }
-    return true;
-}
-
 void ReadName(stClientData& client)
 {
     bool is4Names = true;
     bool isAllLetters = true;
+    vector<string> Words;
 
     do
     {
         getline(cin, client.user_name);
 
-        vector<string> Words = SplitString(client.user_name, " ");
+        Words = SplitString(client.user_name, " ");
 
         is4Names = (Words.size() == 4);
         isAllLetters = AreNamesOnlyLetters(Words);
@@ -660,6 +690,35 @@ void ReadName(stClientData& client)
             cout << "\nPlease, enter a valid full name form consisting of 4 names without any number or special characters!\n\n";
 
     } while (!isAllLetters || !is4Names);
+
+    client.user_name = JoinString(Words, " ");
+}
+
+void readClientDataUpdates(stClientData& client)
+{
+    if (toupper(DetermineAgain("\nUpdate PIN code? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter PIN code: ";
+        client.PIN_Number = ReadPIN();
+    }
+
+    if (toupper(DetermineAgain("\nUpdate name? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter name: ";
+        ReadName(client);
+    }
+
+    if (toupper(DetermineAgain("\nUpdate phone number? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter phone number: ";
+        client.phoneNumber = ReadPhoneNumber();
+    }
+
+    if (toupper(DetermineAgain("\nUpdate account balance? (Y/N)\n")) == 'Y')
+    {
+        cout << "Enter account balance: ";
+        client.balanceUSD = ReadBalance();
+    }
 }
 
 void ReadAccNumberToAddUser(stClientData& client, unordered_map<string, stClientData>& clients)
@@ -681,44 +740,6 @@ void ReadAccNumberToAddUser(stClientData& client, unordered_map<string, stClient
             cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
 
     } while (isExistent || !isAccNumberValid);
-}
-
-string ReadPIN()
-{
-    string PIN;
-    bool isValid = true;
-    do
-    {
-        getline(cin, PIN);
-        isValid = IsValidPIN(PIN);
-
-        if (!isValid)
-            cout << "\nPlease enter a valid PIN (6 digits, numbers only)\n";
-
-    } while (!isValid);
-}
-
-string ReadPhoneNumber()
-{
-    string PhoneNumber = "";
-    bool isValid = true;
-    do
-    {
-        getline(cin, PhoneNumber);
-        isValid = isValidPhoneNumber(PhoneNumber);
-
-        if (!isValid)
-            cout << "\nPlease enter a valid Egyptian phone number (11 digits, e.g. 01012345678)!\n";
-    } while (!isValid);
-}
-
-long long ReadBalance()
-{
-    stNumericInputData inputData;
-    inputData.inputMessage = "\n\nPlease, enter the balance amount\n";
-    inputData.from = 0;
-
-    return ReadNumber(inputData);
 }
 
 void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
@@ -1234,6 +1255,8 @@ void UpdateClientData(unordered_map<string, stClientData>::iterator clientIt)
 void UpdateClientByAccountNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
     stClientData Client;
+
+    cout << "Enter the account number: ";
     string accountNumber = readAccountNumber();
 
     auto clientIt = FindClientByAccountNumber(accountNumber, clients);
