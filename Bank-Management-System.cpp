@@ -1374,7 +1374,7 @@ void ShowTransactionsMenu()
     cout << UI_LINE_BOUNDS << "\n";
 }
 
-void GetClientForTransaction(unordered_map<string, stClientData>::iterator clientIt, unordered_map<string, stClientData>& clients)
+void GetClientForTransaction(unordered_map<string, stClientData>::iterator &clientIt, unordered_map<string, stClientData>& clients)
 {
     string accountNumber = "";
     do
@@ -1406,18 +1406,9 @@ void DepositByAccNumber(unordered_map<string, stClientData>& clients, string fil
 
 void WithdrawByAccNumber(unordered_map<string, stClientData>& clients, string fileName)
 {
-    string accountNumber = "";
-
     unordered_map<string, stClientData>::iterator clientIt;
-    do
-    {
-        accountNumber = readAccountNumber();
-        clientIt = FindClientByAccountNumber(accountNumber, clients);
 
-        if (clientIt == clients.end())
-            cout << "\nThe client with the account number[" << accountNumber << "] doesn't exist. Enter a different account number: ";
-
-    } while (clientIt == clients.end());
+    GetClientForTransaction(clientIt, clients);
 
     cout << "\nThe following are the client data: \n\n";
     PrintInfoCard(clientIt->second);
