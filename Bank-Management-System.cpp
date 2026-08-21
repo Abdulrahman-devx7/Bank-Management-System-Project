@@ -313,8 +313,9 @@ string readAccountNumber()
 string ReadUserName()
 {
     string username = "";
+
     cout << "\nEnter the username: ";
-    cin >> username;
+    getline(cin >> ws, username);
 
     return username;
 }
@@ -323,9 +324,19 @@ string ReadPassword()
 {
     string password = "";
     cout << "\nEnter the password: ";
-    cin >> password;
+    getline(cin >> ws, password);
 
     return password;
+}
+
+bool CheckSpacesInUsername(string &username)
+{
+    for (int i = 0; i < username.length(); i++)
+    {
+        if (isspace(username[i]))
+            return true;
+    }
+    return false;
 }
 
 stLoginCredentials ReadLoginCredentials()
@@ -856,22 +867,27 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
     string inputUsername = "";
 
     bool isExistent = false;
-    cout << "\nUsername: ";
+    bool containSpaces = false;
 
+    //should use ReadUserName function here
+    cout << "\nUsername: ";
     do
     {
         getline(cin >> ws, inputUsername);
         NormalizeUsername(inputUsername);
 
-        if ((isExistent = CheckExistence(inputUsername, users)))
+        if ((containSpaces = CheckSpacesInUsername(inputUsername)))
+            cout << "\nPlease, enter a valid username without any spaces!\nThe name should contain only letters, numbers, and special characters.\n";
+
+        else if((isExistent = CheckExistence(inputUsername, users)))
             cout << "\n The user with the username [" << inputUsername << "] already exists\n\n Enter a different username: ";
 
-    } while (isExistent);
+    } while (isExistent || containSpaces);
+
     userData.user_name = inputUsername;
 
     //Totally fragile for sure. It needs regex to make an obligatory standard form
-    cout << "\nPassword: ";
-    cin >> userData.user_password;
+    userData.user_password = ReadPassword();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     AssignPermissionsToUser(userData);
