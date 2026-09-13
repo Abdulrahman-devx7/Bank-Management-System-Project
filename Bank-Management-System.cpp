@@ -461,12 +461,7 @@ char DetermineAgain(string message)
 
 auto FindClientByAccountNumber(const string& userInputAccNumber, unordered_map<string, stClientData>& clients)
 {
-    auto clientIt = clients.find(userInputAccNumber);
-
-    if (clientIt != clients.end() && clientIt->second.MarkForDelete)
-        return clients.end();
-
-    return clientIt;
+    return clients.find(userInputAccNumber);
 }
 
 bool IsValidPIN(const string& PIN)
