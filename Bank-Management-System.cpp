@@ -581,17 +581,17 @@ void MarkClientForDeleteByAccountNumber(unordered_map<string, stClientData>& cli
     clients[accountNumber].MarkForDelete = true;
 }
 
-bool CheckExistence(string accountNumber, unordered_map<string, stClientData>& clients)
+auto CheckExistence(string accountNumber, unordered_map<string, stClientData>& clients)
 {
-    return clients.contains(accountNumber);
+    return clients.find(accountNumber);
 }
 
 // Can we make this probably more usable or similar to DetermineAccountFind, which return a straight iterator to
 // user's location, which can be then stored in a variable to manipulate directly without needing to
 // search again to get a pointer
-bool CheckExistence(string username, unordered_map<string, stUserData>& clients)
+auto CheckExistence(string username, unordered_map<string, stUserData>& clients)
 {
-    return clients.contains(username);
+    return clients.find(username);
 }
 
 void AssignPermissionsToUser(stUserData& userData)
@@ -733,23 +733,24 @@ void readClientDataUpdates(stClientData& client)
 
 void ReadAccNumberToAddUser(stClientData& client, unordered_map<string, stClientData>& clients)
 {
-    bool isExistent = false;
+    unordered_map<string, stClientData>::iterator existenceIterator = clients.end();
     bool isAccNumberValid = true;
+
     do
     {
         client.accountNumber = readAccountNumber();
-        isExistent = CheckExistence(client.accountNumber, clients);
+        existenceIterator = CheckExistence(client.accountNumber, clients);
         isAccNumberValid = isValidAccountNumber(client.accountNumber);
 
         if (isAccNumberValid)
         {
-            if (isExistent)
+            if (existenceIterator!=clients.end())
                 cout << "\nThe client with the account number[" << client.accountNumber << "] already exists, enter a different account number: ";
         }
         else
             cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
 
-    } while (isExistent || !isAccNumberValid);
+    } while ((existenceIterator != clients.end()) || !isAccNumberValid);
 }
 
 void readClientData(stClientData& client, unordered_map<string, stClientData>& clients)
@@ -854,7 +855,7 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
 {
     string inputUsername = "";
 
-    bool isExistent = false;
+    unordered_map<string, stUserData>::iterator existenceIterator = users.end();
     bool containSpaces = false;
 
     //should use ReadUserName function here
@@ -867,10 +868,10 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
         if ((containSpaces = CheckSpacesInUsername(inputUsername)))
             cout << "\nPlease, enter a valid username without any spaces!\nThe name should contain only letters, numbers, and special characters.\n";
 
-        else if((isExistent = CheckExistence(inputUsername, users)))
+        else if((existenceIterator = CheckExistence(inputUsername, users))!=users.end())
             cout << "\n The user with the username [" << inputUsername << "] already exists\n\n Enter a different username: ";
 
-    } while (isExistent || containSpaces);
+    } while ((existenceIterator != users.end()) || containSpaces);
 
     userData.user_name = inputUsername;
 
@@ -1111,16 +1112,17 @@ void AddUserScreen(string fileName)
 
 void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName)
 {
+    unordered_map<string, stUserData>::iterator userDataIterator = users.end(); 
     stUserData userData;
     string username = ReadUserName();
 
     NormalizeUsername(username);
 
-    if (CheckExistence(username, users))
+    if ((userDataIterator = CheckExistence(username, users)) != users.end())
     {
-        userData = users.find(username)->second;
+        userData = userDataIterator->second;
 
-        string foundUserName = users.find(username)->second.user_name;
+        string foundUserName = userData.user_name;
         NormalizeUsername(foundUserName);
 
         if (foundUserName == "admin1")
@@ -1144,14 +1146,15 @@ void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName
 
 void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName)
 {
+    unordered_map<string, stUserData>::iterator userDataIterator = users.end();
     stUserData userData;
     string inputUsername = ReadUserName();
 
     NormalizeUsername(inputUsername);
 
-    if (CheckExistence(inputUsername, users))
+    if ((userDataIterator = CheckExistence(inputUsername, users)) != users.end())
     {
-        userData = users.find(inputUsername)->second;
+        userData = userDataIterator->second;
         PrintInfoCard(userData);
 
         if (toupper(DetermineAgain("\n\nAre you sure you want to update this user (Y/N)?\n")) == 'Y')
@@ -1169,11 +1172,13 @@ void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName
 
 void FindUser(unordered_map<string, stUserData>& users)
 {
+    unordered_map<string, stUserData>::iterator userDataIterator = users.end();
     string inputUsername = ReadUserName();
+
     NormalizeUsername(inputUsername);
 
-    if (CheckExistence(inputUsername, users))
-        PrintInfoCard(users.find(inputUsername)->second);
+    if ((userDataIterator = CheckExistence(inputUsername, users)) != users.end())
+        PrintInfoCard(userDataIterator->second);
     else
         cout << "The username: [" << inputUsername << "] has not been found!\n";
 }
