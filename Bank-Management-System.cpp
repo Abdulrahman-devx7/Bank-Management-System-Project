@@ -207,7 +207,9 @@ void LoadFromFile(string fileName, vector<stClientData>& clients, string delimit
         while (getline(file, line))
         {
             client = ConvertClientLineToRecord(line, delimiter);
-            clients.push_back(client);
+
+            if(!client.MarkForDelete)
+                clients.push_back(client);
         }
         file.close();
     }
@@ -228,7 +230,9 @@ void LoadFromFile(string fileName, unordered_map<string, stClientData>& clients,
         while (getline(file, line))
         {
             client = ConvertClientLineToRecord(line, delimiter);
-            clients.insert({ client.accountNumber, client });
+
+            if(!client.MarkForDelete)
+                clients.insert({ client.accountNumber, client });
         }
         file.close();
     }
@@ -791,17 +795,6 @@ int ReadWithdrawNumber()
     return ReadNumber(inputData);
 }
 
-vector<stClientData> GetVisibleClients(const vector<stClientData>& clients)
-{
-    vector<stClientData> visibleClients;
-    for (const stClientData& client : clients)
-    {
-        if (!client.MarkForDelete)
-            visibleClients.push_back(client);
-    }
-    return visibleClients;
-}
-
 long long AccumulateBalances(const vector<stClientData>& clients)
 {
     long long sumBalances = 0;
@@ -1076,14 +1069,12 @@ void ShowClientListScreen(string fileName)
     vector<stClientData> clients;
     LoadFromFile(fileName, clients);
 
-    vector<stClientData> visibleClients = GetVisibleClients(clients);
+    PrintFileInfoHeader(clients);
 
-    PrintFileInfoHeader(visibleClients);
-
-    if (visibleClients.size() == 0)
+    if (clients.size() == 0)
         cout << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!";
 
-    for (const stClientData& client : visibleClients)
+    for (const stClientData& client : clients)
     {
         PrintIndividualTableInfo(client);
     }
@@ -1224,19 +1215,17 @@ void ShowClientsBalances(string fileName)
     vector<stClientData> clients;
     LoadFromFile(fileName, clients);
 
-    vector<stClientData> visibleClients = GetVisibleClients(clients);
+    PrintClientBalancesHeader(clients);
 
-    PrintClientBalancesHeader(visibleClients);
-
-    if (visibleClients.size() == 0)
+    if (clients.size() == 0)
         cout << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!";
 
-    for (const stClientData& client : visibleClients)
+    for (const stClientData& client : clients)
     {
         PrintUserInfoInBalancesTable(client);
     }
     cout << string(SCREEN_WIDTH - 34, '-') << "\n";
-    cout << right << setw(42) << "Total Balances = " << AccumulateBalances(visibleClients) << " USD\n";
+    cout << right << setw(42) << "Total Balances = " << AccumulateBalances(clients) << " USD\n";
 }
 
 void VerifyBalanceForWithdraw(unordered_map<string, stClientData>::iterator& clientIt, int withdrawAmount)
