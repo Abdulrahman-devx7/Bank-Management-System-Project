@@ -341,8 +341,13 @@ bool CheckSpacesInUsername(string &username)
 stLoginCredentials ReadLoginCredentials()
 {
     stLoginCredentials loginData;
+
+    cout << "\nUsername: ";
     loginData.inputUsername = ReadUsername();
+
     ConvertToLowerCase(loginData.inputUsername);
+
+    cout << "\nPassword: ";
     loginData.inputPassword = ReadPassword();
 
     return loginData;
