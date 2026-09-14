@@ -1419,6 +1419,7 @@ void ShowTransactionsMenu()
 void GetClientForTransaction(unordered_map<string, stClientData>::iterator &clientIt, unordered_map<string, stClientData>& clients)
 {
     string accountNumber = "";
+    cout << "Please, enter the account number: ";
     do
     {
         accountNumber = readAccountNumber();
