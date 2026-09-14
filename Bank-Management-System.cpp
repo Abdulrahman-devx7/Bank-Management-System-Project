@@ -310,11 +310,11 @@ string readAccountNumber()
 }
 
 //MORE MODULAR DESIGN FOR READING USERNAME & PASSWORD
-string ReadUserName()
+string ReadUsername()
 {
     string username = "";
 
-    cout << "\nEnter the username: ";
+    // Reading only - prompt moved to screen functions to separate concerns
     getline(cin >> ws, username);
 
     return username;
@@ -343,7 +343,7 @@ stLoginCredentials ReadLoginCredentials()
 {
     stLoginCredentials loginData;
 
-    loginData.inputUsername = ReadUserName();
+    loginData.inputUsername = ReadUsername();
     ConvertToLowerCase(loginData.inputUsername);
     loginData.inputPassword = ReadPassword();
 
@@ -681,7 +681,10 @@ void ReadClientDataUpdates(stClientData& data)
 void ReadUserUpdates(stUserData& user)
 {
     if (toupper(DetermineAgain("\n\nDo you want to update the username (Y/N)?\n")) == 'Y')
-        user.user_name = ReadUserName();
+    {
+        cout << "\nEnter the username: ";
+        user.user_name = ReadUsername();
+    }
 
     if (toupper(DetermineAgain("\n\nDo you want to update the password (Y/N)?\n")) == 'Y')
         user.user_password = ReadPassword();
@@ -1119,6 +1122,7 @@ void AddUserScreen(string fileName)
     do
     {
         //Should the two lines after the PrintScreenHeader be added to the AddNewUser function?
+        cout << "\nEnter the username: ";
         AddNewUser(fileName, users);
 
         //You and I know that this is static and isn't linked into a succeed or fail :D I'll try to get into this if needed
@@ -1127,18 +1131,18 @@ void AddUserScreen(string fileName)
     } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n") == 'Y'));
 }
 
-void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName)
+void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName, const string& username)
 {
     stUserData userData;
-    string username = ReadUserName();
+    string localUsername = username;
 
-    NormalizeUsername(username);
+    NormalizeUsername(localUsername);
 
-    if (CheckExistence(username, users))
+    if (CheckExistence(localUsername, users))
     {
-        userData = users.find(username)->second;
+        userData = users.find(localUsername)->second;
 
-        string foundUserName = users.find(username)->second.user_name;
+        string foundUserName = users.find(localUsername)->second.user_name;
         NormalizeUsername(foundUserName);
 
         if (foundUserName == "admin1")
@@ -1157,43 +1161,43 @@ void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName
         }
     }
     else
-        cout << "The user with the username: [" << username << "\] is NOT found!\n";
+        cout << "The user with the username: [" << localUsername << "\] is NOT found!\n";
 }
 
-void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName)
+void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName, const string& inputUsername)
 {
     stUserData userData;
-    string inputUsername = ReadUserName();
+    string localUsername = inputUsername;
 
-    NormalizeUsername(inputUsername);
+    NormalizeUsername(localUsername);
 
-    if (CheckExistence(inputUsername, users))
+    if (CheckExistence(localUsername, users))
     {
-        userData = users.find(inputUsername)->second;
+        userData = users.find(localUsername)->second;
         PrintInfoCard(userData);
 
         if (toupper(DetermineAgain("\n\nAre you sure you want to update this user (Y/N)?\n")) == 'Y')
         {
             ReadUserUpdates(userData);
-            users.insert_or_assign(inputUsername, userData);
+            users.insert_or_assign(localUsername, userData);
             SaveToFile(fileName, users);
         }
         else return;
 
     }
     else
-        cout << "The user with the username: [" << inputUsername << "\] is NOT found!\n";
+        cout << "The user with the username: [" << localUsername << "\] is NOT found!\n";
 }
 
-void FindUser(unordered_map<string, stUserData>& users)
+void FindUser(unordered_map<string, stUserData>& users, const string& inputUsername)
 {
-    string inputUsername = ReadUserName();
-    NormalizeUsername(inputUsername);
+    string localUsername = inputUsername;
+    NormalizeUsername(localUsername);
 
-    if (CheckExistence(inputUsername, users))
-        PrintInfoCard(users.find(inputUsername)->second);
+    if (CheckExistence(localUsername, users))
+        PrintInfoCard(users.find(localUsername)->second);
     else
-        cout << "The username: [" << inputUsername << "] has not been found!\n";
+        cout << "The username: [" << localUsername << "] has not been found!\n";
 }
 
 void DeleteUserScreen(string fileName)
@@ -1202,7 +1206,11 @@ void DeleteUserScreen(string fileName)
     unordered_map<string, stUserData> users;
 
     LoadFromFile(fileName, users);
-    DeleteUser(users, fileName);
+
+    cout << "\nEnter the username: ";
+    string username = ReadUsername();
+
+    DeleteUser(users, fileName, username);
 }
 
 void UpdateUserScreen(string fileName)
@@ -1211,7 +1219,11 @@ void UpdateUserScreen(string fileName)
     unordered_map<string, stUserData> users;
 
     LoadFromFile(fileName, users);
-    UpdateUser(users, fileName);
+
+    cout << "\nEnter the username: ";
+    string username = ReadUsername();
+
+    UpdateUser(users, fileName, username);
 }
 
 void FindUserScreen(string fileName)
@@ -1220,7 +1232,11 @@ void FindUserScreen(string fileName)
     unordered_map<string, stUserData> users;
 
     LoadFromFile(fileName, users);
-    FindUser(users);
+
+    cout << "\nEnter the username: ";
+    string username = ReadUsername();
+
+    FindUser(users, username);
 }
 
 void ShowClientsBalances(string fileName)
