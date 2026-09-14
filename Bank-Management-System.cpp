@@ -314,11 +314,11 @@ string readAccountNumber()
 }
 
 //MORE MODULAR DESIGN FOR READING USERNAME & PASSWORD
-string ReadUserName()
+string ReadUsername()
 {
     string username = "";
 
-    cout << "\nEnter the username: ";
+    // Reading only - prompt moved to screen functions to separate concerns
     getline(cin >> ws, username);
 
     return username;
@@ -327,7 +327,6 @@ string ReadUserName()
 string ReadPassword()
 {
     string password = "";
-    cout << "\nEnter the password: ";
     getline(cin >> ws, password);
 
     return password;
@@ -347,8 +346,12 @@ stLoginCredentials ReadLoginCredentials()
 {
     stLoginCredentials loginData;
 
-    loginData.inputUsername = ReadUserName();
+    cout << "\nUsername: ";
+    loginData.inputUsername = ReadUsername();
+
     ConvertToLowerCase(loginData.inputUsername);
+
+    cout << "\nPassword: ";
     loginData.inputPassword = ReadPassword();
 
     return loginData;
@@ -432,11 +435,18 @@ void NormalizeUsername(string& text)
     ConvertToLowerCase(text);
 }
 
-void PrintScreenHeader(string ScreenTitle)
+void PrintScreenHeader(string ScreenTitle, string SubTitle = "")
 {
-    cout << "---------------------------------------------\n";
-    cout << right << setw(30) << ScreenTitle << "\n";
-    cout << "---------------------------------------------\n\n";
+    cout << setw(80) << left << "" << "---------------------------------------------\n";
+    cout << setw(80) << left << "" << right << setw(30) << ScreenTitle << "\n";
+    cout << setw(80) << left << "" << "---------------------------------------------\n\n";
+
+    if (SubTitle != "")
+    {
+        cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
+        cout << setw(80) << left << "" << right << setw(30) << SubTitle << "\n";
+        cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
+    }
 }
 
 char DetermineAgain(string message)
@@ -673,7 +683,10 @@ void ReadClientDataUpdates(stClientData& data)
 void ReadUserUpdates(stUserData& user)
 {
     if (toupper(DetermineAgain("\n\nDo you want to update the username (Y/N)?\n")) == 'Y')
-        user.user_name = ReadUserName();
+    {
+        cout << "\nEnter the username: ";
+        user.user_name = ReadUsername();
+    }
 
     if (toupper(DetermineAgain("\n\nDo you want to update the password (Y/N)?\n")) == 'Y')
         user.user_password = ReadPassword();
@@ -862,11 +875,11 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
     cout << "\nUsername: ";
     do
     {
-        getline(cin >> ws, inputUsername);
+        inputUsername = ReadUsername();
         NormalizeUsername(inputUsername);
 
         if ((containSpaces = CheckSpacesInUsername(inputUsername)))
-            cout << "\nPlease, enter a valid username without any spaces!\nThe name should contain only letters, numbers, and special characters.\n";
+            cout << "\nPlease, enter a valid username without any spaces!\nThe username should contain only letters, numbers, and special characters.\n";
 
         else if((existenceIterator = CheckExistence(inputUsername, users))!=users.end())
             cout << "\n The user with the username [" << inputUsername << "] already exists\n\n Enter a different username: ";
@@ -876,6 +889,7 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
     userData.user_name = inputUsername;
 
     //Totally fragile for sure. It needs regex to make an obligatory standard form
+    cout << "\nPassword: ";
     userData.user_password = ReadPassword();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -903,72 +917,67 @@ bool CheckBalanceForWithdrawal(const stClientData& client, int withdrawalAmount)
 
 void ShowMainMenu()
 {
-    cout << UI_LINE_BOUNDS << "\n";
-    cout << right << setw(22) << "MAIN MENU" << "\n";
-    cout << UI_LINE_BOUNDS << "\n";
+    PrintScreenHeader("MAIN SCREEN", "MAIN MENU");
 
-    cout << right << setw(10) << "[1]" << " Show Client List" << "\n";
-    cout << right << setw(10) << "[2]" << " Add New Client" << "\n";
-    cout << right << setw(10) << "[3]" << " Delete Client" << "\n";
-    cout << right << setw(10) << "[4]" << " Update Client Info" << "\n";
-    cout << right << setw(10) << "[5]" << " Find Client" << "\n";
-    cout << right << setw(10) << "[6]" << " Transactions" << "\n";
-    cout << right << setw(10) << "[7]" << " Manage Users" << "\n";
-    cout << right << setw(10) << "[8]" << " Logout" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[1]" << " Show Client List" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[2]" << " Add New Client" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[3]" << " Delete Client" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[4]" << " Update Client Info" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[5]" << " Find Client" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[6]" << " Transactions" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[7]" << " Manage Users" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[8]" << " Logout" << "\n";
 
-    cout << UI_LINE_BOUNDS << "\n";
+    cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
 }
 
 void ShowManageUsersMenu()
 {
-    cout << UI_LINE_BOUNDS << "\n";
-    cout << right << setw(30) << "Manage Users Menu" << "\n";
-    cout << UI_LINE_BOUNDS << "\n";
+    PrintScreenHeader("MANAGE USERS SCREEN", "Manage Users Menu");
 
-    cout << right << setw(10) << "[1]" << " List Users" << "\n";
-    cout << right << setw(10) << "[2]" << " Add User" << "\n";
-    cout << right << setw(10) << "[3]" << " Delete User" << "\n";
-    cout << right << setw(10) << "[4]" << " Update User" << "\n";
-    cout << right << setw(10) << "[5]" << " Find User" << "\n";
-    cout << right << setw(10) << "[6]" << " Return to Main Menu" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[1]" << " List Users" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[2]" << " Add User" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[3]" << " Delete User" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[4]" << " Update User" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[5]" << " Find User" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[6]" << " Return to Main Menu" << "\n";
 
-    cout << UI_LINE_BOUNDS << "\n";
+    cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
 }
 
 void PrintFileInfoHeader(const vector<stClientData>& clients)
 {
-    cout << right << setw(62) << "Client list: (" << clients.size() << ") client(s)" << "\n";
-    cout << string(SCREEN_WIDTH, '-') << "\n";
-    cout << left << "| " << setw(20) << " Account Number " << "| ";
+    cout << setw(40) << left << "" << right << setw(62) << "Client list: (" << clients.size() << ") client(s)" << "\n";
+    cout << setw(40) << left << "" << string(SCREEN_WIDTH, '-') << "\n";
+    cout << setw(40) << left << "" << left << "| " << setw(20) << " Account Number " << "| ";
     cout << setw(15) << " PIN Number " << "| ";
     cout << setw(50) << " Client Name " << "| ";
     cout << setw(15) << "Phone Number" << "| ";
-    cout << setw(14) << " Balance - USD" << "|" << "\n";
-    cout << string(SCREEN_WIDTH, '-') << "\n";
+    cout << setw(14) << "Balance - USD" << "|" << "\n";
+    cout << setw(40) << left << "" << string(SCREEN_WIDTH, '-') << "\n";
 }
 
 void PrintFileInfoHeader(const vector<stUserData>& users)
 {
-    cout << right << setw(50) << "User list: (" << users.size() << ") user(s)" << "\n";
-    cout << string(77, '-') << "\n";
-    cout << left << "| " << setw(20) << " User Name " << "| ";
+    cout << setw(55) << left << "" << right << setw(50) << "User list: (" << users.size() << ") user(s)" << "\n";
+    cout << setw(65) << left << "" << string(77, '-') << "\n";
+    cout << setw(65) << left << "" << left << "| " << setw(20) << " User Name " << "| ";
     cout << setw(30) << " Password " << "| ";
     cout << setw(20) << " Permissions " << "|" << "\n";
-    cout << string(77, '-') << "\n";
+    cout << setw(65) << left << "" << string(77, '-') << "\n";
 }
 
 void PrintClientBalancesHeader(const vector<stClientData>& clients)
 {
-    cout << right << setw(42) << "Balances List for (" << clients.size() << ") client(s)" << "\n";
-    cout << string(SCREEN_WIDTH - 34, '-') << "\n";
+    cout << setw(62) << left << "" << right << setw(42) << "Balances List for (" << clients.size() << ") client(s)" << "\n";
+    cout << setw(55) << left << "" << string(SCREEN_WIDTH - 34, '-') << "\n";
 
-    cout << left << "| " << setw(20) << " Account Number " << "| ";
+    cout << setw(55) << left << "" << left << "| " << setw(20) << " Account Number " << "| ";
     cout << setw(50) << " Client Name " << "|";
-    cout << setw(14) << "Balance " << "|" << "\n";
+    cout << setw(14) << "Balance " << " |" << "\n";
 
-    cout << string(SCREEN_WIDTH - 34, '-') << "\n";
+    cout << setw(55) << left << "" << string(SCREEN_WIDTH - 34, '-') << "\n";
 }
-
 //POTENTIAL DRY VIOLATION?
 void EvaluateMenuChoice(enMenuChoice& menuChoice)
 {
@@ -1005,7 +1014,7 @@ void EvaluateMenuChoice(enManageUsersMenuChoice& menuChoice)
 
 void PrintIndividualTableInfo(const stClientData& client)
 {
-    cout << "| " << setw(20) << left << client.accountNumber << "| ";
+    cout << setw(40) << left << "" << "| " << setw(20) << left << client.accountNumber << "| ";
     cout << setw(15) << left << client.PIN_Number << "| ";
     cout << setw(50) << left << client.user_name << "| ";
     cout << setw(15) << left << client.phoneNumber << "| ";
@@ -1014,14 +1023,14 @@ void PrintIndividualTableInfo(const stClientData& client)
 
 void PrintIndividualTableInfo(const stUserData& user)
 {
-    cout << "| " << setw(20) << left << user.user_name << "| ";
+    cout << setw(65) << left << "" << "| " << setw(20) << left << user.user_name << "| ";
     cout << setw(30) << left << user.user_password << "| ";
     cout << setw(20) << left << user.permissions << "|" << "\n";
 }
 
 void PrintUserInfoInBalancesTable(const stClientData& client)
 {
-    cout << "| " << setw(20) << left << client.accountNumber << "| ";
+    cout << setw(55) << left << "" << "| " << setw(20) << left << client.accountNumber << "| ";
     cout << setw(50) << left << client.user_name << "| ";
     cout << setw(14) << left << client.balanceUSD << "| " << "\n";
 }
@@ -1062,35 +1071,37 @@ void SaveToFile(string fileName, unordered_map<string, stUserData>& users)
 
 void ShowClientListScreen(string fileName)
 {
+    PrintScreenHeader("CLIENTS LIST");
     vector<stClientData> clients;
     LoadFromFile(fileName, clients);
 
     PrintFileInfoHeader(clients);
 
     if (clients.size() == 0)
-        cout << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!";
+        cout << setw(40) << left << "" << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!\n";
 
     for (const stClientData& client : clients)
     {
         PrintIndividualTableInfo(client);
     }
-    cout << string(SCREEN_WIDTH, '-') << "\n";
+    cout << setw(40) << left << "" << string(SCREEN_WIDTH, '-') << "\n";
 }
 
 void ListUsersScreen(string fileName)
 {
+    PrintScreenHeader("USERS LIST");
     vector<stUserData> users;
     LoadFromFile(fileName, users);
 
     PrintFileInfoHeader(users);
 
     if (users.size() == 0)
-        cout << right << setw(50) << "NO USERS ARE AVAILABLE IN THE SYSTEM!";
+        cout << setw(65) << left << "" << right << setw(50) << "NO USERS ARE AVAILABLE IN THE SYSTEM!\n";
 
     for (const stUserData& user : users)
         PrintIndividualTableInfo(user);
 
-    cout << string(77, '-') << "\n";
+    cout << setw(65) << left << "" << string(77, '-') << "\n";
 }
 
 void AddUserScreen(string fileName)
@@ -1110,15 +1121,15 @@ void AddUserScreen(string fileName)
     } while (toupper(DetermineAgain("do you want to add more users (Y/N)? \n") == 'Y'));
 }
 
-void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName)
+void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName, const string& username)
 {
     unordered_map<string, stUserData>::iterator userDataIterator = users.end(); 
     stUserData userData;
-    string username = ReadUserName();
+    string localUsername = username;
 
-    NormalizeUsername(username);
+    NormalizeUsername(localUsername);
 
-    if ((userDataIterator = CheckExistence(username, users)) != users.end())
+    if ((userDataIterator = CheckExistence(localUsername, users)) != users.end())
     {
         userData = userDataIterator->second;
 
@@ -1141,18 +1152,18 @@ void DeleteUser(unordered_map<string, stUserData>& users, const string& fileName
         }
     }
     else
-        cout << "The user with the username: [" << username << "\] is NOT found!\n";
+        cout << "The user with the username: [" << localUsername << "\] is NOT found!\n";
 }
 
-void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName)
+void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName, const string& inputUsername)
 {
     unordered_map<string, stUserData>::iterator userDataIterator = users.end();
     stUserData userData;
-    string inputUsername = ReadUserName();
+    string localUsername = inputUsername;
 
-    NormalizeUsername(inputUsername);
+    NormalizeUsername(localUsername);
 
-    if ((userDataIterator = CheckExistence(inputUsername, users)) != users.end())
+    if ((userDataIterator = CheckExistence(localUsername, users)) != users.end())
     {
         userData = userDataIterator->second;
         PrintInfoCard(userData);
@@ -1160,27 +1171,26 @@ void UpdateUser(unordered_map<string, stUserData>& users, const string& fileName
         if (toupper(DetermineAgain("\n\nAre you sure you want to update this user (Y/N)?\n")) == 'Y')
         {
             ReadUserUpdates(userData);
-            users.insert_or_assign(inputUsername, userData);
+            users.insert_or_assign(localUsername, userData);
             SaveToFile(fileName, users);
         }
         else return;
 
     }
     else
-        cout << "The user with the username: [" << inputUsername << "\] is NOT found!\n";
+        cout << "The user with the username: [" << localUsername << "\] is NOT found!\n";
 }
 
-void FindUser(unordered_map<string, stUserData>& users)
+void FindUser(unordered_map<string, stUserData>& users, const string& inputUsername)
 {
     unordered_map<string, stUserData>::iterator userDataIterator = users.end();
-    string inputUsername = ReadUserName();
+    string localUsername = inputUsername;
+    NormalizeUsername(localUsername);
 
-    NormalizeUsername(inputUsername);
-
-    if ((userDataIterator = CheckExistence(inputUsername, users)) != users.end())
+    if ((userDataIterator = CheckExistence(localUsername, users)) != users.end())
         PrintInfoCard(userDataIterator->second);
     else
-        cout << "The username: [" << inputUsername << "] has not been found!\n";
+        cout << "The username: [" << localUsername << "] has not been found!\n";
 }
 
 void DeleteUserScreen(string fileName)
@@ -1189,7 +1199,11 @@ void DeleteUserScreen(string fileName)
     unordered_map<string, stUserData> users;
 
     LoadFromFile(fileName, users);
-    DeleteUser(users, fileName);
+
+    cout << "\nEnter the username: ";
+    string username = ReadUsername();
+
+    DeleteUser(users, fileName, username);
 }
 
 void UpdateUserScreen(string fileName)
@@ -1198,7 +1212,11 @@ void UpdateUserScreen(string fileName)
     unordered_map<string, stUserData> users;
 
     LoadFromFile(fileName, users);
-    UpdateUser(users, fileName);
+
+    cout << "\nEnter the username: ";
+    string username = ReadUsername();
+
+    UpdateUser(users, fileName, username);
 }
 
 void FindUserScreen(string fileName)
@@ -1207,25 +1225,30 @@ void FindUserScreen(string fileName)
     unordered_map<string, stUserData> users;
 
     LoadFromFile(fileName, users);
-    FindUser(users);
+
+    cout << "\nEnter the username: ";
+    string username = ReadUsername();
+
+    FindUser(users, username);
 }
 
 void ShowClientsBalances(string fileName)
 {
+    PrintScreenHeader("TOTAL BALANCES");
     vector<stClientData> clients;
     LoadFromFile(fileName, clients);
 
     PrintClientBalancesHeader(clients);
 
     if (clients.size() == 0)
-        cout << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!";
+        cout << setw(55) << left << "" << right << setw(62) << "NO CLIENTS ARE AVAILABLE IN THE SYSTEM!\n";
 
     for (const stClientData& client : clients)
     {
         PrintUserInfoInBalancesTable(client);
     }
-    cout << string(SCREEN_WIDTH - 34, '-') << "\n";
-    cout << right << setw(42) << "Total Balances = " << AccumulateBalances(clients) << " USD\n";
+    cout << setw(55) << left << "" << string(SCREEN_WIDTH - 34, '-') << "\n";
+    cout << setw(55) << left << "" << right << setw(50) << "Total Balances = " << AccumulateBalances(clients) << " USD\n";
 }
 
 void VerifyBalanceForWithdraw(unordered_map<string, stClientData>::iterator& clientIt, int withdrawAmount)
@@ -1390,21 +1413,20 @@ void ShowDeleteClientScreen(string fileName)
 
 void ShowTransactionsMenu()
 {
-    cout << UI_LINE_BOUNDS << "\n";
-    cout << right << setw(30) << "Transaction Menu" << "\n";
-    cout << UI_LINE_BOUNDS << "\n";
+    PrintScreenHeader("TRANSACTIONS SCREEN", "Transaction Menu");
 
-    cout << right << setw(10) << "[1]" << " Deposit" << "\n";
-    cout << right << setw(10) << "[2]" << " Withdraw" << "\n";
-    cout << right << setw(10) << "[3]" << " Total Balances" << "\n";
-    cout << right << setw(10) << "[4]" << " Return to Main Menu" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[1]" << " Deposit" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[2]" << " Withdraw" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[3]" << " Total Balances" << "\n";
+    cout << setw(80) << left << "" << right << setw(10) << "[4]" << " Return to Main Menu" << "\n";
 
-    cout << UI_LINE_BOUNDS << "\n";
+    cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
 }
 
 void GetClientForTransaction(unordered_map<string, stClientData>::iterator &clientIt, unordered_map<string, stClientData>& clients)
 {
     string accountNumber = "";
+    cout << "Please, enter the account number: ";
     do
     {
         accountNumber = readAccountNumber();
