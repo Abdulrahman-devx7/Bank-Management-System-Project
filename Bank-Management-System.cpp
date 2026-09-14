@@ -323,7 +323,6 @@ string ReadUsername()
 string ReadPassword()
 {
     string password = "";
-    cout << "\nEnter the password: ";
     getline(cin >> ws, password);
 
     return password;
@@ -342,7 +341,6 @@ bool CheckSpacesInUsername(string &username)
 stLoginCredentials ReadLoginCredentials()
 {
     stLoginCredentials loginData;
-
     loginData.inputUsername = ReadUsername();
     ConvertToLowerCase(loginData.inputUsername);
     loginData.inputPassword = ReadPassword();
@@ -883,11 +881,11 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
     cout << "\nUsername: ";
     do
     {
-        getline(cin >> ws, inputUsername);
+        inputUsername = ReadUsername();
         NormalizeUsername(inputUsername);
 
         if ((containSpaces = CheckSpacesInUsername(inputUsername)))
-            cout << "\nPlease, enter a valid username without any spaces!\nThe name should contain only letters, numbers, and special characters.\n";
+            cout << "\nPlease, enter a valid username without any spaces!\nThe username should contain only letters, numbers, and special characters.\n";
 
         else if((isExistent = CheckExistence(inputUsername, users)))
             cout << "\n The user with the username [" << inputUsername << "] already exists\n\n Enter a different username: ";
@@ -897,6 +895,7 @@ void readUserData(stUserData& userData, unordered_map<string, stUserData>& users
     userData.user_name = inputUsername;
 
     //Totally fragile for sure. It needs regex to make an obligatory standard form
+    cout << "\nPassword: ";
     userData.user_password = ReadPassword();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -1122,7 +1121,6 @@ void AddUserScreen(string fileName)
     do
     {
         //Should the two lines after the PrintScreenHeader be added to the AddNewUser function?
-        cout << "\nEnter the username: ";
         AddNewUser(fileName, users);
 
         //You and I know that this is static and isn't linked into a succeed or fail :D I'll try to get into this if needed
