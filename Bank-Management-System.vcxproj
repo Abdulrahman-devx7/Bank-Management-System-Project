@@ -129,6 +129,10 @@
   <ItemGroup>
     <ClCompile Include="Bank-Management-System.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\AnotherExperimentArea\RichString.h" />
+    <ClInclude Include="..\InputValidation\InputValidate.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
