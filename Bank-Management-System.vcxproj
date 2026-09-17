@@ -136,6 +136,7 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="IPerson.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bank-Management-System.rc" />
