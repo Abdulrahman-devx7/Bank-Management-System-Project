@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="..\AnotherExperimentArea\RichString.h" />
     <ClInclude Include="..\InputValidation\InputValidate.h" />
+    <ClInclude Include="IPerson.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
