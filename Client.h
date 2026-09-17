@@ -20,19 +20,9 @@ public:
 		return _clientAccount;
 	}
 
-	Mode getClientStatus()
-	{
-		return _mode;
-	}
-
 	static Client getEmptyClient()
 	{
 		return Client(Mode::Empty, "", "", "", "", "", 0.0);
-	}
-
-	bool IsEmpty()
-	{
-		return _mode == Mode::Empty;
 	}
 };
 

@@ -35,6 +35,16 @@ public:
         return _phoneNumber;
     }
 
+    Mode Status()
+    {
+        return _mode;
+    }
+
+    bool IsEmpty()
+    {
+        return _mode == Mode::Empty;
+    }
+
     // Setters
     void SetFullName(const string& fullName)
     {
@@ -50,6 +60,8 @@ public:
     {
         _phoneNumber = phoneNumber;
     }
+
+
 
 };
 
