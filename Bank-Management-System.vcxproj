@@ -132,7 +132,13 @@
   <ItemGroup>
     <ClInclude Include="..\AnotherExperimentArea\RichString.h" />
     <ClInclude Include="..\InputValidation\InputValidate.h" />
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="Client.h" />
     <ClInclude Include="IPerson.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Bank-Management-System.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
