@@ -12,6 +12,11 @@ private:
     string _phoneNumber;
     Mode _mode;
 
+protected:
+    IPerson(string fullName, string email, string phoneNumber) :
+        _fullName(fullName), _email(email), _phoneNumber(phoneNumber) {
+    }
+
 public:
 
     // Getters
@@ -46,9 +51,5 @@ public:
         _phoneNumber = phoneNumber;
     }
 
-    IPerson(string fullName, string email, string phoneNumber) :
-        _fullName(fullName), _email(email), _phoneNumber(phoneNumber) {}
-
-    virtual void PrintInfoCard() = 0;
 };
 
