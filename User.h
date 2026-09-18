@@ -5,6 +5,9 @@
 
 class User : public IPerson
 {
+public:
+	enum class Mode { Empty = 1, Update = 2, New = 3 };
+
 private:
 	string _username;
 	string _password;
@@ -20,7 +23,7 @@ public:
 
 	User(Mode mode, string fullName, string email, string phoneNumber, string username, string password, int32_t permissions)
 		: IPerson(fullName, email, phoneNumber),
-		_username(username), _password(password), _permissions(permissions), _mode(mode) {}
+		_username(username), _password(password), _permissions(permissions) {}
 
 	bool CheckAccessPermission(Permissions Permission)
 	{
@@ -47,6 +50,16 @@ public:
 		return _permissions;
 	}
 
+	Mode Status()
+	{
+		return _mode;
+	}
+
+	bool IsEmpty()
+	{
+		return _mode == Mode::Empty;
+	}
+
 	void setUsername(string username)
 	{
 		_username = username;
@@ -61,4 +74,10 @@ public:
 	{
 		_permissions = permissions;
 	}
+
+	void SetMode(Mode mode)
+	{
+		_mode = mode;
+	}
+
 };

@@ -6,6 +6,9 @@
 
 class Client : public IPerson
 {
+public:
+	enum class Mode { Empty = 1, Update = 2, New = 3 };
+
 private:
 	Account _clientAccount;
 	Mode _mode;
@@ -20,9 +23,25 @@ public:
 		return _clientAccount;
 	}
 
+	Mode Status()
+	{
+		return _mode;
+	}
+
+	bool IsEmpty()
+	{
+		return _mode == Mode::Empty;
+	}
+
 	static Client getEmptyClient()
 	{
 		return Client(Mode::Empty, "", "", "", "", "", 0.0);
 	}
+
+	void SetMode(Mode mode)
+	{
+		_mode = mode;
+	}
+
 };
 
