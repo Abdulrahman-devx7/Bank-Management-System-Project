@@ -12,7 +12,7 @@ public:
 private:
 	Account _clientAccount;
 	Mode _mode;
-	bool isMarkedForDeletion = false;
+	bool _isMarkedForDeletion = false;
 
 public:
 	Client(Mode mode, string fullName, string email, string phoneNumber, string accountNumber, string PIN, double balance)
@@ -33,6 +33,11 @@ public:
 		return _mode == Mode::Empty;
 	}
 
+	bool IsMarkedForDeletion()
+	{
+		return _isMarkedForDeletion;
+	}
+
 	static Client getEmptyClient()
 	{
 		return Client(Mode::Empty, "", "", "", "", "", 0.0);
@@ -41,6 +46,11 @@ public:
 	void SetMode(Mode mode)
 	{
 		_mode = mode;
+	}
+
+	void MarkForDeletion()
+	{
+		_isMarkedForDeletion = true;
 	}
 
 };

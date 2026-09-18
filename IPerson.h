@@ -44,6 +44,5 @@ public:
         _phoneNumber = phoneNumber;
     }
 
-
 };
 
