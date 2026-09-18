@@ -17,13 +17,7 @@ protected:
         _fullName(fullName), _email(email), _phoneNumber(phoneNumber) {
     }
 
-    // Overload that allows initializing the mode as well
-    IPerson(Mode mode, string fullName, string email, string phoneNumber) :
-        _fullName(fullName), _email(email), _phoneNumber(phoneNumber), _mode(mode) {
-    }
-
 public:
-
     // Getters
     string FullName() const
     {
