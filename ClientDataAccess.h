@@ -7,7 +7,7 @@
 class ClientDataAccess
 {
 public:
-	enum class enDataStatus { eSuccess = 0, eFileNotFound = 1, eFileEmpty = 2 };
+    enum class enDataStatus { eSuccess = 0, eFileNotFound = 1 };
 
 private:
 
@@ -75,9 +75,6 @@ public:
                     clients.insert({ client.account().AccountNumber(), client });
             }
             clientFile.close();
-
-            if (clients.size() == 0)
-                return enDataStatus::eFileEmpty;
         }
         else
             return enDataStatus::eFileNotFound;
