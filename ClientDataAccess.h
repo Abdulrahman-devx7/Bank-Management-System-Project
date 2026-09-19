@@ -75,6 +75,7 @@ public:
                     clients.insert({ client.account().AccountNumber(), client });
             }
             clientFile.close();
+            return enDataStatus::eSuccess;
         }
         else
             return enDataStatus::eFileNotFound;
