@@ -13,7 +13,7 @@ private:
 	string _password;
 	int32_t _permissions;
 	Mode _mode;
-	bool isMarkedForDeletion = false;
+	bool _isMarkedForDeletion = false;
 
 public: 
 	enum Permissions : int32_t {
@@ -60,6 +60,11 @@ public:
 		return _mode == Mode::Empty;
 	}
 
+	bool IsMarkedForDeletion()
+	{
+		return _isMarkedForDeletion;
+	}
+
 	void setUsername(string username)
 	{
 		_username = username;
@@ -78,6 +83,11 @@ public:
 	void SetMode(Mode mode)
 	{
 		_mode = mode;
+	}
+
+	void MarkForDeletion()
+	{
+		_isMarkedForDeletion = true;
 	}
 
 };
