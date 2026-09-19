@@ -136,6 +136,7 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientDataAccess.h" />
     <ClInclude Include="IPerson.h" />
+    <ClInclude Include="IScreen.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
