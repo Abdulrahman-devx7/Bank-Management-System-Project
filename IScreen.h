@@ -10,7 +10,19 @@ using namespace std;
 class IScreen
 {
 protected:
+    static bool CheckAccessRights(User &activeUser, User::Permissions screenPermission)
+    {
+        if (activeUser.CheckAccessPermission(screenPermission))
+            return true;
 
+        else
+        {
+            PrintScreenHeader("ACCESS DENIED", "You currently have no access\n to this page.\nPlease, contact your admin.");
+            return false;
+        }
+    }
+
+public:
     static void PrintScreenHeader(string ScreenTitle, string SubTitle = "")
     {
         cout << setw(80) << left << "" << string(45, '-') << "\n";
@@ -25,19 +37,18 @@ protected:
         }
     }
 
-    static bool CheckAccessRights(User &activeUser, User::Permissions screenPermission)
+    static void PromptUser(string message)
     {
-        if (activeUser.CheckAccessPermission(screenPermission))
-            return true;
-
-        else
-        {
-            PrintScreenHeader("ACCESS DENIED", "You currently have no access\n to this page.\nPlease, contact your admin.");
-            return false;
-        }
+        cout << "\n\n" << message;
+        system("pause>0");
     }
 
-public:
+    static void ResetScreen()
+    {
+        system("cls");
+        system("color 0f");
+    }
+
     virtual void Execute() = 0;   
     virtual ~IScreen() = default;
 

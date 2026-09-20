@@ -139,6 +139,7 @@
     <ClInclude Include="IPerson.h" />
     <ClInclude Include="IScreen.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Session.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>

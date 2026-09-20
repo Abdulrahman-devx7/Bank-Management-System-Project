@@ -5,11 +5,10 @@
 
 class Session
 {
+public:
+	enum class enLoginStatus { LoggedIn = 1, LoggedOut = 2 };
 
 private:
-	enum class enLoginStatus { LoggedIn = 1, LoggedOut = 2 };
-	enum class SystemReadiness { Ready = 1, EssentialSystemFilesProblematic = 2, NoBootUp = 3 };
-
 	unordered_map<string, Client> _clientMap;
 	unordered_map<string, User> _userMap;
 
@@ -21,11 +20,10 @@ private:
 		= UserDataAccess::enDataStatus::eFileNotFound;
 
 	enLoginStatus _status = enLoginStatus::LoggedOut;
-	SystemReadiness _systemState;
 
-	// POSITION OF THIS FUNCTION IS TEMPORARY UNTIL IT COULD GET DELEGATED TO THE BUSINESS LOGIC LAYER FOR USERS
 	void _AddBaseUser(const string &username, const string &password)
 	{
+		// This logic is a place holder until we create the user business logic class and then use it here.
 		User baseUser = User::getEmptyUser();
 
 		baseUser.setUsername(username);
@@ -47,23 +45,12 @@ private:
 		_AddBaseUser("admin1", "system111");
 	}
 
-	void _HandleClientFileNotFound()
-	{
-		IScreen::PrintScreenHeader("ERROR OCCURRED", "The client database connected\nto the system doesn't exist.\nPlease contact your admin.");
-		IScreen::PromptUser("Press any button to halt the application.\n");
-	}
-
-	void _HandleRunWithoutBoot()
-	{
-		IScreen::PrintScreenHeader("ERROR OCCURRED", "Please, boot the system's\nessentials before trying to\n run the application.");
-		IScreen::PromptUser("Press any button to halt the application.\n");
-	}
-
 public:
 
 	Session()
 	{
-		_systemState = SystemReadiness::NoBootUp;
+		_clientFileStatus = ClientDataAccess::LoadData("clients.txt", GetClientMap(), "#//#");
+		_userFileStatus = UserDataAccess::LoadData("users.txt", GetUserMap(), "#//#");
 	}
 
 	unordered_map<string, Client>& GetClientMap() 
@@ -96,48 +83,23 @@ public:
 		_status = status;
 	}
 
-	// Read-only getter for system readiness
-	SystemReadiness GetSystemReadiness() const
+	void Run()
 	{
-		return _systemState;
-	}
-
-	void Boot()
-	{
-		_clientFileStatus = ClientDataAccess::LoadData("clients.txt", GetClientMap(), "#//#");
-		_userFileStatus = UserDataAccess::LoadData("users.txt", GetUserMap(), "#//#");
-
 		if (getUserFileStatus() != UserDataAccess::enDataStatus::eFileNotFound)
 		{
+			// handle the case where a user file is empty and then proceed with login screen
 			if (getUserFileStatus() == UserDataAccess::enDataStatus::eFileEmpty)
 				_HandleEmptyUsersFile();
 
-			if (getClientFileStatus() == ClientDataAccess::enDataStatus::eFileNotFound)
-				_HandleClientFileNotFound();
+			// afterwards, check if something is wrong with the client file or not as well before proceeding with login
 
+			// login screen with authentication there, which is followed by routing to the main menu with the two loops once everything succeeds.
 		}
 		else
-			_HandleUsersFileNotFound();
-
-		if (getUserFileStatus() != UserDataAccess::enDataStatus::eFileNotFound
-			&& getClientFileStatus() != ClientDataAccess::enDataStatus::eFileNotFound)
-
-			_systemState = SystemReadiness::Ready;
-		else
-			_systemState = SystemReadiness::EssentialSystemFilesProblematic;
-	}
-
-	void Run()
-	{
-        if (GetSystemReadiness() == SystemReadiness::NoBootUp)
-			_HandleRunWithoutBoot();
-
-		else if (GetSystemReadiness() == SystemReadiness::Ready)
 		{
-
+			_HandleUsersFileNotFound();
+			return;
 		}
-		// login screen with authentication there, which is followed by routing to the main menu with the two loops once everything succeeds.
-		// 
 	}
 };
 
