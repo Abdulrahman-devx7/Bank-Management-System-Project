@@ -11,7 +11,7 @@ public:
 
 private:
 
-    static void AddDataLineToFile(string fileName, string dataLine)
+    static void _AddDataLineToFile(string fileName, string dataLine)
     {
         fstream file;
         file.open(fileName, ios::out | ios::app);
@@ -23,7 +23,7 @@ private:
         }
     }
 
-    static User ConvertUserLineToRecord(string Line, string delimiter = "#//#")
+    static User _ConvertUserLineToRecord(string Line, string delimiter = "#//#")
     {
         vector<string> UserData = RichString::Split(Line, delimiter);
 
@@ -40,7 +40,7 @@ private:
 
     }
 
-    static string ConvertRecordToLine(User user, string delimiter = "#//#")
+    static string _ConvertRecordToLine(User user, string delimiter = "#//#")
     {
         string recordLine = "";
 
@@ -59,7 +59,13 @@ private:
 
 public:
 
-    enDataStatus LoadData(string fileName, unordered_map<string, User>& clients, string delimiter = "#//#")
+    static void AppendUserRecord(User &target, const string &filename, const string &delimiter="#//#")
+    {
+        _AddDataLineToFile(filename, _ConvertRecordToLine(target));
+
+    }
+
+    static enDataStatus LoadData(string fileName, unordered_map<string, User>& clients, string delimiter = "#//#")
     {
         fstream userFile;
 
@@ -72,7 +78,7 @@ public:
 
             while (getline(userFile, line))
             {
-                user = ConvertUserLineToRecord(line, delimiter);
+                user = _ConvertUserLineToRecord(line, delimiter);
 
                 if (!user.IsMarkedForDeletion())
                     clients.insert({ user.Username() , user });
@@ -89,7 +95,7 @@ public:
             return enDataStatus::eFileNotFound;
     }
 
-    void SaveData(string fileName, unordered_map<string, User>& clients)
+    static void SaveData(string fileName, unordered_map<string, User>& clients)
     {
         fstream userFile;
         userFile.open(fileName, ios::out);
@@ -100,7 +106,7 @@ public:
             {
                 for (auto& [accountNumber, client] : clients)
                 {
-                    string line = ConvertRecordToLine(client);
+                    string line = _ConvertRecordToLine(client);
 
                     userFile << line << "\n";
                 }
