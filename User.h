@@ -35,32 +35,32 @@ public:
 		return User(Mode::Empty, "", "", "", "", "", 0);
 	}
 
-	string Username()
+	string Username() const
 	{
 		return _username;
 	}
 
-	string Password()
+	string Password() const
 	{
 		return _password;
 	}
 
-	int32_t getPermissions()
+	int32_t getPermissions() const
 	{
 		return _permissions;
 	}
 
-	Mode Status()
+	Mode Status() const
 	{
 		return _mode;
 	}
 
-	bool IsEmpty()
+	bool IsEmpty() const
 	{
 		return _mode == Mode::Empty;
 	}
 
-	bool IsMarkedForDeletion()
+	bool IsMarkedForDeletion() const
 	{
 		return _isMarkedForDeletion;
 	}
