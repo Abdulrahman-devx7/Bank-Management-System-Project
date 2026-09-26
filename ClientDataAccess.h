@@ -57,7 +57,7 @@ private:
 
 public:
 
-    enDataStatus LoadData(string fileName, unordered_map<string, Client>& clients, string delimiter = "#//#")
+    static enDataStatus LoadData(string fileName, unordered_map<string, Client>& clients, string delimiter = "#//#")
     {
         fstream clientFile;
         clientFile.open(fileName, ios::in);
@@ -81,7 +81,7 @@ public:
             return enDataStatus::eFileNotFound;
     }
 
-    void SaveData(string fileName, unordered_map<string, Client>& clients)
+    static void SaveData(string fileName, unordered_map<string, Client>& clients)
     {
         fstream clientFile;
         clientFile.open(fileName, ios::out);
