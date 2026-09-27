@@ -24,17 +24,6 @@ private:
 	SystemReadiness _systemState;
 
 	// POSITION OF THIS FUNCTION IS TEMPORARY UNTIL IT COULD GET DELEGATED TO THE BUSINESS LOGIC LAYER FOR USERS
-	void _AddBaseUser(const string &username, const string &password)
-	{
-		User baseUser = User::getEmptyUser();
-
-		baseUser.setUsername(username);
-		baseUser.setPassword(password);
-		baseUser.SetMode(User::Mode::Update);
-
-		GetUserMap().insert({ username, baseUser });
-	}
-
 	void _HandleUsersFileNotFound()
 	{
 		IScreen::PrintScreenHeader("ERROR OCCURRED", "The user database connected to\nthe system isn't found!\nPlease, contact your admin to resolve\n the issue");
@@ -44,7 +33,7 @@ private:
 	{
 		IScreen::PrintScreenHeader("ERROR OCCURRED", "The database connected to\nthe system doesn't\ncontain any users.\nUse these credentials to start using\nthe system:\nUsername: admin1 --- Pass : system111");
 		IScreen::PromptUser("Press any button to proceed..\n");
-		_AddBaseUser("admin1", "system111");
+		//_AddBaseUser("admin1", "system111");
 	}
 
 	void _HandleClientFileNotFound()
