@@ -1,6 +1,7 @@
 #pragma once
 #include "ClientDataAccess.h"
 #include "UserDataAccess.h"
+#include "UserDataManager.h"
 #include "IScreen.h"
 
 class Session
@@ -10,8 +11,15 @@ private:
 	enum class enLoginStatus { LoggedIn = 1, LoggedOut = 2 };
 	enum class SystemReadiness { Ready = 1, EssentialSystemFilesProblematic = 2, NoBootUp = 3 };
 
+	const string client_file_name = "clients.txt";
+	const string users_file_name = "users.txt";
+
+	// We are thinking of delegating these containers to the managers later on after finishing the program files.
 	unordered_map<string, Client> _clientMap;
 	unordered_map<string, User> _userMap;
+
+	UserDataManager _userManager{ _userMap, "users.txt" };
+	// Client data manager 
 
 	User _activeUser = User::getEmptyUser();
 	ClientDataAccess::enDataStatus _clientFileStatus
@@ -21,7 +29,8 @@ private:
 		= UserDataAccess::enDataStatus::eFileNotFound;
 
 	enLoginStatus _status = enLoginStatus::LoggedOut;
-	SystemReadiness _systemState;
+
+	SystemReadiness _systemState = SystemReadiness::NoBootUp;
 
 	// POSITION OF THIS FUNCTION IS TEMPORARY UNTIL IT COULD GET DELEGATED TO THE BUSINESS LOGIC LAYER FOR USERS
 	void _HandleUsersFileNotFound()
@@ -33,7 +42,7 @@ private:
 	{
 		IScreen::PrintScreenHeader("ERROR OCCURRED", "The database connected to\nthe system doesn't\ncontain any users.\nUse these credentials to start using\nthe system:\nUsername: admin1 --- Pass : system111");
 		IScreen::PromptUser("Press any button to proceed..\n");
-		//_AddBaseUser("admin1", "system111");
+		_userManager.AddBaseUser("admin1", "system111");
 	}
 
 	void _HandleClientFileNotFound()
@@ -50,10 +59,9 @@ private:
 
 public:
 
-	Session()
-	{
-		_systemState = SystemReadiness::NoBootUp;
-	}
+	UserDataManager& GetUserManager() { return _userManager; }
+
+	// Should add these two to the entity managers instead
 
 	unordered_map<string, Client>& GetClientMap() 
 	{
@@ -93,8 +101,8 @@ public:
 
 	void Boot()
 	{
-		_clientFileStatus = ClientDataAccess::LoadData("clients.txt", GetClientMap(), "#//#");
-		_userFileStatus = UserDataAccess::LoadData("users.txt", GetUserMap(), "#//#");
+		_clientFileStatus = ClientDataAccess::LoadData(client_file_name, GetClientMap(), "#//#");
+		_userFileStatus = UserDataAccess::LoadData(users_file_name, GetUserMap(), "#//#");
 
 		if (getUserFileStatus() != UserDataAccess::enDataStatus::eFileNotFound)
 		{

@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include "UserDataAccess.h"
 
-class ClientDataManager
+class UserDataManager
 {
 public:
 	enum class enSaveResult { Success = 1, Non_AddNewMode = 2, UserExists = 3 };
@@ -18,8 +18,8 @@ private:
 public:
 
 	// Don't forget passing by reference for the getter of the same map in the session controller.
-	ClientDataManager(unordered_map<string, User>& injectedMap, string _sourceFileName)
-		:_userMap(injectedMap), _sourceFile(_sourceFileName) {}
+	UserDataManager(unordered_map<string, User>& injectedMap, string sourceFileName)
+		:_userMap(injectedMap), _sourceFile(sourceFileName) {}
 
 	enSaveResult Add(User& target)
 	{
