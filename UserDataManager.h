@@ -99,5 +99,17 @@ public:
 			return true;
 	}
 
+	void AddBaseUser(const string& username, const string& password)
+	{
+		User baseUser = User::getEmptyUser();
+
+		baseUser.setUsername(username);
+		baseUser.setPassword(password);
+		baseUser.SetMode(User::Mode::Update);
+
+		_userMap.insert({ username, baseUser });
+	}
+
+
 };
 
