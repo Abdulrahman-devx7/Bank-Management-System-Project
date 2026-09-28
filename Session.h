@@ -2,13 +2,12 @@
 #include "ClientDataAccess.h"
 #include "UserDataAccess.h"
 #include "UserDataManager.h"
+#include "ClientDataManager.h"
 #include "IScreen.h"
 
 class Session
 {
-
 private:
-	enum class enLoginStatus { LoggedIn = 1, LoggedOut = 2 };
 	enum class SystemReadiness { Ready = 1, EssentialSystemFilesProblematic = 2, NoBootUp = 3 };
 
 	const string client_file_name = "clients.txt";
@@ -18,17 +17,16 @@ private:
 	unordered_map<string, Client> _clientMap;
 	unordered_map<string, User> _userMap;
 
-	UserDataManager _userManager{ _userMap, "users.txt" };
-	// Client data manager 
+	UserDataManager _userManager{ _userMap, users_file_name };
+	ClientDataManager _clientManager{ _clientMap, client_file_name };
 
 	User _activeUser = User::getEmptyUser();
+
 	ClientDataAccess::enDataStatus _clientFileStatus
 		= ClientDataAccess::enDataStatus::eFileNotFound;
 
 	UserDataAccess::enDataStatus _userFileStatus
 		= UserDataAccess::enDataStatus::eFileNotFound;
-
-	enLoginStatus _status = enLoginStatus::LoggedOut;
 
 	SystemReadiness _systemState = SystemReadiness::NoBootUp;
 
@@ -57,9 +55,9 @@ private:
 		IScreen::PromptUser("Press any button to halt the application.\n");
 	}
 
-public:
-
 	UserDataManager& GetUserManager() { return _userManager; }
+
+	ClientDataManager& GetClientManager() { return _clientManager; }
 
 	// Should add these two to the entity managers instead
 
@@ -83,22 +81,19 @@ public:
 		return _userFileStatus;
 	}
 
-	enLoginStatus GetLoginStatus() const
-	{
-		return _status;
-	}
-
-	void SetLoginStatus(enLoginStatus status)
-	{
-		_status = status;
-	}
-
 	// Read-only getter for system readiness
 	SystemReadiness GetSystemReadiness() const
 	{
 		return _systemState;
 	}
 
+public:
+
+	const User& GetActiveUser() const
+	{
+		return _activeUser;
+	}
+	
 	void Boot()
 	{
 		_clientFileStatus = ClientDataAccess::LoadData(client_file_name, GetClientMap(), "#//#");
@@ -131,10 +126,22 @@ public:
 
 		else if (GetSystemReadiness() == SystemReadiness::Ready)
 		{
+			// Instantiate a login screen object with the session dep. injection
+			// With the login screen object having a dependency injection, it could access the 
+			// integer indicating the number of false credentials entering. This means that 
+			// our fellow login screen object would be changing an important indicator here.
+			// Thus take an action from here and onward when extending the system. 
+			// The auth would be done here normally followed by instantiating the main menu class with the dep. injection
+			// This is going to be encircled in while(true) loop to keep the program running.
+			// The login screen object would be connected to the session controller and potential checkers
+			// could be added here for extensibility inside this while(true) loop
+
+			while (true)
+			{
+
+			}
 
 		}
-		// login screen with authentication there, which is followed by routing to the main menu with the two loops once everything succeeds.
-		// 
 	}
 };
 

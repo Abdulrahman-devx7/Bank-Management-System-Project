@@ -5,8 +5,23 @@
 class UserDataManager
 {
 public:
-	enum class enSaveResult { Success = 1, Non_AddNewMode = 2, UserExists = 3 };
-	enum class DeleteOrUpdateResult { Success = 1, Non_updateMode = 2, UserNoExist = 3 };
+	enum class enSaveResult
+	{ 
+		Success = 1,
+		Non_AddNewMode = 2,
+		UserExists = 3 };
+	enum class DeleteOrUpdateResult 
+	{
+		Success = 1,
+		Non_updateMode = 2,
+		UserNoExist = 3 
+	};
+	enum class enAuthStatus
+	{
+		Normal = 1,
+		Success = 2,
+		InvalidCredentials = 3,
+	};
 
 private:
 	// Instantiating the data manager object with these two ensures that we if we were to change source we're
@@ -89,14 +104,14 @@ public:
 	}
 
 	// Should this merely return an object or is the Boolean a sufficient indicator? We have the find method returning a pointer, so...
-	bool AuthenticateUser(const string &username, const string &password)
+	enAuthStatus Authenticate(const string &username, const string &password)
 	{
 		auto targetUserIt = _userMap.find(username);
 
 		if ((targetUserIt == _userMap.end()) || (targetUserIt->second.Password() != password))
-			return false;
+			return enAuthStatus::InvalidCredentials;
 		else
-			return true;
+			return enAuthStatus::Success;
 	}
 
 	void AddBaseUser(const string& username, const string& password)
