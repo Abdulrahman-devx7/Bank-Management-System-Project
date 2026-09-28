@@ -64,6 +64,19 @@ public:
 		return nullptr;
 	}
 
+	User* Find(const string& username, const string& password)
+	{
+		auto userIt = _userMap.find(username);
+
+		if (userIt != _userMap.end())
+		{
+			if(userIt->second.Password()==password)
+				return &(userIt->second);
+		}
+
+		return nullptr;
+	}
+
 	// don't forget the username validation that prohibits spaces in the middle of it. this exists 
 	// in the add user screen of the procedural version but doesn't in update user
 	// SO REMEMBER ADDING THAT TO THE UI LAYER.

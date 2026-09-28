@@ -3,7 +3,7 @@
 #include "UserDataAccess.h"
 #include "UserDataManager.h"
 #include "ClientDataManager.h"
-#include "IScreen.h"
+#include "LoginScreen.h"
 
 class Session
 {
@@ -135,10 +135,12 @@ public:
 			// This is going to be encircled in while(true) loop to keep the program running.
 			// The login screen object would be connected to the session controller and potential checkers
 			// could be added here for extensibility inside this while(true) loop
-
+			LoginScreen login(_userManager, _activeUser);
 			while (true)
 			{
+				login.Execute();
 
+				// Main Menu Screen with its exectue method
 			}
 
 		}

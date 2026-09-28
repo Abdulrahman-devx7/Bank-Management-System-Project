@@ -88,6 +88,9 @@ public:
 			stLoginCredentials loginData = _ReadLoginCredentials();
 			_authStatus = _usersManager.Authenticate(loginData.inputUsername, loginData.inputPassword);
 
+			if (_authStatus == UserDataManager::enAuthStatus::Success)
+				_activeUser = *_usersManager.Find(loginData.inputUsername, loginData.inputPassword);
+
 		} while (_authStatus != UserDataManager::enAuthStatus::Success);
 
 		PromptUser("Login Succeeded! Please, press any button to enter the main menu");
