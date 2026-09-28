@@ -57,6 +57,12 @@ private:
 
 public:
 
+    static void AppendUserRecord(Client &target, const string& filename, const string& delimiter = "#//#")
+    {
+        AddDataLineToFile(filename, ConvertRecordToLine(target));
+    }
+
+
     static enDataStatus LoadData(string fileName, unordered_map<string, Client>& clients, string delimiter = "#//#")
     {
         fstream clientFile;
