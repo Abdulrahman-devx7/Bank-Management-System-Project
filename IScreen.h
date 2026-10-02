@@ -10,6 +10,11 @@ using namespace std;
 class IScreen
 {
 protected:
+
+    inline static const std::string UI_LINE_BOUNDS{ 44, '=' };
+    inline static const int SCREEN_WIDTH = 118;
+    inline static const int SCREEN_INDENT = 25;
+
     static bool CheckAccessRights(User &activeUser, User::Permissions screenPermission)
     {
         if (activeUser.CheckAccessPermission(screenPermission))

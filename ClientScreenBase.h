@@ -3,11 +3,8 @@
 #include "Client.h"
 #include <string>
 
-class ClientScreenBase : private IScreen 
+class ClientScreenBase : protected IScreen 
 {
-private:
-    inline static const std::string UI_LINE_BOUNDS{ 44, '=' };    
-
 protected:
 
     ClientScreenBase() {}
