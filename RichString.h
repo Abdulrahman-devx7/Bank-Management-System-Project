@@ -215,26 +215,26 @@ public:
         _Value = StartWordsWithLowerCase(Value(), delimiter);
     }
 
-    static string CapitalizeString(string text)
+    static string ToUpper(string text)
     {
         std::transform(text.begin(), text.end(), text.begin(), ::toupper);
         return text;
     }
 
-    void CapitalizeString()
+    void ToUpper()
     {
-        _Value = CapitalizeString(Value());
+        _Value = ToUpper(Value());
     }
 
-    static string DecapitalizeString(string text)
+    static string ToLower(string text)
     {
         std::transform(text.begin(), text.end(), text.begin(), ::tolower);
         return text;
     }
 
-    void DecapitalizeString()
+    void ToLower()
     {
-        _Value = DecapitalizeString(Value());
+        _Value = ToLower(Value());
     }
 
     static char InvertCharacter(char character)

@@ -56,6 +56,12 @@
     <ClInclude Include="ClientDataManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LoginScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientScreenBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bank-Management-System.rc">
