@@ -48,6 +48,11 @@ public:
 		return Client(Mode::Empty, "", "", "", "", "", 0.0);
 	}
 
+	static Client getNewClientObject()
+	{
+		return Client(Mode::New, "", "", "", "", "", 0.0);
+	}
+
 	void SetMode(Mode mode)
 	{
 		_mode = mode;

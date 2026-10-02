@@ -119,5 +119,37 @@ public:
         RichString::ToUpper(accNumber);
         return accNumber;
     }
+
+    static char DetermineAgain(string message)
+    {
+        char PlayAgain;
+        cout << message;
+        cin >> PlayAgain;
+
+        while (cin.fail() || (toupper(PlayAgain) != 'N' && toupper(PlayAgain) != 'Y')
+            || (std::cin.peek() != '\n' && std::cin.peek() != EOF))
+        {
+            cin.clear();
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            cout << "Please, enter a valid Choice (Y/N)!\n";
+
+            cin >> PlayAgain;
+        }
+        cin.ignore();
+
+        return PlayAgain;
+    }
+
+    bool AreNamesOnlyLetters(const vector<string>& names)
+    {
+        for (const string& name : names)
+        {
+            if (!all_of(name.begin(), name.end(), ::isalpha))
+                return false;
+        }
+        return true;
+    }
+
+
 };
 

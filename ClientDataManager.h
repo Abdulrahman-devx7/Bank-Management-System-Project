@@ -1,5 +1,7 @@
 #pragma once
 #include "ClientDataAccess.h"
+#include "BatchSearchBooleans.h"
+
 class ClientDataManager
 {
 public:
@@ -21,7 +23,7 @@ public:
 		if (target.Status() == Client::Mode::New)
 		{
 			_clientMap.insert({ target.account().AccountNumber(), target});
-			ClientDataAccess::AppendUserRecord(target, "users.txt");
+			ClientDataAccess::AppendUserRecord(target, _sourceFile);
 			target.SetMode(Client::Mode::Update);
 
 			return enSaveResult::Success;
@@ -83,6 +85,25 @@ public:
 	const unordered_map<string, Client>& GetClientMap()
 	{
 		return _clientMap;
+	}
+
+	SearchFilterOptions BatchSearch(const string &accountNumber, const string &email, const string &phoneNumber)
+	{
+		SearchFilterOptions options;
+		for (const auto& [acc_number, client] : _clientMap)
+		{
+			if (client.account().AccountNumber() == accountNumber)
+				options.matchAccountNumber = true;
+
+			if (client.Email() == email)
+				options.matchEmail = true;
+
+			if (client.PhoneNumber() == phoneNumber)
+				options.matchPhoneNumber = true;
+
+			if (options.hasAnyMatch())
+				return options;
+		}
 	}
 
 };

@@ -1,6 +1,8 @@
 #pragma once
 #include "IScreen.h"
 #include "Client.h"
+#include "RichString.h"
+#include "InputValidate.h"
 #include <string>
 
 class ClientScreenBase : protected IScreen 
@@ -16,6 +18,33 @@ protected:
 
         return userInput;
     }
+
+    void ReadFullName(Client& client)
+    {
+        bool is4Names = true;
+        bool isAllLetters = true;
+        vector<string> Words;
+
+        do
+        {
+            string fullName = "";
+            getline(cin, fullName);
+            client.SetFullName(fullName);
+
+            Words = RichString::Split(client.FullName(), " ");
+
+            is4Names = (Words.size() == 4);
+            isAllLetters = InputValidate::AreNamesOnlyLetters(Words);
+
+            if (!is4Names || !isAllLetters)
+                cout << "\nPlease, enter a valid full name form consisting of 4 names without any number or special characters!\n\n";
+
+        } while (!isAllLetters || !is4Names);
+
+        client.SetFullName(RichString::JoinString(Words, " "));
+    }
+
+
 
     static void PrintInfoCard(Client& client)
     {
