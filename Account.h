@@ -15,17 +15,17 @@ private:
 	double _balance = 0.0;
 
 public:
-	string AccountNumber() const
+	const string AccountNumber() const
 	{
 		return _accountNumber;
 	}
 
-	string PIN() const
+	const string PIN() const
 	{
 		return _PIN;
 	}
 
-	double Balance() const
+	const double Balance() const
 	{
 		return _balance;
 	}
@@ -43,9 +43,14 @@ public:
 	Account(string accountNumber, string PIN, double balance) 
 		: _accountNumber(accountNumber), _PIN(PIN), _balance(balance) {}
 
-	void Withdraw(double amount)
+	bool Withdraw(double amount)
 	{
-		_balance -= amount;
+		if (amount > _balance)
+		{
+			_balance -= amount;
+			return true;
+		}
+		else return false;
 	}
 
 	void Deposit(double amount)

@@ -18,7 +18,12 @@ public:
 	Client(Mode mode, string fullName, string email, string phoneNumber, string accountNumber, string PIN, double balance)
 		: IPerson(fullName, email, phoneNumber), _clientAccount(accountNumber, PIN, balance), _mode(mode) {}
 
-	const Account &account() const
+	const Account& account() const
+	{
+		return _clientAccount;
+	}
+
+	Account& account()
 	{
 		return _clientAccount;
 	}
