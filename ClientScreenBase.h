@@ -4,6 +4,13 @@
 class ClientScreenBase
 {
 protected:
+    string ReadAccountNumber()
+    {
+        string userInput = "";
+        getline(cin >> ws, userInput);
+
+        return userInput;
+    }
 
 };
 

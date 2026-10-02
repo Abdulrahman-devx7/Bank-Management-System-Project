@@ -3,7 +3,8 @@
 #include <climits>
 #include <utility>
 #include <cmath>
-#include "Date.h"
+#include <regex>
+#include "RichString.h"
 using namespace std;
 
 class InputValidate
@@ -12,13 +13,6 @@ private:
     static bool IsInputMalformed()
     {
         return cin.fail() || (std::cin.peek() != '\n' && std::cin.peek() != EOF);
-    }
-
-    static void SwapDates(Date& date1, Date& date2)
-    {
-        Date placeHolder = date1;
-        date1 = date2;
-        date2 = placeHolder;
     }
 
 public:
@@ -85,15 +79,6 @@ public:
         return Number;
     }
 
-
-    static bool IsDateBetween(const Date &targetDate, Date date1, Date date2)
-    {
-        if (!(Date::IsDate1BeforeDate2(date1, date2)))
-            SwapDates(date1, date2);
-
-        return (Date::CompareDates(targetDate, date1) != Date::enDateCompare::After) && (Date::CompareDates(targetDate, date2) != Date::enDateCompare::Before);
-    }
-
     static string ReadString()
     {
         string text;
@@ -101,9 +86,38 @@ public:
         return text;
     }
 
-    static bool IsValidDate(const Date& date1)
+    static bool IsValidAccountNumber(const string& accountNumber)
     {
-        return Date::IsValidDate(date1);
+        static const regex pattern("[a-zA-Z]{3}[0-9]{4}");
+        return regex_match(accountNumber, pattern);
+    }
+
+    static bool IsValidPIN(const string& PIN)
+    {
+        return PIN.length() == 6 &&
+            all_of(PIN.begin(), PIN.end(), [](unsigned char c) {
+            return isdigit(c);
+                });
+    }
+    static bool IsValidPhoneNumber(const string& phoneNumber)
+    {
+        static const regex pattern("(010|011|012|015)[0-9]{8}");
+        return regex_match(phoneNumber, pattern);
+    }
+
+    static string NormalizeUsername(string text)
+    {
+        RichString::Trim(text);
+        RichString::ToLower(text);
+
+        return text;
+    }
+
+    static std::string NormalizeAccountNumber(std::string accNumber)
+    {
+        RichString::Trim(accNumber);
+        RichString::ToUpper(accNumber);
+        return accNumber;
     }
 };
 
