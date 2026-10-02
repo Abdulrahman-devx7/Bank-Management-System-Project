@@ -59,18 +59,6 @@ private:
 
 	ClientDataManager& GetClientManager() { return _clientManager; }
 
-	// Should add these two to the entity managers instead
-
-	unordered_map<string, Client>& GetClientMap() 
-	{
-		return _clientMap;
-	}
-
-	unordered_map<string, User>& GetUserMap() 
-	{
-		return _userMap;
-	}
-
 	ClientDataAccess::enDataStatus getClientFileStatus() const
 	{
 		return _clientFileStatus;
@@ -96,8 +84,8 @@ public:
 	
 	void Boot()
 	{
-		_clientFileStatus = ClientDataAccess::LoadData(client_file_name, GetClientMap(), "#//#");
-		_userFileStatus = UserDataAccess::LoadData(users_file_name, GetUserMap(), "#//#");
+		_clientFileStatus = ClientDataAccess::LoadData(client_file_name, _clientMap, "#//#");
+		_userFileStatus = UserDataAccess::LoadData(users_file_name, _userMap, "#//#");
 
 		if (getUserFileStatus() != UserDataAccess::enDataStatus::eFileNotFound)
 		{

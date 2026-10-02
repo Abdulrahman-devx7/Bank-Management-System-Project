@@ -7,26 +7,26 @@ public:
 	enum class DeleteOrUpdateResult { Success = 1, Non_updateMode = 2, UserNoExist = 3 };
 
 private:
-	unordered_map<string, Client> _userMap;
+	unordered_map<string, Client> _clientMap;
 	string _sourceFile;
 
 public:
 
 	ClientDataManager(unordered_map<string, Client>& injectedMap, string sourceFileName)
-		:_userMap(injectedMap), _sourceFile(sourceFileName) {
+		:_clientMap(injectedMap), _sourceFile(sourceFileName) {
 	}
 
 	enSaveResult Add(Client &target)
 	{
 		if (target.Status() == Client::Mode::New)
 		{
-			_userMap.insert({ target.account().AccountNumber(), target});
+			_clientMap.insert({ target.account().AccountNumber(), target});
 			ClientDataAccess::AppendUserRecord(target, "users.txt");
 			target.SetMode(Client::Mode::Update);
 
 			return enSaveResult::Success;
 		}
-		else if (_userMap.find(target.account().AccountNumber()) != _userMap.end())
+		else if (_clientMap.find(target.account().AccountNumber()) != _clientMap.end())
 			return enSaveResult::UserExists;
 
 		else
@@ -36,9 +36,9 @@ public:
 
 	Client* Find(const Client& target)
 	{
-		auto userIt = _userMap.find(target.account().AccountNumber());
+		auto userIt = _clientMap.find(target.account().AccountNumber());
 
-		if (userIt != _userMap.end())
+		if (userIt != _clientMap.end())
 			return &(userIt->second);
 
 		return nullptr;
@@ -53,9 +53,9 @@ public:
 		switch (previousData.Status())
 		{
 		case Client::Mode::Update:
-			_userMap.erase(targetPointer->account().AccountNumber());
-			_userMap.insert_or_assign(newData.account().AccountNumber(), newData);
-			ClientDataAccess::SaveData(_sourceFile, _userMap);
+			_clientMap.erase(targetPointer->account().AccountNumber());
+			_clientMap.insert_or_assign(newData.account().AccountNumber(), newData);
+			ClientDataAccess::SaveData(_sourceFile, _clientMap);
 			return DeleteOrUpdateResult::Success;
 
 		default:
@@ -80,7 +80,10 @@ public:
 		}
 	}
 
-
+	const unordered_map<string, Client>& GetClientMap()
+	{
+		return _clientMap;
+	}
 
 };
 

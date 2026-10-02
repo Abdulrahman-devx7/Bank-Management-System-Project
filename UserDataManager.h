@@ -138,6 +138,11 @@ public:
 		_userMap.insert({ username, baseUser });
 	}
 
+	const unordered_map<string, User>& GetUserMap()
+	{
+		return _userMap;
+	}
+
 
 };
 
