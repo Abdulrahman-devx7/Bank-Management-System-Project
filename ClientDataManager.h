@@ -1,6 +1,6 @@
 #pragma once
 #include "ClientDataAccess.h"
-#include "BatchSearchBooleans.h"
+#include "BatchSearchStruct.h"
 
 class ClientDataManager
 {

@@ -2,56 +2,85 @@
 #include "ClientScreenBase.h"
 #include "ClientDataManager.h"
 #include "InputValidate.h"
-#include "BatchSearchBooleans.h"
+#include "BatchSearchStruct.h"
 #include <limits>
 
 class AddClientScreen : protected ClientScreenBase
 {
 private:
-	const ClientDataManager _manager;
+	ClientDataManager _manager;
 
-	//string ReadPIN()
-	//{
-	//	string PIN;
-	//	bool isValid = true;
-	//	do
-	//	{
-	//		getline(cin, PIN);
-	//		isValid = InputValidate::IsValidPIN(PIN);
-
-	//		if (!isValid)
-	//			cout << "\nPlease enter a valid PIN (6 digits, numbers only)\n";
-
-	//	} while (!isValid);
-
-	//	return PIN;
-	//}
-
-	//string ReadPhoneNumber()
-	//{
-	//	string PhoneNumber = "";
-	//	bool isValid = true;
-	//	do
-	//	{
-	//		getline(cin, PhoneNumber);
-	//		isValid = InputValidate::IsValidPhoneNumber(PhoneNumber);
-
-	//		if (!isValid)
-	//			cout << "\nPlease enter a valid Egyptian phone number (11 digits, e.g. 01012345678)!\n";
-	//	} while (!isValid);
-	//	return PhoneNumber;
-	//}
-
-	//long double ReadBalance()
-	//{
-	//	return InputValidate::ReadFloatBetween(0, numeric_limits<long double>::max());
-	//}
-
-	void readClientData(Client& client)
+	void _handleBatchSearchError(const SearchFilterOptions options)
 	{
-		// need to finish this with all fields
+		if(options.hasAnyMatch())
+		{
+			cout << "\nAn error occurred! The following field/s are pre-existent in our database:\n\n";
+			if (options.matchAccountNumber)
+				cout << "- The Account Number\n";
+
+			if (options.matchEmail)
+				cout << "- The Email\n";
+
+			if (options.matchPhoneNumber)
+				cout << "- The Phone Number";
+
+			cout << "\n\nPlease, renter these credentials: \n\n";
+		}
 	}
 
+	void _printNewClientSavingStatus(ClientDataManager::enSaveResult result)
+	{
+		switch (result)
+		{
+		case ClientDataManager::enSaveResult::Success:
+			cout << "\nClient added successfully!\n";
+			break;
+
+		case ClientDataManager::enSaveResult::Non_AddNewMode:
+			cout << "\nAn error occurred!\nPlease, ensure the client you're trying to add is in a state for new addition or that you've picked the option to add a new client";
+			break;
+
+		case ClientDataManager::enSaveResult::UserExists:
+			cout << "\nAn error occurred!\nThe client you're trying to add already exists.\nPlease, input unique data.";
+			break;
+
+		default:
+			cout << "\nUNDEFINED STATE\n";
+			break;
+		}
+	}
+
+	void _readClientData(Client& client)
+	{
+		SearchFilterOptions result;
+		do
+		{
+			_handleBatchSearchError(result);
+
+			cout << "Enter the account number: ";
+			client.account().SetAccountNumber(ReadAccountNumber());
+
+			cout << "\nEnter the phone number: ";
+			client.SetPhoneNumber(ReadPhoneNumber());
+
+			cout << "\nEnter the E-mail: ";
+			client.SetEmail(ReadEmail());
+
+			result = _manager.BatchSearch(client.account().AccountNumber(), client.Email(), client.PhoneNumber());
+
+		} while (result.hasAnyMatch());
+
+		cout << "\nEnter the full name: ";
+		client.SetFullName(ReadFullName());
+
+		cout << "\nEnter the PIN: ";
+		client.account().SetPIN(ReadPIN());
+
+		cout << "Enter the balance";
+		client.account().SetBalance(ReadBalance());
+
+		client.SetMode(Client::Mode::New);
+	}
 
 public:
 	AddClientScreen(const ClientDataManager& injectedManager)
@@ -61,12 +90,14 @@ public:
 	{
 		IScreen::PrintScreenHeader("ADD NEW CLIENT SCREEN");
 
-		//do
-		//{
+		do
+		{
+			Client newClient = Client::getNewClientObject();
+			_readClientData(newClient);
 
+			_printNewClientSavingStatus(_manager.Add(newClient));
 
-		//	
-		//} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n"));
+		} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n")));
 	}
 };
 

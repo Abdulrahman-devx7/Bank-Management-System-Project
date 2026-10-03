@@ -27,7 +27,7 @@ protected:
     ClientScreenBase() {}
 
     // Should be merely concerned about reading the raw input and validate it.
-    string ReadAccountNumber(Client &client)
+    string ReadAccountNumber()
     {
         bool isAccNumberValid = true;
         string input;
@@ -40,9 +40,11 @@ protected:
             _HandleBadInputUI(isAccNumberValid);
 
         } while (!isAccNumberValid);
+
+        return input;
     }
 
-    string ReadFullName(Client& client)
+    string ReadFullName()
     {
         bool is4Names = true;
         bool isAllLetters = true;
@@ -53,7 +55,7 @@ protected:
             string fullName = "";
             getline(cin, fullName);
 
-            Words = RichString::Split(client.FullName(), " ");
+            Words = RichString::Split(fullName, " ");
 
             is4Names = (Words.size() == 4);
             isAllLetters = InputValidate::AreNamesOnlyLetters(Words);
@@ -106,6 +108,10 @@ protected:
         return PIN;
     }
 
+    double ReadBalance()
+    {
+        return InputValidate::ReadFloatBetween(0, numeric_limits<long double>::max(), "\nPlease, make sure you have inputted a non-negative balance value or a valid numeric value..\n");
+    }
 
     static void PrintInfoCard(Client& client)
     {

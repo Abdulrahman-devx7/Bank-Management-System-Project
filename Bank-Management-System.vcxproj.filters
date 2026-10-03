@@ -68,7 +68,7 @@
     <ClInclude Include="AddClientScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BatchSearchBooleans.h">
+    <ClInclude Include="BatchSearchStruct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

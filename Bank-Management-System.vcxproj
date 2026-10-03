@@ -132,7 +132,7 @@
   <ItemGroup>
     <ClInclude Include="Account.h" />
     <ClInclude Include="AddClientScreen.h" />
-    <ClInclude Include="BatchSearchBooleans.h" />
+    <ClInclude Include="BatchSearchStruct.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientDataAccess.h" />
     <ClInclude Include="ClientDataManager.h" />
