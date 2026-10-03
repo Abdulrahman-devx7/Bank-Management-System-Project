@@ -140,7 +140,7 @@ public:
         return PlayAgain;
     }
 
-    bool AreNamesOnlyLetters(const vector<string>& names)
+    static bool AreNamesOnlyLetters(const vector<string>& names)
     {
         for (const string& name : names)
         {

@@ -49,7 +49,7 @@ private:
 
 	void readClientData(Client& client)
 	{
-
+		// need to finish this with all fields
 	}
 
 
@@ -61,12 +61,12 @@ public:
 	{
 		IScreen::PrintScreenHeader("ADD NEW CLIENT SCREEN");
 
-		do
-		{
+		//do
+		//{
 
 
-			
-		} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n"));
+		//	
+		//} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n"));
 	}
 };
 

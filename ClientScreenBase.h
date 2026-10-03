@@ -7,11 +7,8 @@
 
 class ClientScreenBase : protected IScreen 
 {
-protected:
-
-    ClientScreenBase() {}
-
-    static string ReadAccountNumber()
+private:
+    static string _readAccountNumber()
     {
         string userInput = "";
         getline(cin >> ws, userInput);
@@ -19,7 +16,33 @@ protected:
         return userInput;
     }
 
-    void ReadFullName(Client& client)
+    static void _HandleBadInputUI(bool isValid)
+    {
+        if (isValid)
+            cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
+    }
+
+protected:
+
+    ClientScreenBase() {}
+
+    // Should be merely concerned about reading the raw input and validate it.
+    string ReadAccountNumber(Client &client)
+    {
+        bool isAccNumberValid = true;
+        string input;
+        do
+        {
+            input = _readAccountNumber();
+            isAccNumberValid = InputValidate::IsValidAccountNumber(input);
+            input = InputValidate::NormalizeAccountNumber(input);
+
+            _HandleBadInputUI(isAccNumberValid);
+
+        } while (!isAccNumberValid);
+    }
+
+    string ReadFullName(Client& client)
     {
         bool is4Names = true;
         bool isAllLetters = true;
@@ -29,7 +52,6 @@ protected:
         {
             string fullName = "";
             getline(cin, fullName);
-            client.SetFullName(fullName);
 
             Words = RichString::Split(client.FullName(), " ");
 
@@ -41,9 +63,48 @@ protected:
 
         } while (!isAllLetters || !is4Names);
 
-        client.SetFullName(RichString::JoinString(Words, " "));
+        return RichString::JoinString(Words, " ");
     }
 
+    string ReadEmail()
+    {
+        string email = "";
+        getline(std::cin >> ws, email);
+        return email;
+    }
+
+    string ReadPhoneNumber()
+    {
+        string PhoneNumber = "";
+        bool isValid = true;
+        do
+        {
+            getline(cin, PhoneNumber);
+            isValid = InputValidate::IsValidPhoneNumber(PhoneNumber);
+
+            if (!isValid)
+                cout << "\nPlease enter a valid Egyptian phone number (11 digits, e.g. 01012345678)!\n";
+        } while (!isValid);
+
+        return PhoneNumber;
+    }
+
+    string ReadPIN()
+    {
+        string PIN;
+        bool isValid = true;
+        do
+        {
+            getline(cin, PIN);
+            isValid = InputValidate::IsValidPIN(PIN);
+
+            if (!isValid)
+                cout << "\nPlease enter a valid PIN (6 digits, numbers only)\n";
+
+        } while (!isValid);
+
+        return PIN;
+    }
 
 
     static void PrintInfoCard(Client& client)
@@ -76,6 +137,7 @@ protected:
 
         std::cout << indent << UI_LINE_BOUNDS << "\n\n";
     }
+
 
 };
 
