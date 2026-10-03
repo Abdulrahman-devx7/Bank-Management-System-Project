@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <stdexcept>
+#include "InputValidate.h"
 using namespace std;
 
 class Account
@@ -30,14 +32,31 @@ public:
 		return _balance;
 	}
 
-	void SetPIN(const string& pin)
+	void SetPIN(const std::string& pin)
 	{
+		if (!InputValidate::IsValidPIN(pin))
+		{
+			throw std::invalid_argument("SetPIN failed: PIN must conform to the required format.");
+		}
 		_PIN = pin;
 	}
 
 	void SetBalance(double amount)
 	{
+		if (amount < 0.0)
+		{
+			throw std::invalid_argument("SetBalance failed: Account balance cannot be negative.");
+		}
 		_balance = amount;
+	}
+
+	void SetAccountNumber(const std::string& accountNumber)
+	{
+		if (!InputValidate::IsValidAccountNumber(accountNumber))
+		{
+			throw std::invalid_argument("SetAccountNumber failed: Invalid account number format.");
+		}
+		_accountNumber = accountNumber;
 	}
 
 	Account(string accountNumber, string PIN, double balance) 
