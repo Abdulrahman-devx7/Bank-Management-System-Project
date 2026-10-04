@@ -38,12 +38,20 @@ public:
 
 	Client* Find(const Client& target)
 	{
-		auto userIt = _clientMap.find(target.account().AccountNumber());
+		auto clientIt = _clientMap.find(target.account().AccountNumber());
 
-		if (userIt != _clientMap.end())
-			return &(userIt->second);
+		if (clientIt != _clientMap.end())
+			return &(clientIt->second);
 
 		return nullptr;
+	}
+
+	Client* Find(const string& accountNumber)
+	{
+		auto clientIt = _clientMap.find(accountNumber);
+
+		if(clientIt!=_clientMap.end())
+			return &(clientIt)
 	}
 
 	DeleteOrUpdateResult Update(const Client& previousData, const Client& newData)
