@@ -41,7 +41,10 @@ public:
 		auto clientIt = _clientMap.find(target.account().AccountNumber());
 
 		if (clientIt != _clientMap.end())
+		{
+			clientIt->second.SetMode(Client::Mode::Update);
 			return &(clientIt->second);
+		}
 
 		return nullptr;
 	}
@@ -50,8 +53,13 @@ public:
 	{
 		auto clientIt = _clientMap.find(accountNumber);
 
-		if(clientIt!=_clientMap.end())
-			return &(clientIt)
+		if (clientIt != _clientMap.end())
+		{
+			clientIt->second.SetMode(Client::Mode::Update);
+			return &(clientIt->second);
+		}
+
+		return nullptr;
 	}
 
 	DeleteOrUpdateResult Update(const Client& previousData, const Client& newData)
@@ -83,6 +91,7 @@ public:
 		{
 		case Client::Mode::Update:
 			targetPointer->MarkForDeletion();
+			ClientDataAccess::SaveData(_sourceFile, _clientMap);
 			return DeleteOrUpdateResult::Success;
 
 		default:
