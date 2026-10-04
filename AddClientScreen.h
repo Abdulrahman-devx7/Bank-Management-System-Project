@@ -9,6 +9,7 @@ class AddClientScreen : protected ClientScreenBase
 {
 private:
 	ClientDataManager _manager;
+	User _activeUser;
 
 	void _handleBatchSearchError(const SearchFilterOptions options)
 	{
@@ -83,21 +84,24 @@ private:
 	}
 
 public:
-	AddClientScreen(const ClientDataManager& injectedManager)
-		:_manager(injectedManager) {}
+	AddClientScreen(const ClientDataManager& injectedManager, User &injectedUser)
+		:_manager(injectedManager), _activeUser(injectedUser) {}
 
 	void Execute() override
 	{
-		IScreen::PrintScreenHeader("ADD NEW CLIENT SCREEN");
-
-		do
+		if(CheckAccessRights(_activeUser, User::Permissions::AddNewClient))
 		{
-			Client newClient = Client::getNewClientObject();
-			_readClientData(newClient);
+			do
+			{
+				IScreen::PrintScreenHeader("ADD NEW CLIENT SCREEN");
 
-			_printNewClientSavingStatus(_manager.Add(newClient));
+				Client newClient = Client::getNewClientObject();
+				_readClientData(newClient);
 
-		} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n")));
+				_printNewClientSavingStatus(_manager.Add(newClient));
+
+			} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n")));
+		}
 	}
 };
 
