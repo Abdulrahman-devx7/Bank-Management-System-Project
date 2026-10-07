@@ -150,6 +150,15 @@ public:
         return true;
     }
 
+    bool CheckSpacesInUsername(string& username)
+    {
+        for (int i = 0; i < username.length(); i++)
+        {
+            if (isspace(username[i]))
+                return true;
+        }
+        return false;
+    }
 
 };
 

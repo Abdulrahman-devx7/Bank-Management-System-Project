@@ -1,32 +1,46 @@
-#pragma once 
-#include "ClientScreenBase.h"
-#include "ClientDataManager.h"
+#pragma once
+#include "UserScreenBase.h"
+#include "UserDataManager.h"
+#include "InputValidate.h"
 
-class FindUserScreen : protected ClientScreenBase
+class FindUserScreen : protected UserScreenBase
 {
 private:
-	ClientDataManager _manager;
+	UserDataManager _manager;
 	User _activeUser;
 
-	void _FindUser(const string &accountNumber)
+	void _FindUser(const string& username)
 	{
-		Client* foundClient = nullptr;
-		if ((foundClient = (_manager.Find(accountNumber))) != nullptr)
-			PrintInfoCard(*foundClient);
-		else
-			cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
+		User targetUser = User::getEmptyUser();
+		targetUser.setUsername(username);
 
+		User* foundUser = _manager.Find(targetUser);
+
+		if (foundUser != nullptr)
+		{
+			cout << "\n";
+			PrintInfoCard(*foundUser);
+		}
+		else
+		{
+			cout << "\nUser with username [" << username << "] is not found!\n";
+		}
 	}
 
 public:
+	FindUserScreen(const UserDataManager& injectedManager, const User& injectedUser)
+		: _manager(injectedManager), _activeUser(injectedUser) {}
 
 	void Execute() override
 	{
-		if (CheckAccessRights(_activeUser, User::Permissions::DeleteClient))
+		if (CheckAccessRights(_activeUser, User::Permissions::ManageUsers))
 		{
-			cout << "\nPlease, enter the account number: ";
-			string accountNumber = ReadAccountNumber();
-			_FindUser(accountNumber);
+			IScreen::PrintScreenHeader("FIND USER SCREEN");
+
+			cout << "\nEnter the username: ";
+			string username = ReadUsername();
+
+			_FindUser(username);
 		}
 	}
 };
