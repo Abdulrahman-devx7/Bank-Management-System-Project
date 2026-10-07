@@ -16,7 +16,7 @@ private:
         return userInput;
     }
 
-    static void _HandleBadInputUI(bool isValid)
+    static void _HandleBadAccNumber(bool isValid)
     {
         if (isValid)
             cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
@@ -37,7 +37,7 @@ protected:
             isAccNumberValid = InputValidate::IsValidAccountNumber(input);
             input = InputValidate::NormalizeAccountNumber(input);
 
-            _HandleBadInputUI(isAccNumberValid);
+            _HandleBadAccNumber(isAccNumberValid);
 
         } while (!isAccNumberValid);
 

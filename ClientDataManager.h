@@ -62,13 +62,13 @@ public:
 		return nullptr;
 	}
 
-	DeleteOrUpdateResult Update(const Client& previousData, const Client& newData)
+	DeleteOrUpdateResult Update(const Client& newData)
 	{
-		Client* targetPointer = Find(previousData);
+		Client* targetPointer = Find(newData.account().AccountNumber());
 		if (targetPointer == nullptr)
 			return DeleteOrUpdateResult::UserNoExist;
 
-		switch (previousData.Status())
+		switch (newData.Status())
 		{
 		case Client::Mode::Update:
 			_clientMap.erase(targetPointer->account().AccountNumber());
