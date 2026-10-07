@@ -21,11 +21,11 @@ private:
 			break;
 
 		case ClientDataManager::DeleteOrUpdateResult::Non_updateMode:
-			cout << "\nAn error occurred!\nPlease, ensure the client you're trying to add is in a state for new addition or that you've picked the option to add a new client";
+			cout << "\nAn error occurred!\nPlease, ensure the client you're trying to add is in a state for update or that you've picked the option to delete a client";
 			break;
 
 		case ClientDataManager::DeleteOrUpdateResult::UserNoExist:
-			cout << "\nAn error occurred!\nThe client you're trying to add already exists.\nPlease, input unique data.";
+			cout << "\nAn error occurred!\nThe client you're trying delete doesn't exist.\nPlease, input unique data.";
 			break;
 
 		default:
