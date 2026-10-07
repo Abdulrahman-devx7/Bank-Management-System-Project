@@ -18,6 +18,9 @@
     <ClCompile Include="Bank-Management-System.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Delete.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Account.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BatchSearchStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeleteClientScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

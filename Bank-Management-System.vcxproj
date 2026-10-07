@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bank-Management-System.cpp" />
+    <ClCompile Include="Delete.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Account.h" />
@@ -138,6 +139,7 @@
     <ClInclude Include="ClientDataManager.h" />
     <ClInclude Include="ClientListScreen.h" />
     <ClInclude Include="ClientScreenBase.h" />
+    <ClInclude Include="DeleteClientScreen.h" />
     <ClInclude Include="InputValidate.h" />
     <ClInclude Include="LoginScreen.h" />
     <ClInclude Include="RichString.h" />

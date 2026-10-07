@@ -84,6 +84,7 @@ public:
 	{
 		do
 		{
+			ResetScreen();
 			_ScreenHeaderMessage();
 			stLoginCredentials loginData = _ReadLoginCredentials();
 			_authStatus = _usersManager.Authenticate(loginData.inputUsername, loginData.inputPassword);
