@@ -13,9 +13,6 @@ private:
     const UserDataManager& _manager;
     const User& _activeUser;
 
-    inline static const int SCREEN_WIDTH = 118;
-    inline static const int SCREEN_INDENT = 25;
-
     static void PrintUsersTableHeader(size_t userCount)
     {
         const std::string indent(SCREEN_INDENT, ' ');
