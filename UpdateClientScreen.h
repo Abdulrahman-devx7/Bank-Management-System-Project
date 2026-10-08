@@ -33,22 +33,31 @@ private:
 
 	void _ReadClientDataUpdates(Client &targetClient)
 	{
+		ClientBatchSearch result;
+		do
+		{
+			if (toupper(InputValidate::DetermineAgain("\nDo you want to update the email (Y/N)?\n")) == 'Y')
+			{
+				cout << "Enter email: ";
+				targetClient.SetEmail(ReadEmail());
+			}
+
+			if (toupper(InputValidate::DetermineAgain("\nDo you want to update the phone number (Y/N)?\n")) == 'Y')
+			{
+				cout << "Enter phone number: ";
+				targetClient.SetPhoneNumber(ReadPhoneNumber());
+			}
+
+			result = _manager.BatchSearch(targetClient.account().AccountNumber(), targetClient.Email(), targetClient.PhoneNumber());
+			result.matchAccountNumber = false;
+
+		} while (result.hasAnyMatch());
+
+
 		if (toupper(InputValidate::DetermineAgain("\nDo you want to update the full name (Y/N)?\n")) == 'Y')
 		{
 			cout << "Enter full name: ";
 			targetClient.SetFullName(ReadFullName());
-		}
-
-		if (toupper(InputValidate::DetermineAgain("\nDo you want to update the email (Y/N)?\n")) == 'Y')
-		{
-			cout << "Enter email: ";
-			targetClient.SetEmail(ReadEmail());
-		}
-
-		if (toupper(InputValidate::DetermineAgain("\nDo you want to update the phone number (Y/N)?\n")) == 'Y')
-		{
-			cout << "Enter phone number: ";
-			targetClient.SetPhoneNumber(ReadPhoneNumber());
 		}
 
 		if (toupper(InputValidate::DetermineAgain("\nDo you want to update the PIN code (Y/N)?\n")) == 'Y')
