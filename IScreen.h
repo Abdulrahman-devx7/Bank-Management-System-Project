@@ -15,7 +15,7 @@ protected:
     inline static const int SCREEN_WIDTH = 118;
     inline static const int SCREEN_INDENT = 25;
 
-    static bool CheckAccessRights(User &activeUser, User::Permissions screenPermission)
+    static bool CheckAccessRights(const User &activeUser, const User::Permissions screenPermission)
     {
         if (activeUser.CheckAccessPermission(screenPermission))
             return true;

@@ -2,7 +2,7 @@
 #include "ClientScreenBase.h"
 #include "ClientDataManager.h"
 #include "InputValidate.h"
-#include "BatchSearchStruct.h"
+#include "ClientBatchSearch.h"
 #include <limits>
 
 class AddClientScreen : protected ClientScreenBase
@@ -11,7 +11,7 @@ private:
 	ClientDataManager _manager;
 	User _activeUser;
 
-	void _handleBatchSearchError(const SearchFilterOptions options)
+	void _handleBatchSearchError(const ClientBatchSearch options)
 	{
 		if(options.hasAnyMatch())
 		{
@@ -53,7 +53,7 @@ private:
 
 	void _readClientData(Client& client)
 	{
-		SearchFilterOptions result;
+		ClientBatchSearch result;
 		do
 		{
 			_handleBatchSearchError(result);
@@ -100,7 +100,7 @@ public:
 
 				_printNewClientSavingStatus(_manager.Add(newClient));
 
-			} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?\n")));
+			} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?(Y/N)\n")));
 		}
 	}
 };

@@ -9,7 +9,7 @@ private:
     UserDataManager _manager;
     User _activeUser;
 
-    void _PrintDeleteUserStatus(UserDataManager::DeleteOrUpdateResult result)
+    void _PrintDeletionUserStatus(UserDataManager::DeleteOrUpdateResult result)
     {
         switch (result)
         {
@@ -33,26 +33,17 @@ private:
 
     void _DeleteUser(const string& username)
     {
-        User targetUser = User::getEmptyUser();
-        targetUser.setUsername(username);
+        User* foundUser = nullptr;
 
-        User* foundUser = _manager.Find(targetUser);
-
-        if (foundUser != nullptr)
+        if ((foundUser = (_manager.Find(username))) != nullptr)
         {
             PrintInfoCard(*foundUser);
 
-            if (toupper(InputValidate::DetermineAgain("\n\nAre you sure you want to delete this user (Y/N)?\n")) == 'Y')
-            {
-                User userToDelete = *foundUser;
-                UserDataManager::DeleteOrUpdateResult result = _manager.Delete(userToDelete);
-                _PrintDeleteUserStatus(result);
-            }
+            if (toupper(InputValidate::DetermineAgain("\n\nAre you sure you want to delete this client (Y/N)?\n")) == 'Y')
+                _PrintDeletionUserStatus(_manager.Delete(*foundUser));
         }
         else
-        {
-            cout << "\nUser with username (" << username << ") is not found!\n";
-        }
+            cout << "\User with the username (" << username << ") is not found!\n";
     }
 
 public:

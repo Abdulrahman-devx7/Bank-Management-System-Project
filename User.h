@@ -25,7 +25,7 @@ public:
 		: IPerson(fullName, email, phoneNumber),
 		_username(username), _password(password), _permissions(permissions) {}
 
-	bool CheckAccessPermission(Permissions Permission)
+	bool CheckAccessPermission(Permissions Permission) const
 	{
 		return (Permission & this->_permissions) == Permission;
 	}

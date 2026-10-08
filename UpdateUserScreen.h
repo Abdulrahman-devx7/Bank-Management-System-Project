@@ -2,6 +2,7 @@
 #include "UserScreenBase.h"
 #include "UserDataManager.h"
 #include "InputValidate.h"
+#include "UserBatchSearch.h"
 
 class UpdateUserScreen : protected UserScreenBase
 {
@@ -33,11 +34,31 @@ private:
 
     void _ReadUserDataUpdates(User& targetUser)
     {
-        if (toupper(InputValidate::DetermineAgain("\nDo you want to update the username (Y/N)?\n")) == 'Y')
+        UserBatchSearch result;
+        do
         {
-            cout << "Enter username: ";
-            targetUser.setUsername(ReadUsername());
-        }
+            _handleBatchSearchError(result);
+
+            if (toupper(InputValidate::DetermineAgain("\nDo you want to update the email (Y/N)?\n")) == 'Y')
+            {
+                cout << "Enter email: ";
+                targetUser.SetEmail(ReadEmail());
+            }
+
+            if (toupper(InputValidate::DetermineAgain("\nDo you want to update the phone number (Y/N)?\n")) == 'Y')
+            {
+                cout << "Enter phone number: ";
+                targetUser.SetPhoneNumber(ReadPhoneNumber());
+            }
+
+            if (toupper(InputValidate::DetermineAgain("\nDo you want to update the username (Y/N)?\n")) == 'Y')
+            {
+                cout << "Enter username: ";
+                targetUser.setUsername(ReadUsername());
+            }
+            result = _manager.BatchSearch(targetUser.Username(), targetUser.Email(), targetUser.PhoneNumber());
+
+        } while (result.hasAnyMatch());
 
         if (toupper(InputValidate::DetermineAgain("\nDo you want to update the password (Y/N)?\n")) == 'Y')
         {
@@ -51,99 +72,31 @@ private:
             targetUser.SetFullName(ReadFullName());
         }
 
-        if (toupper(InputValidate::DetermineAgain("\nDo you want to update the email (Y/N)?\n")) == 'Y')
-        {
-            cout << "Enter email: ";
-            targetUser.SetEmail(ReadEmail());
-        }
-
-        if (toupper(InputValidate::DetermineAgain("\nDo you want to update the phone number (Y/N)?\n")) == 'Y')
-        {
-            cout << "Enter phone number: ";
-            targetUser.SetPhoneNumber(ReadPhoneNumber());
-        }
 
         if (toupper(InputValidate::DetermineAgain("\nDo you want to update the permissions (Y/N)?\n")) == 'Y')
         {
-            _AssignPermissionsToUser(targetUser);
+            AssignPermissionsToUser(targetUser);
         }
-    }
-
-    void _AssignPermissionsToUser(User& user)
-    {
-        if (toupper(InputValidate::DetermineAgain("\nDo you want to give this user full access (Y/N)?\n")) == 'Y')
-        {
-            user.setPermissions(-1);
-            return;
-        }
-
-        cout << "\nDo you want to give access to:\n\n";
-
-        int permissions = 0;
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to showing client list (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::ListClients);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to adding new clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::AddNewClient);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to deleting clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::DeleteClient);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to updating clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::UpdateClients);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to finding clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::FindClient);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to transactions (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::Transactions);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to managing users (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::ManageUsers);
-
-        cout << "\n";
-
-        user.setPermissions(permissions);
     }
 
     void _UpdateUser(const string& username)
     {
-        User targetUser = User::getEmptyUser();
-        targetUser.setUsername(username);
+        User* foundUser = nullptr;
 
-        User* foundUser = _manager.Find(targetUser);
-
-        if (foundUser != nullptr)
+        if ((foundUser = (_manager.Find(username))) != nullptr)
         {
             PrintInfoCard(*foundUser);
 
-            if (toupper(InputValidate::DetermineAgain("\n\nDo you want to update this user's data (Y/N)?\n")) == 'Y')
+            if (toupper(InputValidate::DetermineAgain("\n\nDo you want to update this client's data (Y/N)?\n")) == 'Y')
             {
-                User updatedUser = *foundUser;
-                _ReadUserDataUpdates(updatedUser);
-                updatedUser.SetMode(User::Mode::Update);
-
-                UserDataManager::DeleteOrUpdateResult result = _manager.Update(*foundUser, updatedUser);
-                _PrintUpdateUserStatus(result);
+                _ReadUserDataUpdates(*foundUser);
+                _manager.Update(*foundUser);
             }
+
         }
         else
-        {
-            cout << "\nUser with username (" << username << ") is not found!\n";
-        }
+            cout << "\nClient with account number (" << username << ") is not found!\n";
+
     }
 
 public:
@@ -157,7 +110,7 @@ public:
             IScreen::PrintScreenHeader("UPDATE USER SCREEN");
 
             cout << "\nEnter the username: ";
-            string username = ReadUsername();
+            string username = ReadUsername();   
 
             _UpdateUser(username);
         }

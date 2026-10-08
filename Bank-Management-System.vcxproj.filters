@@ -18,12 +18,6 @@
     <ClCompile Include="Bank-Management-System.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Delete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UpdateClientScreen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Account.h">
@@ -74,13 +68,34 @@
     <ClInclude Include="AddClientScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BatchSearchStruct.h">
+    <ClInclude Include="ClientBatchSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DeleteClientScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UpdateClientScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddUserScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeleteUserScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FindUserScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListUsersScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateUserScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserScreenBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserBatchSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

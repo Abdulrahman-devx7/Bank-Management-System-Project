@@ -1,5 +1,5 @@
 #pragma once
-struct SearchFilterOptions
+struct ClientBatchSearch
 {
     bool matchAccountNumber = false;
     bool matchEmail = false;

@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "UserDataAccess.h"
+#include "UserBatchSearch.h"
 
 class UserDataManager
 {
@@ -76,21 +77,31 @@ public:
 
 		return nullptr;
 	}
+	User* Find(const string& username)
+	{
+		auto userIt = _userMap.find(username);
+
+		if (userIt != _userMap.end())
+			return &(userIt->second);
+
+		return nullptr;
+	}
+
 
 	// don't forget the username validation that prohibits spaces in the middle of it. this exists 
 	// in the add user screen of the procedural version but doesn't in update user
 	// SO REMEMBER ADDING THAT TO THE UI LAYER.
-	DeleteOrUpdateResult Update(const User &previousData, const User &newData)
+	DeleteOrUpdateResult Update(const User &targetUser)
 	{
-		User* targetPointer = Find(previousData);
+		User* targetPointer = Find(targetUser);
 		if (targetPointer == nullptr)
 			return DeleteOrUpdateResult::UserNoExist;
 
-		switch (previousData.Status())
+		switch (targetUser.Status())
 		{
 		case User::Mode::Update:
 			_userMap.erase(targetPointer->Username());
-			_userMap.insert_or_assign(newData.Username(), newData);
+			_userMap.insert_or_assign(targetUser.Username(), targetUser);
 			UserDataAccess::SaveData(_sourceFile, _userMap);
 			return DeleteOrUpdateResult::Success;
 
@@ -109,6 +120,7 @@ public:
 		{
 		case User::Mode::Update:
 			targetPointer->MarkForDeletion();
+			UserDataAccess::SaveData(_sourceFile, _userMap);
 			return DeleteOrUpdateResult::Success;
 
 		default:
@@ -138,9 +150,28 @@ public:
 		_userMap.insert({ username, baseUser });
 	}
 
-	const unordered_map<string, User>& GetUserMap()
+	const unordered_map<string, User>& GetUserMap() const
 	{
 		return _userMap;
+	}
+
+	UserBatchSearch BatchSearch(const string& username, const string& email, const string& phoneNumber)
+	{
+		UserBatchSearch options;
+		for (const auto& [acc_number, user] : _userMap)
+		{
+			if (user.Username() == username)
+				options.matchUsername = true;
+
+			if (user.Email() == email)
+				options.matchEmail = true;
+
+			if (user.PhoneNumber() == phoneNumber)
+				options.matchPhoneNumber = true;
+
+			if (options.hasAnyMatch())
+				return options;
+		}
 	}
 
 

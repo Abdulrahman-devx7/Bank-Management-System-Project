@@ -1,6 +1,6 @@
 #pragma once
 #include "ClientDataAccess.h"
-#include "BatchSearchStruct.h"
+#include "ClientBatchSearch.h"
 
 class ClientDataManager
 {
@@ -104,9 +104,9 @@ public:
 		return _clientMap;
 	}
 
-	SearchFilterOptions BatchSearch(const string &accountNumber, const string &email, const string &phoneNumber)
+	ClientBatchSearch BatchSearch(const string &accountNumber, const string &email, const string &phoneNumber)
 	{
-		SearchFilterOptions options;
+		ClientBatchSearch options;
 		for (const auto& [acc_number, client] : _clientMap)
 		{
 			if (client.account().AccountNumber() == accountNumber)

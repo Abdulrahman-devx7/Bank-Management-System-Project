@@ -2,6 +2,7 @@
 #include "UserScreenBase.h"
 #include "UserDataManager.h"
 #include "InputValidate.h"
+#include "UserBatchSearch.h"
 
 class AddUserScreen : protected UserScreenBase
 {
@@ -11,8 +12,24 @@ private:
 
     void _ReadUserData(User& user)
     {
-        cout << "\nEnter username: ";
-        user.setUsername(ReadUsername());
+        UserBatchSearch result;
+
+        do
+        {
+            _handleBatchSearchError(result);
+
+            cout << "\nEnter email: ";
+            user.SetEmail(ReadEmail());
+
+            cout << "\nEnter phone number: ";
+            user.SetPhoneNumber(ReadPhoneNumber());
+
+            cout << "\nEnter username: ";
+            user.setUsername(ReadUsername());
+
+            result = _manager.BatchSearch(user.Username(), user.Email(), user.PhoneNumber());
+
+        } while (result.hasAnyMatch());
 
         cout << "\nEnter password: ";
         user.setPassword(ReadPassword());
@@ -20,65 +37,9 @@ private:
         cout << "\nEnter full name: ";
         user.SetFullName(ReadFullName());
 
-        cout << "\nEnter email: ";
-        user.SetEmail(ReadEmail());
-
-        cout << "\nEnter phone number: ";
-        user.SetPhoneNumber(ReadPhoneNumber());
-
-        _AssignPermissionsToUser(user);
+        AssignPermissionsToUser(user);
 
         user.SetMode(User::Mode::New);
-    }
-
-    void _AssignPermissionsToUser(User& user)
-    {
-        if (toupper(InputValidate::DetermineAgain("\nDo you want to give this user full access (Y/N)?\n")) == 'Y')
-        {
-            user.setPermissions(-1);
-            return;
-        }
-
-        cout << "\nDo you want to give access to:\n\n";
-
-        int permissions = 0;
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to showing client list (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::ListClients);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to adding new clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::AddNewClient);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to deleting clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::DeleteClient);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to updating clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::UpdateClients);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to finding clients (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::FindClient);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to transactions (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::Transactions);
-
-        cout << "\n";
-
-        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to managing users (Y/N)?\n")) == 'Y')
-            permissions = permissions | static_cast<int>(User::Permissions::ManageUsers);
-
-        cout << "\n";
-
-        user.setPermissions(permissions);
     }
 
     void _PrintAddUserStatus(UserDataManager::enSaveResult result)

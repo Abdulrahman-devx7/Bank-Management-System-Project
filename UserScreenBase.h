@@ -65,6 +65,24 @@ protected:
 
     UserScreenBase() {}
 
+    void _handleBatchSearchError(const UserBatchSearch options)
+    {
+        if (options.hasAnyMatch())
+        {
+            cout << "\nAn error occurred! The following field/s are pre-existent in our database:\n\n";
+            if (options.matchUsername)
+                cout << "- The Username\n";
+
+            if (options.matchEmail)
+                cout << "- The Email\n";
+
+            if (options.matchPhoneNumber)
+                cout << "- The Phone Number";
+
+            cout << "\n\nPlease, renter these credentials: \n\n";
+        }
+    }
+
     string ReadUsername()
     {
         string username = "";

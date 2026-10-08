@@ -12,7 +12,7 @@ private:
 	DeleteClientScreen(ClientDataManager injectedManager, User injectedUser)
 		: _manager(injectedManager), _activeUser(injectedUser) {}
 
-	void _printNewClientDeletionStatus(ClientDataManager::DeleteOrUpdateResult result)
+	void _printClientDeletionStatus(ClientDataManager::DeleteOrUpdateResult result)
 	{
 		switch (result)
 		{
@@ -44,7 +44,7 @@ private:
 			PrintInfoCard(*foundClient);
 
 			if (toupper(InputValidate::DetermineAgain("\n\nAre you sure you want to delete this client (Y/N)?\n")) == 'Y')
-				_printNewClientDeletionStatus(_manager.Delete(*foundClient));
+				_printClientDeletionStatus(_manager.Delete(*foundClient));
 		}
 		else
 			cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
