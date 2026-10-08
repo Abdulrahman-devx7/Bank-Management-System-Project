@@ -8,10 +8,6 @@ private:
 	ClientDataManager _manager;
 	User _activeUser;
 
-	DepositScreen(const ClientDataManager& injectedManager, User& injectedUser)
-		:_manager(injectedManager), _activeUser(injectedUser) {
-	}
-
 	float _ReadDepositNumber()
 	{
 		return InputValidate::ReadFloatBetween(0, FLT_MAX, "\nPlease, enter a valid positive numeric input to withdraw!\n");
@@ -44,6 +40,12 @@ private:
 			else
 				cout << "\n\nTransaction has been canceled.\n\n";
 		}
+	}
+
+public:
+
+	DepositScreen(const ClientDataManager& injectedManager, User& injectedUser)
+		:_manager(injectedManager), _activeUser(injectedUser) {
 	}
 
 	void Execute() override
