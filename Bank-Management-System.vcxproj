@@ -143,10 +143,12 @@
     <ClInclude Include="DeleteClientScreen.h" />
     <ClInclude Include="DeleteUserScreen.h" />
     <ClInclude Include="DepositScreen.h" />
+    <ClInclude Include="FindClientScreen.h" />
     <ClInclude Include="FindUserScreen.h" />
     <ClInclude Include="InputValidate.h" />
     <ClInclude Include="ListUsersScreen.h" />
     <ClInclude Include="LoginScreen.h" />
+    <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="RichString.h" />
     <ClInclude Include="UpdateClientScreen.h" />
     <ClInclude Include="UpdateUserScreen.h" />

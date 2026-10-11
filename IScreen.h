@@ -11,7 +11,7 @@ class IScreen
 {
 protected:
 
-    inline static const std::string UI_LINE_BOUNDS{ 44, '=' };
+    inline static const std::string UI_LINE_BOUNDS = std::string(44, '=');    
     inline static const int SCREEN_WIDTH = 118;
     inline static const int SCREEN_INDENT = 25;
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "ClientScreenBase.h"
 #include "ClientDataManager.h"
-class FindClientScreen : ClientScreenBase
+class FindClientScreen : public ClientScreenBase
 {
 private:
 	ClientDataManager _manager;

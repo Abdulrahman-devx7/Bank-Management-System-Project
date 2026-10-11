@@ -2,7 +2,7 @@
 #include "IScreen.h"
 #include "UserDataManager.h"
 
-class LoginScreen : IScreen
+class LoginScreen : public IScreen
 {
 private:
 	struct stLoginCredentials

@@ -4,6 +4,7 @@
 #include "UserDataManager.h"
 #include "ClientDataManager.h"
 #include "LoginScreen.h"
+#include "MainMenuScreen.h"
 
 class Session
 {
@@ -77,6 +78,11 @@ private:
 
 public:
 
+	Session()
+	{
+
+	}
+
 	const User& GetActiveUser() const
 	{
 		return _activeUser;
@@ -95,6 +101,8 @@ public:
 			if (getClientFileStatus() == ClientDataAccess::enDataStatus::eFileNotFound)
 				_HandleClientFileNotFound();
 
+			_userManager = UserDataManager(_userMap, users_file_name);
+			_clientManager = ClientDataManager(_clientMap, client_file_name);
 		}
 		else
 			_HandleUsersFileNotFound();
@@ -124,11 +132,11 @@ public:
 			// The login screen object would be connected to the session controller and potential checkers
 			// could be added here for extensibility inside this while(true) loop
 			LoginScreen login(_userManager, _activeUser);
+			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager);
 			while (true)
 			{
 				login.Execute();
-
-				// Main Menu Screen with its exectue method
+				startupScreen.Execute();
 			}
 
 		}

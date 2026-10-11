@@ -99,7 +99,7 @@ public:
 		}
 	}
 
-	const unordered_map<string, Client>& GetClientMap()
+	unordered_map<string, Client>& GetClientMap()
 	{
 		return _clientMap;
 	}

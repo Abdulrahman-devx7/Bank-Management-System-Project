@@ -5,7 +5,7 @@
 #include "ClientBatchSearch.h"
 #include <limits>
 
-class AddClientScreen : protected ClientScreenBase
+class AddClientScreen : public ClientScreenBase
 {
 private:
 	ClientDataManager _manager;

@@ -3,7 +3,7 @@
 #include "ClientDataManager.h"
 #include "InputValidate.h"
 
-class UpdateClientScreen : protected ClientScreenBase
+class UpdateClientScreen : public ClientScreenBase
 {
 private:
 	ClientDataManager _manager;

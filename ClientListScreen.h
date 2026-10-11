@@ -2,14 +2,14 @@
 #include "ClientScreenBase.h"
 #include "RichString.h"
 #include <unordered_map>
-class ClientListScreen : private ClientScreenBase
+class ClientListScreen : public ClientScreenBase
 {
 private:
-	const unordered_map<string, Client>& _list;
+	unordered_map<string, Client>& _list;
 
     static void PrintFileInfoHeader(const unordered_map<string, Client> clients)
     {
-        const std::string indent(SCREEN_INDENT, ' ');
+        std::string indent(SCREEN_INDENT, ' ');
 
         std::cout << "\n" << indent
             << std::setw((SCREEN_WIDTH + 24) / 2) << std::right
@@ -49,7 +49,7 @@ private:
         {
             PrintIndividualTableInfo(client);
         }
-        cout << setw(40) << left << "" << string(SCREEN_WIDTH, '-') << "\n";
+        std::cout << std::string(SCREEN_INDENT, ' ') << std::string(SCREEN_WIDTH, '-') << "\n";
     }
 
 public:

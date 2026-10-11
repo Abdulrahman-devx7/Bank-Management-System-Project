@@ -3,14 +3,12 @@
 #include "ClientDataManager.h"
 #include "InputValidate.h"
 
-class DeleteClientScreen : ClientScreenBase
+class DeleteClientScreen : public ClientScreenBase
 {
 private:
 	ClientDataManager _manager;
 	User _activeUser;
 
-	DeleteClientScreen(ClientDataManager injectedManager, User injectedUser)
-		: _manager(injectedManager), _activeUser(injectedUser) {}
 
 	void _printClientDeletionStatus(ClientDataManager::DeleteOrUpdateResult result)
 	{
@@ -52,6 +50,9 @@ private:
 	}
 
 public:
+	DeleteClientScreen(ClientDataManager injectedManager, User injectedUser)
+		: _manager(injectedManager), _activeUser(injectedUser) {}
+
 	void Execute() override
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::DeleteClient))
