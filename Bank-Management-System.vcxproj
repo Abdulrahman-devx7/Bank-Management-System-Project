@@ -133,6 +133,7 @@
     <ClInclude Include="Account.h" />
     <ClInclude Include="AddClientScreen.h" />
     <ClInclude Include="AddUserScreen.h" />
+    <ClInclude Include="ClientBalancesScreen.h" />
     <ClInclude Include="ClientBatchSearch.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientDataAccess.h" />
@@ -141,6 +142,7 @@
     <ClInclude Include="ClientScreenBase.h" />
     <ClInclude Include="DeleteClientScreen.h" />
     <ClInclude Include="DeleteUserScreen.h" />
+    <ClInclude Include="DepositScreen.h" />
     <ClInclude Include="FindUserScreen.h" />
     <ClInclude Include="InputValidate.h" />
     <ClInclude Include="ListUsersScreen.h" />
@@ -156,6 +158,7 @@
     <ClInclude Include="Session.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="UserScreenBase.h" />
+    <ClInclude Include="WithdrawalScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bank-Management-System.rc" />
