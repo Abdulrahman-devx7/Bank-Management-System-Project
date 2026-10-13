@@ -72,6 +72,7 @@ public:
     {
         if (CheckAccessRights(_activeUser, User::Permissions::ManageUsers))
         {
+            ResetScreen();
             IScreen::PrintScreenHeader("ADD NEW USER SCREEN");
 
             do

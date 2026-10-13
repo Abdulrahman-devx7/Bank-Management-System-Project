@@ -93,6 +93,7 @@ public:
 		{
 			do
 			{
+				ResetScreen();
 				IScreen::PrintScreenHeader("ADD NEW CLIENT SCREEN");
 
 				Client newClient = Client::getNewClientObject();
@@ -100,7 +101,7 @@ public:
 
 				_printNewClientSavingStatus(_manager.Add(newClient));
 
-			} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?(Y/N)\n")));
+			} while (tolower(InputValidate::DetermineAgain("\nWould you like to add more clients?(Y/N)\n"))=='y');
 		}
 	}
 };

@@ -57,6 +57,7 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::DeleteClient))
 		{
+			ResetScreen();
 			IScreen::PrintScreenHeader("DELETE CLIENT SCREEN");
 
 			cout << "Please, enter the account number: ";

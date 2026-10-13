@@ -88,6 +88,7 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::Transactions))
 		{
+			ResetScreen();
 			IScreen::PrintScreenHeader("WITHDRAWAL SCREEN");
 
 			cout << "Please, enter the account number: ";

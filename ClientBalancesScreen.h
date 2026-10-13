@@ -82,6 +82,7 @@ public:
     {
         if (CheckAccessRights(_activeUser, User::Permissions::Transactions))
         {
+            ResetScreen();
             PrintScreenHeader("TOTAL BALANCES SCREEN");
             PrintBalancesTable();
         }

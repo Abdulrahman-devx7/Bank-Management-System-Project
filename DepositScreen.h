@@ -52,6 +52,7 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::Transactions))
 		{
+			ResetScreen();
 			IScreen::PrintScreenHeader("DEPOSIT SCREEN");
 
 			cout << "Please, enter the account number";

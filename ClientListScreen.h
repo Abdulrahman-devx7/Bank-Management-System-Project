@@ -63,6 +63,7 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::ListClients))
 		{
+            ResetScreen();
 			IScreen::PrintScreenHeader("CLIENTS LIST");
 			PrintTable();
 		}

@@ -72,7 +72,7 @@ public:
                 if (IsChoiceExist(menuChoice))
                 {
                     _screens[menuChoice]->Execute();
-                    PromptUser("Press any button to go back");
+                    PromptUser("Press any button to go back...");
                 }
                 else
                     menuChoice = enUserMenuChoice::MainMenu;

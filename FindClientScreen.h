@@ -26,6 +26,7 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::FindClient))
 		{
+			ResetScreen();
 			IScreen::PrintScreenHeader("FIND USER SCREEN");
 
 			cout << "\nEnter the username: ";

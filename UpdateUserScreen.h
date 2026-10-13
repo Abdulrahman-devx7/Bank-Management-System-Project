@@ -107,6 +107,7 @@ public:
     {
         if (CheckAccessRights(_activeUser, User::Permissions::ManageUsers))
         {
+            ResetScreen();
             IScreen::PrintScreenHeader("UPDATE USER SCREEN");
 
             cout << "\nEnter the username: ";

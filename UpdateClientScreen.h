@@ -103,6 +103,7 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::UpdateClients))
 		{
+			ResetScreen();
 			IScreen::PrintScreenHeader("UPDATE CLIENT SCREEN");
 
 			cout << "Please, enter the account number";

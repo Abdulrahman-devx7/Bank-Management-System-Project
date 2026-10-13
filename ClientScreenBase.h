@@ -18,7 +18,7 @@ private:
 
     static void _HandleBadAccNumber(bool isValid)
     {
-        if (isValid)
+        if (!isValid)
             cout << "\nInput rejected! Please, enter an account number that follows the form: ABC1234 \n";
     }
 

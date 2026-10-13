@@ -109,7 +109,7 @@ public:
 		ClientBatchSearch options;
 		for (const auto& [acc_number, client] : _clientMap)
 		{
-			if (client.account().AccountNumber() == accountNumber)
+			if (acc_number == accountNumber)
 				options.matchAccountNumber = true;
 
 			if (client.Email() == email)
@@ -117,9 +117,6 @@ public:
 
 			if (client.PhoneNumber() == phoneNumber)
 				options.matchPhoneNumber = true;
-
-			if (options.hasAnyMatch())
-				return options;
 		}
 		return options;
 	}

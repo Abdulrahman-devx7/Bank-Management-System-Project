@@ -81,6 +81,7 @@ public:
     {
         if (CheckAccessRights(_activeUser, User::Permissions::ManageUsers))
         {
+            ResetScreen();
             PrintScreenHeader("LIST USERS SCREEN");
             PrintUsersTable();
         }
