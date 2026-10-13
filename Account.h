@@ -17,17 +17,17 @@ private:
 	double _balance = 0.0;
 
 public:
-	const string AccountNumber() const
+	const string& AccountNumber() const
 	{
 		return _accountNumber;
 	}
 
-	const string PIN() const
+	const string& PIN() const
 	{
 		return _PIN;
 	}
 
-	const double Balance() const
+	double Balance() const
 	{
 		return _balance;
 	}
@@ -59,7 +59,7 @@ public:
 		_accountNumber = accountNumber;
 	}
 
-	Account(string accountNumber, string PIN, double balance) 
+	Account(const string& accountNumber, const string& PIN, double balance) 
 		: _accountNumber(accountNumber), _PIN(PIN), _balance(balance) {}
 
 	bool Withdraw(double amount)

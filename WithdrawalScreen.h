@@ -5,10 +5,11 @@
 class WithdrawalScreen : public ClientScreenBase
 {
 private:
-	ClientDataManager _manager;
-	User _activeUser;
-	Client _foundClient = Client::getEmptyClient();
-	//A client member has been added to this class to reduce parameter drilling and maintain accessibility 
+private:
+	ClientDataManager& _manager;
+	User& _activeUser;
+	Client* _foundClient = nullptr;
+	//A client pointer member has been added to this class to reduce parameter drilling and maintain accessibility 
 	enum class WithdrawalStatus {
 		Succeeded = 1,
 		Canceled = 2,
@@ -22,7 +23,7 @@ private:
 
 	bool CheckBalanceForWithdrawal(long double withdrawalAmount)
 	{
-		return (withdrawalAmount > _foundClient.account().Balance());
+		return (withdrawalAmount > _foundClient->account().Balance());
 	}
 
 	void _PrintWithdrawalStatus(const WithdrawalStatus status, long double amount)
@@ -31,7 +32,7 @@ private:
 		{
 		case WithdrawalStatus::Succeeded:
 			cout << "\n\nDone! Your withdrawal of " << amount << " has been done successfully. Your new balance is: "
-				<< _foundClient.account().Balance() << " USD\n\n";
+				<< _foundClient->account().Balance() << " USD\n\n";
 			break;
 
 		case WithdrawalStatus::Canceled: 
@@ -39,7 +40,7 @@ private:
 			break;
 
 		case WithdrawalStatus::InsufficientBalance:
-			cout << "\n\nInsufficient balance!\nYou can only withdraw up to " << _foundClient.account().Balance();
+			cout << "\n\nInsufficient balance!\nYou can only withdraw up to " << _foundClient->account().Balance();
 			break;
 		}
 	}
@@ -50,7 +51,7 @@ private:
 		{
 			if (!CheckBalanceForWithdrawal(withdrawalAmount))
 			{
-				_foundClient.account().Withdraw(withdrawalAmount);
+				_foundClient->account().Withdraw(withdrawalAmount);
 				return WithdrawalStatus::Succeeded;
 			}
 			else
@@ -63,21 +64,23 @@ private:
 
 	void _WithdrawalUIProcess(const string& accountNumber)
 	{
-		Client* foundClient = _manager.Find(accountNumber);
+		_foundClient = _manager.Find(accountNumber);
 
-		if (foundClient != nullptr)
+		if (_foundClient != nullptr)
 		{
 			cout << "\nThe following are the client data: \n\n";
-			PrintInfoCard(*foundClient);
+			PrintInfoCard(*_foundClient);
 			long double withdrawAmount = _ReadWithdrawNumber();
 			_PrintWithdrawalStatus(_VerifyWithdrawal(withdrawAmount), withdrawAmount);
 		}
+		else
+			cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
 	}
 
 
 public:
 
-	WithdrawalScreen(const ClientDataManager& injectedManager, User& injectedUser)
+	WithdrawalScreen(ClientDataManager& injectedManager, User& injectedUser)
 		:_manager(injectedManager), _activeUser(injectedUser) {}
 
 
@@ -85,9 +88,9 @@ public:
 	{
 		if (CheckAccessRights(_activeUser, User::Permissions::Transactions))
 		{
-			IScreen::PrintScreenHeader("DEPOSIT SCREEN");
+			IScreen::PrintScreenHeader("WITHDRAWAL SCREEN");
 
-			cout << "Please, enter the account number";
+			cout << "Please, enter the account number: ";
 			string accountNumber = ReadAccountNumber();
 			_WithdrawalUIProcess(accountNumber);
 		}

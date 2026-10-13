@@ -7,8 +7,8 @@
 class UpdateUserScreen : public UserScreenBase
 {
 private:
-    UserDataManager _manager;
-    User _activeUser;
+    UserDataManager& _manager;
+    User& _activeUser;
 
     void _PrintUpdateUserStatus(UserDataManager::DeleteOrUpdateResult result)
     {
@@ -100,7 +100,7 @@ private:
     }
 
 public:
-    UpdateUserScreen(const UserDataManager& injectedManager, const User& injectedUser)
+    UpdateUserScreen(UserDataManager& injectedManager, User& injectedUser)
         : _manager(injectedManager), _activeUser(injectedUser) {}
 
     void Execute() override

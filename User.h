@@ -21,7 +21,7 @@ public:
 		FindClient = 16, Transactions = 32, ManageUsers = 64
 	};
 
-	User(Mode mode, string fullName, string email, string phoneNumber, string username, string password, int32_t permissions)
+	User(Mode mode, const string& fullName, const string& email, const string& phoneNumber, const string& username, const string& password, int32_t permissions)
 		: IPerson(fullName, email, phoneNumber),
 		_mode(mode), _username(username), _password(password), _permissions(permissions) {}
 
@@ -35,12 +35,12 @@ public:
 		return User(Mode::Empty, "", "", "", "", "", 0);
 	}
 
-	string Username() const
+	const string& Username() const
 	{
 		return _username;
 	}
 
-	string Password() const
+	const string& Password() const
 	{
 		return _password;
 	}
@@ -65,12 +65,12 @@ public:
 		return _isMarkedForDeletion;
 	}
 
-	void setUsername(string username)
+	void setUsername(const string& username)
 	{
 		_username = username;
 	}
 
-	void setPassword(string password)
+	void setPassword(const string& password)
 	{
 		_password = password;
 	}

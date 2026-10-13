@@ -11,7 +11,7 @@ public:
 
 private:
 
-    static void _AddDataLineToFile(string fileName, string dataLine)
+    static void _AddDataLineToFile(const string& fileName, const string& dataLine)
     {
         fstream file;
         file.open(fileName, ios::out | ios::app);
@@ -23,7 +23,7 @@ private:
         }
     }
 
-    static User _ConvertUserLineToRecord(string Line, string delimiter = "#//#")
+    static User _ConvertUserLineToRecord(const string& Line, const string& delimiter = "#//#")
     {
         vector<string> UserData = RichString::Split(Line, delimiter);
 
@@ -40,7 +40,7 @@ private:
 
     }
 
-    static string _ConvertRecordToLine(User user, string delimiter = "#//#")
+    static string _ConvertRecordToLine(const User& user, const string& delimiter = "#//#")
     {
         string recordLine = "";
 
@@ -59,13 +59,13 @@ private:
 
 public:
 
-    static void AppendUserRecord(User &target, const string &filename, const string &delimiter="#//#")
+    static void AppendUserRecord(const User& target, const string& filename, const string& delimiter="#//#")
     {
-        _AddDataLineToFile(filename, _ConvertRecordToLine(target));
+        _AddDataLineToFile(filename, _ConvertRecordToLine(target, delimiter));
 
     }
 
-    static enDataStatus LoadData(string fileName, unordered_map<string, User>& clients, string delimiter = "#//#")
+    static enDataStatus LoadData(const string& fileName, unordered_map<string, User>& clients, const string& delimiter = "#//#")
     {
         fstream userFile;
 
@@ -95,23 +95,20 @@ public:
             return enDataStatus::eFileNotFound;
     }
 
-    static void SaveData(string fileName, unordered_map<string, User>& clients)
+    static void SaveData(const string& fileName, const unordered_map<string, User>& clients)
     {
         fstream userFile;
         userFile.open(fileName, ios::out);
 
         if(userFile.is_open())
         {
-            if (userFile.is_open())
+            for (const auto& [accountNumber, client] : clients)
             {
-                for (auto& [accountNumber, client] : clients)
-                {
-                    string line = _ConvertRecordToLine(client);
+                string line = _ConvertRecordToLine(client);
 
-                    userFile << line << "\n";
-                }
-                userFile.close();
+                userFile << line << "\n";
             }
+            userFile.close();
         }
     }
 

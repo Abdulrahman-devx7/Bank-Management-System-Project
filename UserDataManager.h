@@ -28,13 +28,13 @@ private:
 	// Instantiating the data manager object with these two ensures that we if we were to change source we're
 	// saving to or loading from, we'd merely have to pass the file name we want via the constructor of the data manager object 
 	// and be able to use this inside the object. Thus, completely avoiding any hardcoding here in this class
-	unordered_map<string, User> _userMap;
-	string _sourceFile;
+	unordered_map<string, User> &_userMap;
+	const string &_sourceFile;
 
 public:
 
 	// Don't forget passing by reference for the getter of the same map in the session controller.
-	UserDataManager(unordered_map<string, User>& injectedMap, string sourceFileName)
+	UserDataManager(unordered_map<string, User>& injectedMap, const string& sourceFileName)
 		:_userMap(injectedMap), _sourceFile(sourceFileName) {}
 
 	enSaveResult Add(User& target)
@@ -155,6 +155,11 @@ public:
 		return _userMap;
 	}
 
+	unordered_map<string, User>& GetUserMap()
+	{
+		return _userMap;
+	}
+
 	UserBatchSearch BatchSearch(const string& username, const string& email, const string& phoneNumber)
 	{
 		UserBatchSearch options;
@@ -172,6 +177,7 @@ public:
 			if (options.hasAnyMatch())
 				return options;
 		}
+		return options;
 	}
 
 

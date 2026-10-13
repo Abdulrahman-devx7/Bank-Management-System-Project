@@ -6,8 +6,8 @@
 class DeleteClientScreen : public ClientScreenBase
 {
 private:
-	ClientDataManager _manager;
-	User _activeUser;
+	ClientDataManager& _manager;
+	User& _activeUser;
 
 
 	void _printClientDeletionStatus(ClientDataManager::DeleteOrUpdateResult result)
@@ -50,7 +50,7 @@ private:
 	}
 
 public:
-	DeleteClientScreen(ClientDataManager injectedManager, User injectedUser)
+	DeleteClientScreen(ClientDataManager& injectedManager, User& injectedUser)
 		: _manager(injectedManager), _activeUser(injectedUser) {}
 
 	void Execute() override

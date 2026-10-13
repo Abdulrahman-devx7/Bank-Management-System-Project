@@ -113,7 +113,7 @@ protected:
         return InputValidate::ReadFloatBetween(0, numeric_limits<long double>::max(), "\nPlease, make sure you have inputted a non-negative balance value or a valid numeric value..\n");
     }
 
-    static void PrintInfoCard(Client& client)
+    static void PrintInfoCard(const Client& client)
     {
         const int indentWidth = 40;
         const int labelWidth = 18;

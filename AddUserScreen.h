@@ -7,8 +7,8 @@
 class AddUserScreen : public UserScreenBase
 {
 private:
-    UserDataManager _manager;
-    User _activeUser;
+    UserDataManager& _manager;
+    User& _activeUser;
 
     void _ReadUserData(User& user)
     {
@@ -65,7 +65,7 @@ private:
     }
 
 public:
-    AddUserScreen(const UserDataManager& injectedManager, const User& injectedUser)
+    AddUserScreen(UserDataManager& injectedManager, User& injectedUser)
         : _manager(injectedManager), _activeUser(injectedUser) {}
 
     void Execute() override

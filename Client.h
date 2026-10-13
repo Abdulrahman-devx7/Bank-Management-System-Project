@@ -15,7 +15,7 @@ private:
 	bool _isMarkedForDeletion = false;
 
 public:
-	Client(Mode mode, string fullName, string email, string phoneNumber, string accountNumber, string PIN, double balance)
+	Client(Mode mode, const string& fullName, const string& email, const string& phoneNumber, const string& accountNumber, const string& PIN, double balance)
 		: IPerson(fullName, email, phoneNumber), _clientAccount(accountNumber, PIN, balance), _mode(mode) {}
 
 	const Account& account() const

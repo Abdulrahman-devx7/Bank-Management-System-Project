@@ -8,10 +8,10 @@
 class AddClientScreen : public ClientScreenBase
 {
 private:
-	ClientDataManager _manager;
-	User _activeUser;
+	ClientDataManager& _manager;
+	User& _activeUser;
 
-	void _handleBatchSearchError(const ClientBatchSearch options)
+	void _handleBatchSearchError(const ClientBatchSearch& options)
 	{
 		if(options.hasAnyMatch())
 		{
@@ -84,7 +84,7 @@ private:
 	}
 
 public:
-	AddClientScreen(const ClientDataManager& injectedManager, User &injectedUser)
+	AddClientScreen(ClientDataManager& injectedManager, User &injectedUser)
 		:_manager(injectedManager), _activeUser(injectedUser) {}
 
 	void Execute() override

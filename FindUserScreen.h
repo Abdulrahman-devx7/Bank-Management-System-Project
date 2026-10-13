@@ -6,8 +6,8 @@
 class FindUserScreen : public UserScreenBase
 {
 private:
-	UserDataManager _manager;
-	User _activeUser;
+	UserDataManager& _manager;
+	User& _activeUser;
 
 	void _FindUser(const string& username)
 	{
@@ -28,7 +28,7 @@ private:
 	}
 
 public:
-	FindUserScreen(const UserDataManager& injectedManager, const User& injectedUser)
+	FindUserScreen(UserDataManager& injectedManager, User& injectedUser)
 		: _manager(injectedManager), _activeUser(injectedUser) {}
 
 	void Execute() override

@@ -28,7 +28,7 @@ protected:
     }
 
 public:
-    static void PrintScreenHeader(string ScreenTitle, string SubTitle = "")
+    static void PrintScreenHeader(const string& ScreenTitle, const string& SubTitle = "")
     {
         cout << setw(80) << left << "" << string(45, '-') << "\n";
         cout << setw(80) << left << "" << right << setw(30) << ScreenTitle << "\n";
@@ -42,7 +42,7 @@ public:
         }
     }
 
-    static void PromptUser(string message)
+    static void PromptUser(const string& message)
     {
         cout << "\n\n" << message;
         system("pause>0");

@@ -8,23 +8,23 @@ private:
     string _email;
     string _phoneNumber;
 protected:
-    IPerson(string fullName, string email, string phoneNumber) :
+    IPerson(const string& fullName, const string& email, const string& phoneNumber) :
         _fullName(fullName), _email(email), _phoneNumber(phoneNumber){
     }
 
 public:
     // Getters
-    string FullName() const
+    const string& FullName() const
     {
         return _fullName;
     }
 
-    string Email() const
+    const string& Email() const
     {
         return _email;
     }
 
-    string PhoneNumber() const
+    const string& PhoneNumber() const
     {
         return _phoneNumber;
     }

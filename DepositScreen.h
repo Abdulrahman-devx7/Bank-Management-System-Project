@@ -5,8 +5,8 @@
 class DepositScreen : public ClientScreenBase
 {
 private:
-	ClientDataManager _manager;
-	User _activeUser;
+	ClientDataManager& _manager;
+	User& _activeUser;
 
 	float _ReadDepositNumber()
 	{
@@ -44,7 +44,7 @@ private:
 
 public:
 
-	DepositScreen(const ClientDataManager& injectedManager, User& injectedUser)
+	DepositScreen(ClientDataManager& injectedManager, User& injectedUser)
 		:_manager(injectedManager), _activeUser(injectedUser) {
 	}
 

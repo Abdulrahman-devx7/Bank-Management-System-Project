@@ -32,8 +32,8 @@ private:
 	UserDataManager::enAuthStatus _authStatus = UserDataManager::enAuthStatus::Normal;
 	stLoginCredentials _credentials;
 
-	UserDataManager _usersManager;
-	User _activeUser;
+	UserDataManager& _usersManager;
+	User& _activeUser;
 
 	void _ScreenHeaderMessage()
 	{

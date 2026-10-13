@@ -23,7 +23,7 @@ public:
         return (Number >= From && Number <= To);
     }
 
-    static long long ReadInteger(string errorMessage = "Invalid Input! Please, enter a valid input\n")
+    static long long ReadInteger(const string& errorMessage = "Invalid Input! Please, enter a valid input\n")
     {
         long long Number = 0;
         cin >> Number;
@@ -39,7 +39,7 @@ public:
         return Number;
     }
 
-    static long long ReadIntegerBetween(long long from, long long to, string errorMessage = "Number is not within range, enter a valid number\n")
+    static long long ReadIntegerBetween(long long from, long long to, const string& errorMessage = "Number is not within range, enter a valid number\n")
     {
         long long Number = ReadInteger(errorMessage);
 
@@ -51,7 +51,7 @@ public:
         return Number;
     }
 
-    static long double ReadFloat(string errorMessage = "Invalid Input! Please, enter a valid input\n")
+    static long double ReadFloat(const string& errorMessage = "Invalid Input! Please, enter a valid input\n")
     {
         long double Number = 0;
         cin >> Number;
@@ -67,7 +67,7 @@ public:
         return Number;
     }
 
-    static long double ReadFloatBetween(long double from, long double to, string errorMessage = "Number is not within range, enter a valid number\n")
+    static long double ReadFloatBetween(long double from, long double to, const string& errorMessage = "Number is not within range, enter a valid number\n")
     {
         long double Number = ReadFloat(errorMessage);
 
@@ -120,7 +120,7 @@ public:
         return accNumber;
     }
 
-    static char DetermineAgain(string message)
+    static char DetermineAgain(const string& message)
     {
         char PlayAgain;
         cout << message;
@@ -150,7 +150,7 @@ public:
         return true;
     }
 
-    static bool CheckSpacesInUsername(string& username)
+    static bool CheckSpacesInUsername(const string& username)
     {
         for (int i = 0; i < username.length(); i++)
         {

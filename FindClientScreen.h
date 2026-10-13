@@ -4,8 +4,8 @@
 class FindClientScreen : public ClientScreenBase
 {
 private:
-	ClientDataManager _manager;
-	User _activeUser;
+	ClientDataManager& _manager;
+	User& _activeUser;
 
 	void _FindUserUIProcess(const string &accountNumber)
 	{
@@ -18,7 +18,7 @@ private:
 	}
 
 public:
-	FindClientScreen(const ClientDataManager& injectedManager, const User& injectedUser)
+	FindClientScreen(ClientDataManager& injectedManager, User& injectedUser)
 		: _manager(injectedManager), _activeUser(injectedUser) {
 	}
 

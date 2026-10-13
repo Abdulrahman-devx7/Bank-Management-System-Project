@@ -11,7 +11,7 @@ public:
 
 private:
 
-    static void AddDataLineToFile(string fileName, string dataLine)
+    static void AddDataLineToFile(const string& fileName, const string& dataLine)
     {
         fstream file;
         file.open(fileName, ios::out | ios::app);
@@ -23,7 +23,7 @@ private:
         }
     }
 
-    static Client ConvertClientLineToRecord(string Line, string delimiter = "#//#")
+    static Client ConvertClientLineToRecord(const string& Line, const string& delimiter = "#//#")
     {
         vector<string> ClientData = RichString::Split(Line, delimiter);
 
@@ -39,7 +39,7 @@ private:
         return parsedClient;
     }
 
-    static string ConvertRecordToLine(Client client, string delimiter = "#//#")
+    static string ConvertRecordToLine(const Client& client, const string& delimiter = "#//#")
     {
         string recordLine = "";
 
@@ -57,13 +57,13 @@ private:
 
 public:
 
-    static void AppendUserRecord(Client &target, const string& filename, const string& delimiter = "#//#")
+    static void AppendUserRecord(const Client& target, const string& filename, const string& delimiter = "#//#")
     {
-        AddDataLineToFile(filename, ConvertRecordToLine(target));
+        AddDataLineToFile(filename, ConvertRecordToLine(target, delimiter));
     }
 
 
-    static enDataStatus LoadData(string fileName, unordered_map<string, Client>& clients, string delimiter = "#//#")
+    static enDataStatus LoadData(const string& fileName, unordered_map<string, Client>& clients, const string& delimiter = "#//#")
     {
         fstream clientFile;
         clientFile.open(fileName, ios::in);
@@ -87,14 +87,14 @@ public:
             return enDataStatus::eFileNotFound;
     }
 
-    static void SaveData(string fileName, unordered_map<string, Client>& clients)
+    static void SaveData(const string& fileName, const unordered_map<string, Client>& clients)
     {
         fstream clientFile;
         clientFile.open(fileName, ios::out);
 
         if (clientFile.is_open())
         {
-            for (auto& [accountNumber, client] : clients)
+            for (const auto& [accountNumber, client] : clients)
             {
                 string line = ConvertRecordToLine(client);
 

@@ -6,8 +6,8 @@
 class UpdateClientScreen : public ClientScreenBase
 {
 private:
-	ClientDataManager _manager;
-	User _activeUser;
+	ClientDataManager& _manager;
+	User& _activeUser;
 
 	void _PrintNewClientUpdateStatus(ClientDataManager::DeleteOrUpdateResult result)
 	{
@@ -96,7 +96,7 @@ private:
 
 public: 
 
-	UpdateClientScreen(const ClientDataManager& injectedManager, const User& injectedUser)
+	UpdateClientScreen(ClientDataManager& injectedManager, User& injectedUser)
 	: _manager(injectedManager), _activeUser(injectedUser) {}
 
 	void Execute() override

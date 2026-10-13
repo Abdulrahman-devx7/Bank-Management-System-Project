@@ -14,7 +14,7 @@ private:
 
 public:
 
-	ClientDataManager(unordered_map<string, Client>& injectedMap, string sourceFileName)
+	ClientDataManager(unordered_map<string, Client>& injectedMap, const string& sourceFileName)
 		:_clientMap(injectedMap), _sourceFile(sourceFileName) {
 	}
 
@@ -121,6 +121,7 @@ public:
 			if (options.hasAnyMatch())
 				return options;
 		}
+		return options;
 	}
 
 };

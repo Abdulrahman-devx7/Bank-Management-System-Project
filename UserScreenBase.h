@@ -65,7 +65,7 @@ protected:
 
     UserScreenBase() {}
 
-    void _handleBatchSearchError(const UserBatchSearch options)
+    void _handleBatchSearchError(const UserBatchSearch& options)
     {
         if (options.hasAnyMatch())
         {

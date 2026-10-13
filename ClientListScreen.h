@@ -8,7 +8,7 @@ private:
 	unordered_map<string, Client>& _list;
 	User& _activeUser;
 
-    static void PrintFileInfoHeader(const unordered_map<string, Client> clients)
+    static void PrintFileInfoHeader(const unordered_map<string, Client>& clients)
     {
         std::string indent(SCREEN_INDENT, ' ');
 
