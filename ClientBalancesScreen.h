@@ -7,7 +7,7 @@
 #include "ClientDataManager.h"
 #include "User.h"
 
-class TotalBalancesScreen : protected ClientScreenBase
+class TotalBalancesScreen : public ClientScreenBase
 {
 private:
     ClientDataManager& _manager;

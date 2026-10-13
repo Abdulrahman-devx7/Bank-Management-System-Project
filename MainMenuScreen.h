@@ -25,9 +25,9 @@ private:
 		Logout = 8
 	};
 
-	User _activeUser;
-	ClientDataManager _clientManager;
-	UserDataManager _userManager;
+	User &_activeUser;
+	ClientDataManager &_clientManager;
+	UserDataManager &_userManager;
 
 	std::unordered_map<enMainMenuChoice, std::unique_ptr<IScreen>> _screens;
 

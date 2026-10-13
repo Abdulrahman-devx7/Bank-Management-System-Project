@@ -2,7 +2,7 @@
 #include "ClientScreenBase.h"
 #include "ClientDataManager.h"
 
-class DepositScreen : ClientScreenBase
+class DepositScreen : public ClientScreenBase
 {
 private:
 	ClientDataManager _manager;

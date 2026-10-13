@@ -2,7 +2,7 @@
 #include "ClientScreenBase.h"
 #include "ClientDataManager.h"
 
-class WithdrawalScreen : protected ClientScreenBase
+class WithdrawalScreen : public ClientScreenBase
 {
 private:
 	ClientDataManager _manager;
