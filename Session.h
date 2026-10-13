@@ -135,6 +135,7 @@ public:
 			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager);
 			while (true)
 			{
+				login.setAuthStatus(UserDataManager::enAuthStatus::Normal);
 				login.Execute();
 				startupScreen.Execute();
 			}

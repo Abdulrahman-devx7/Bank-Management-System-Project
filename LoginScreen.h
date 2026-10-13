@@ -63,6 +63,7 @@ private:
 		cout << "\nUsername: ";
 		loginData.inputUsername = ReadUsername();
 
+		InputValidate::NormalizeUsername(loginData.inputUsername);
 		// 🚨🚨 This will be added later via including a library dedicated for input validation and normalization
 		// ConvertToLowerCase(loginData.inputUsername);
 
@@ -80,12 +81,23 @@ public:
 	LoginScreen(UserDataManager &manager, User &activeUser)
 		: _usersManager(manager), _activeUser(activeUser) {}
 
+	UserDataManager::enAuthStatus AuthStatus()
+	{
+		return _authStatus;
+	}
+
+	void setAuthStatus(UserDataManager::enAuthStatus status)
+	{
+		_authStatus = status;
+	}
+
 	void Execute() override
 	{
 		do
 		{
 			ResetScreen();
 			_ScreenHeaderMessage();
+
 			stLoginCredentials loginData = _ReadLoginCredentials();
 			_authStatus = _usersManager.Authenticate(loginData.inputUsername, loginData.inputPassword);
 
