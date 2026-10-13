@@ -26,12 +26,16 @@ private:
     {
         PrintScreenHeader("TRANSACTIONS SCREEN", "Menu");
 
-        cout << setw(80) << left << "" << right << setw(10) << "[1]" << " Deposit" << "\n";
-        cout << setw(80) << left << "" << right << setw(10) << "[2]" << " Withdraw" << "\n";
-        cout << setw(80) << left << "" << right << setw(10) << "[3]" << " Total Balances" << "\n";
-        cout << setw(80) << left << "" << right << setw(10) << "[4]" << " Return to Main Menu" << "\n";
+        const int menuWidth = (int)UI_LINE_BOUNDS.length();
+        int indent = GetCenterIndent(menuWidth);
+        string pad(indent, ' ');
 
-        cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
+        cout << pad << right << setw(10) << "[1]" << " Deposit" << "\n";
+        cout << pad << right << setw(10) << "[2]" << " Withdraw" << "\n";
+        cout << pad << right << setw(10) << "[3]" << " Total Balances" << "\n";
+        cout << pad << right << setw(10) << "[4]" << " Return to Main Menu" << "\n";
+
+        cout << pad << UI_LINE_BOUNDS << "\n";
     }
 
     bool IsChoiceExist(enMenuChoice choice)

@@ -13,28 +13,29 @@ private:
     void _ReadUserData(User& user)
     {
         UserBatchSearch result;
+        string pad = GetIndentPadding();
 
         do
         {
             _handleBatchSearchError(result);
 
-            cout << "\nEnter email: ";
+            cout << pad << "Enter email: ";
             user.SetEmail(ReadEmail());
 
-            cout << "\nEnter phone number: ";
+            cout << "\n" << pad << "Enter phone number: ";
             user.SetPhoneNumber(ReadPhoneNumber());
 
-            cout << "\nEnter username: ";
+            cout << "\n" << pad << "Enter username: ";
             user.setUsername(ReadUsername());
 
             result = _manager.BatchSearch(user.Username(), user.Email(), user.PhoneNumber());
 
         } while (result.hasAnyMatch());
 
-        cout << "\nEnter password: ";
+        cout << "\n" << pad << "Enter password: ";
         user.setPassword(ReadPassword());
 
-        cout << "\nEnter full name: ";
+        cout << "\n" << pad << "Enter full name: ";
         user.SetFullName(ReadFullName());
 
         AssignPermissionsToUser(user);

@@ -23,7 +23,7 @@ private:
 		}
 		else
 		{
-			cout << "\nUser with username [" << username << "] is not found!\n";
+			cout << "\n" << GetIndentPadding() << "User with username [" << username << "] is not found!\n";
 		}
 	}
 
@@ -38,7 +38,7 @@ public:
 			ResetScreen();
 			IScreen::PrintScreenHeader("FIND USER SCREEN");
 
-			cout << "\nEnter the username: ";
+			cout << GetIndentPadding() << "Enter the username: ";
 			string username = ReadUsername();
 
 			_FindUser(username);

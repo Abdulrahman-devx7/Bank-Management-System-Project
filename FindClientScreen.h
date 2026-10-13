@@ -14,7 +14,7 @@ private:
 		if (foundUser != nullptr)
 			PrintInfoCard(*foundUser);
 		else
-			cout << "\nUser with username [" << accountNumber << "] is not found!\n";
+			cout << "\n" << GetIndentPadding() << "Client with account number [" << accountNumber << "] is not found!\n";
 	}
 
 public:
@@ -27,12 +27,12 @@ public:
 		if (CheckAccessRights(_activeUser, User::Permissions::FindClient))
 		{
 			ResetScreen();
-			IScreen::PrintScreenHeader("FIND USER SCREEN");
+			IScreen::PrintScreenHeader("FIND CLIENT SCREEN");
 
-			cout << "\nEnter the username: ";
-			string username = ReadAccountNumber();
+			cout << GetIndentPadding() << "Please, enter the account number: ";
+			string accountNumber = ReadAccountNumber();
 
-			_FindUserUIProcess(username);
+			_FindUserUIProcess(accountNumber);
 		}
 	}
 

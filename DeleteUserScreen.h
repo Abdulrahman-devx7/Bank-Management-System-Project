@@ -39,11 +39,11 @@ private:
         {
             PrintInfoCard(*foundUser);
 
-            if (toupper(InputValidate::DetermineAgain("\n\nAre you sure you want to delete this client (Y/N)?\n")) == 'Y')
+            if (toupper(InputValidate::DetermineAgain("\n\nAre you sure you want to delete this user (Y/N)?\n")) == 'Y')
                 _PrintDeletionUserStatus(_manager.Delete(*foundUser));
         }
         else
-            cout << "\User with the username (" << username << ") is not found!\n";
+            cout << "\n" << GetIndentPadding() << "User with the username (" << username << ") is not found!\n";
     }
 
 public:
@@ -57,7 +57,7 @@ public:
             ResetScreen();
             IScreen::PrintScreenHeader("DELETE USER SCREEN");
 
-            cout << "\nEnter the username: ";
+            cout << GetIndentPadding() << "Enter the username: ";
             string username = ReadUsername();
 
             _DeleteUser(username);

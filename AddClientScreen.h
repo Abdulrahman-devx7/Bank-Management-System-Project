@@ -54,30 +54,31 @@ private:
 	void _readClientData(Client& client)
 	{
 		ClientBatchSearch result;
+		string pad = GetIndentPadding();
 		do
 		{
 			_handleBatchSearchError(result);
 
-			cout << "Enter the account number: ";
+			cout << pad << "Enter the account number: ";
 			client.account().SetAccountNumber(ReadAccountNumber());
 
-			cout << "\nEnter the phone number: ";
+			cout << "\n" << pad << "Enter the phone number: ";
 			client.SetPhoneNumber(ReadPhoneNumber());
 
-			cout << "\nEnter the E-mail: ";
+			cout << "\n" << pad << "Enter the E-mail: ";
 			client.SetEmail(ReadEmail());
 
 			result = _manager.BatchSearch(client.account().AccountNumber(), client.Email(), client.PhoneNumber());
 
 		} while (result.hasAnyMatch());
 
-		cout << "\nEnter the full name: ";
+		cout << "\n" << pad << "Enter the full name: ";
 		client.SetFullName(ReadFullName());
 
-		cout << "\nEnter the PIN: ";
+		cout << "\n" << pad << "Enter the PIN: ";
 		client.account().SetPIN(ReadPIN());
 
-		cout << "Enter the balance";
+		cout << "\n" << pad << "Enter the balance: ";
 		client.account().SetBalance(ReadBalance());
 
 		client.SetMode(Client::Mode::New);

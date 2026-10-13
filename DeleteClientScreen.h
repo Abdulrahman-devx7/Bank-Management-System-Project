@@ -45,7 +45,7 @@ private:
 				_printClientDeletionStatus(_manager.Delete(*foundClient));
 		}
 		else
-			cout << "\nClient with account number (" << accountNumber << ") is not found!\n";
+			cout << "\n" << GetIndentPadding() << "Client with account number (" << accountNumber << ") is not found!\n";
 
 	}
 
@@ -60,7 +60,7 @@ public:
 			ResetScreen();
 			IScreen::PrintScreenHeader("DELETE CLIENT SCREEN");
 
-			cout << "Please, enter the account number: ";
+			cout << GetIndentPadding() << "Please, enter the account number: ";
 			string accountNumber = ReadAccountNumber();
 			_deleteClient(accountNumber);
 		}
