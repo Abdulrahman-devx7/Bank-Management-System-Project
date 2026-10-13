@@ -100,9 +100,6 @@ public:
 
 			if (getClientFileStatus() == ClientDataAccess::enDataStatus::eFileNotFound)
 				_HandleClientFileNotFound();
-
-			_userManager = UserDataManager(_userMap, users_file_name);
-			_clientManager = ClientDataManager(_clientMap, client_file_name);
 		}
 		else
 			_HandleUsersFileNotFound();

@@ -9,7 +9,7 @@ public:
 	enum class DeleteOrUpdateResult { Success = 1, Non_updateMode = 2, UserNoExist = 3 };
 
 private:
-	unordered_map<string, Client> _clientMap;
+	unordered_map<string, Client>& _clientMap;
 	string _sourceFile;
 
 public:

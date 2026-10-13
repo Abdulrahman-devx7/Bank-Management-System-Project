@@ -29,7 +29,7 @@ private:
 	// saving to or loading from, we'd merely have to pass the file name we want via the constructor of the data manager object 
 	// and be able to use this inside the object. Thus, completely avoiding any hardcoding here in this class
 	unordered_map<string, User> &_userMap;
-	const string &_sourceFile;
+	string _sourceFile;
 
 public:
 
