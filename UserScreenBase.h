@@ -5,7 +5,7 @@
 #include "InputValidate.h"
 #include <string>
 
-class UserScreenBase : protected IScreen
+class UserScreenBase : public IScreen
 {
 private:
     static string _readUsername()

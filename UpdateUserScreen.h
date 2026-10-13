@@ -4,7 +4,7 @@
 #include "InputValidate.h"
 #include "UserBatchSearch.h"
 
-class UpdateUserScreen : protected UserScreenBase
+class UpdateUserScreen : public UserScreenBase
 {
 private:
     UserDataManager _manager;

@@ -56,7 +56,7 @@ public:
 	MainMenuScreen(User activeUser, ClientDataManager clientManager, UserDataManager userManager) :
 		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager)
 	{
-		_screens[enMainMenuChoice::ClientList] = std::make_unique<ClientListScreen>(_clientManager.GetClientMap());
+		_screens[enMainMenuChoice::ClientList] = std::make_unique<ClientListScreen>(_clientManager.GetClientMap(), activeUser );
 		_screens[enMainMenuChoice::AddClient] = std::make_unique<AddClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::DeleteClient] = std::make_unique<DeleteClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::UpdateClient] = std::make_unique<UpdateClientScreen>(_clientManager, _activeUser);

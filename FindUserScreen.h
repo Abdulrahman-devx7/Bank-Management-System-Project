@@ -3,7 +3,7 @@
 #include "UserDataManager.h"
 #include "InputValidate.h"
 
-class FindUserScreen : protected UserScreenBase
+class FindUserScreen : public UserScreenBase
 {
 private:
 	UserDataManager _manager;

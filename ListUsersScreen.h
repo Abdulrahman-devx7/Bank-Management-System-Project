@@ -7,7 +7,7 @@
 #include "UserDataManager.h"
 #include "User.h"
 
-class ListUsersScreen : protected UserScreenBase
+class ListUsersScreen : public UserScreenBase
 {
 private:
     const UserDataManager& _manager;

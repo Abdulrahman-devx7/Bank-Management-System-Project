@@ -3,7 +3,7 @@
 #include "UserDataManager.h"
 #include "InputValidate.h"
 
-class DeleteUserScreen : protected UserScreenBase
+class DeleteUserScreen : public UserScreenBase
 {
 private:
     UserDataManager _manager;

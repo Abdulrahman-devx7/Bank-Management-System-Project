@@ -6,7 +6,7 @@
 #include "ClientBalancesScreen.h"
 #include <unordered_map>
 
-class TransactionMenu : public ClientScreenBase
+class TransactionMenu : public IScreen
 {
 private:
 	enum class enMenuChoice : short
@@ -14,7 +14,7 @@ private:
         Deposit=1,
         Withdraw=2, 
         TotalBalances=3, 
-        Logout=4
+        MainMenu=4
 	};
 
     User& _activeUser;
@@ -50,7 +50,7 @@ public:
 
     void Execute() override
     {
-        enMenuChoice menuChoice = enMenuChoice::Logout;
+        enMenuChoice menuChoice = enMenuChoice::MainMenu;
         do
         {
             ResetScreen();
@@ -60,9 +60,9 @@ public:
             if (IsChoiceExist(menuChoice))
                 _screens[menuChoice]->Execute();
             else
-                menuChoice = enMenuChoice::Logout;
+                menuChoice = enMenuChoice::MainMenu;
 
-        } while (menuChoice != enMenuChoice::Logout);
+        } while (menuChoice != enMenuChoice::MainMenu);
     }
 };
 
