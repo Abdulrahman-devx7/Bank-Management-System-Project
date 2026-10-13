@@ -42,7 +42,7 @@ public:
 		if (target.Status() == User::Mode::New)
 		{
 			_userMap.insert({ target.Username(), target });
-			UserDataAccess::AppendUserRecord(target, "users.txt");
+			UserDataAccess::AppendUserRecord(target, _sourceFile);
 			target.SetMode(User::Mode::Update);
 
 			return enSaveResult::Success;

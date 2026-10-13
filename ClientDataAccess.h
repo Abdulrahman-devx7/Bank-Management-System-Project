@@ -13,11 +13,26 @@ private:
 
     static void AddDataLineToFile(const string& fileName, const string& dataLine)
     {
+        bool needsLeadingNewline = false;
+        {
+            ifstream checkFile(fileName, ios::binary | ios::ate);
+            if (checkFile.is_open() && checkFile.tellg() > 0)
+            {
+                checkFile.seekg(-1, ios::end);
+                char lastChar = 0;
+                checkFile.get(lastChar);
+                if (lastChar != '\n' && lastChar != '\r')
+                    needsLeadingNewline = true;
+            }
+        }
+
         fstream file;
         file.open(fileName, ios::out | ios::app);
 
         if (file.is_open())
         {
+            if (needsLeadingNewline)
+                file << "\n";
             file << dataLine << endl;
             file.close();
         }
@@ -75,9 +90,12 @@ public:
 
             while (getline(clientFile, line))
             {
+                if (line.empty())
+                    continue;
+
                 client = ConvertClientLineToRecord(line, delimiter);
 
-                if (!client.IsMarkedForDeletion())
+                if (!client.IsEmpty() && !client.IsMarkedForDeletion())
                     clients.insert({ client.account().AccountNumber(), client });
             }
             clientFile.close();

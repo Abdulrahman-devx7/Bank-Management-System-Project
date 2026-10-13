@@ -13,11 +13,26 @@ private:
 
     static void _AddDataLineToFile(const string& fileName, const string& dataLine)
     {
+        bool needsLeadingNewline = false;
+        {
+            ifstream checkFile(fileName, ios::binary | ios::ate);
+            if (checkFile.is_open() && checkFile.tellg() > 0)
+            {
+                checkFile.seekg(-1, ios::end);
+                char lastChar = 0;
+                checkFile.get(lastChar);
+                if (lastChar != '\n' && lastChar != '\r')
+                    needsLeadingNewline = true;
+            }
+        }
+
         fstream file;
         file.open(fileName, ios::out | ios::app);
 
         if (file.is_open())
         {
+            if (needsLeadingNewline)
+                file << "\n";
             file << dataLine << endl;
             file.close();
         }
@@ -65,7 +80,7 @@ public:
 
     }
 
-    static enDataStatus LoadData(const string& fileName, unordered_map<string, User>& clients, const string& delimiter = "#//#")
+    static enDataStatus LoadData(const string& fileName, unordered_map<string, User>& users, const string& delimiter = "#//#")
     {
         fstream userFile;
 
@@ -78,14 +93,17 @@ public:
 
             while (getline(userFile, line))
             {
+                if (line.empty())
+                    continue;
+
                 user = _ConvertUserLineToRecord(line, delimiter);
 
-                if (!user.IsMarkedForDeletion())
-                    clients.insert({ user.Username() , user });
+                if (!user.IsEmpty() && !user.IsMarkedForDeletion())
+                    users.insert({ user.Username() , user });
             }
             userFile.close();
 
-            if (clients.size() == 0)
+            if (users.size() == 0)
                 return enDataStatus::eFileEmpty;
             else
                 return enDataStatus::eSuccess;
