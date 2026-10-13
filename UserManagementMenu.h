@@ -60,18 +60,24 @@ public:
 
     void Execute() override
     {
-        enUserMenuChoice menuChoice = enUserMenuChoice::MainMenu;
-        do
+        if (CheckAccessRights(_activeUser, User::Permissions::ManageUsers))
         {
-            ResetScreen();
-            ShowUserManagementMenu();
-            menuChoice = static_cast<enUserMenuChoice>(InputValidate::ReadIntegerBetween(1, 6));
+            enUserMenuChoice menuChoice = enUserMenuChoice::MainMenu;
+            do
+            {
+                ResetScreen();
+                ShowUserManagementMenu();
+                menuChoice = static_cast<enUserMenuChoice>(InputValidate::ReadIntegerBetween(1, 6));
 
-            if (IsChoiceExist(menuChoice))
-                _screens[menuChoice]->Execute();
-            else
-                menuChoice = enUserMenuChoice::MainMenu;
+                if (IsChoiceExist(menuChoice))
+                {
+                    _screens[menuChoice]->Execute();
+                    PromptUser("Press any button to go back");
+                }
+                else
+                    menuChoice = enUserMenuChoice::MainMenu;
 
-        } while (menuChoice != enUserMenuChoice::MainMenu);
+            } while (menuChoice != enUserMenuChoice::MainMenu);
+        }
     }
 };

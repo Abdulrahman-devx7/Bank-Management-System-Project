@@ -6,6 +6,7 @@ class ClientListScreen : public ClientScreenBase
 {
 private:
 	unordered_map<string, Client>& _list;
+	User& _activeUser;
 
     static void PrintFileInfoHeader(const unordered_map<string, Client> clients)
     {
@@ -54,14 +55,17 @@ private:
 
 public:
 
-	ClientListScreen(unordered_map<string, Client>& clientList)
-		: _list(clientList) {
+	ClientListScreen(unordered_map<string, Client>& clientList, User& activeUser)
+		: _list(clientList), _activeUser(activeUser) {
 	}
 
 	void Execute() override
 	{
-		IScreen::PrintScreenHeader("CLIENTS LIST");
-        PrintTable();
+		if (CheckAccessRights(_activeUser, User::Permissions::ListClients))
+		{
+			IScreen::PrintScreenHeader("CLIENTS LIST");
+			PrintTable();
+		}
 	}
 
 };
