@@ -51,7 +51,7 @@ public:
     UserManagementMenu(User& activeUser, UserDataManager& userManager)
         : _activeUser(activeUser), _userManager(userManager)
     {
-        _screens[enUserMenuChoice::ListUsers] = std::make_unique<ListUsersScreen>(_userManager.GetUserMap(), activeUser);
+        _screens[enUserMenuChoice::ListUsers] = std::make_unique<ListUsersScreen>(_userManager, activeUser);
         _screens[enUserMenuChoice::AddNewUser] = std::make_unique<AddUserScreen>(_userManager, _activeUser);
         _screens[enUserMenuChoice::DeleteUser] = std::make_unique<DeleteUserScreen>(_userManager, _activeUser);
         _screens[enUserMenuChoice::UpdateUser] = std::make_unique<UpdateUserScreen>(_userManager, _activeUser);

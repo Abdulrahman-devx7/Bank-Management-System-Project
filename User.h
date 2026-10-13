@@ -23,7 +23,7 @@ public:
 
 	User(Mode mode, string fullName, string email, string phoneNumber, string username, string password, int32_t permissions)
 		: IPerson(fullName, email, phoneNumber),
-		_username(username), _password(password), _permissions(permissions) {}
+		_mode(mode), _username(username), _password(password), _permissions(permissions) {}
 
 	bool CheckAccessPermission(Permissions Permission) const
 	{
