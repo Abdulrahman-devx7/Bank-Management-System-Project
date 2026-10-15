@@ -1,0 +1,91 @@
+#pragma once
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <unordered_map>
+#include "ClientScreenBase.h"
+#include "ClientDataManager.h"
+#include "User.h"
+
+class TotalBalancesScreen : public ClientScreenBase
+{
+private:
+    ClientDataManager& _manager;
+    User& _activeUser;
+
+    inline static const int BALANCES_TABLE_WIDTH = 77;
+
+    static void PrintClientBalancesHeader(size_t clientCount)
+    {
+        int indent = GetCenterIndent(BALANCES_TABLE_WIDTH);
+        const std::string pad(indent, ' ');
+
+        std::cout << "\n" << pad
+            << CenterText("Balances List: (" + std::to_string(clientCount) + ") Client(s)", BALANCES_TABLE_WIDTH) << "\n";
+
+        std::cout << pad << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
+
+        std::cout << pad << "| " << std::left
+            << std::setw(16) << "Account Number" << "| "
+            << std::setw(40) << "Full Name" << "| "
+            << std::setw(14) << "Balance (USD)" << "|\n";
+
+        std::cout << pad << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
+    }
+
+    static void PrintIndividualClientBalanceRow(const Client& client)
+    {
+        int indent = GetCenterIndent(BALANCES_TABLE_WIDTH);
+        const std::string pad(indent, ' ');
+
+        std::cout << pad << "| " << std::left
+            << std::setw(16) << FormatCell(client.account().AccountNumber(), 16) << "| "
+            << std::setw(40) << FormatCell(client.FullName(), 40) << "| "
+            << std::setw(14) << std::fixed << std::setprecision(2) << client.account().Balance() << "|\n";
+    }
+
+    void PrintBalancesTable()
+    {
+        const auto& clientMap = _manager.GetClientMap();
+        double totalBalances = 0.0;
+
+        PrintClientBalancesHeader(clientMap.size());
+
+        int indent = GetCenterIndent(BALANCES_TABLE_WIDTH);
+        const std::string pad(indent, ' ');
+
+        if (clientMap.empty())
+        {
+            std::cout << pad << "| " << std::left
+                << std::setw(BALANCES_TABLE_WIDTH - 4) << "No clients available in the system." << " |\n";
+        }
+        else
+        {
+            for (const auto& [accountNumber, client] : clientMap)
+            {
+                PrintIndividualClientBalanceRow(client);
+                totalBalances += client.account().Balance();
+            }
+        }
+
+        std::cout << pad << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
+
+        std::cout << pad << std::setw(BALANCES_TABLE_WIDTH - 15) << std::right << "Total Balances = $"
+            << std::left << std::fixed << std::setprecision(2) << totalBalances << "\n\n";
+    }
+
+public:
+    TotalBalancesScreen(ClientDataManager& injectedManager, User& injectedUser)
+        : _manager(injectedManager), _activeUser(injectedUser) {
+    }
+
+    void Execute() override
+    {
+        if (CheckAccessRights(_activeUser, User::Permissions::Transactions))
+        {
+            ResetScreen();
+            PrintScreenHeader("TOTAL BALANCES SCREEN");
+            PrintBalancesTable();
+        }
+    }
+};
