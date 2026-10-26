@@ -32,18 +32,14 @@ private:
     {
         PrintScreenHeader("USER MANAGEMENT SCREEN", "Menu");
 
-        const int menuWidth = (int)UI_LINE_BOUNDS.length();
-        int indent = GetCenterIndent(menuWidth);
-        string pad(indent, ' ');
+        std::cout << std::setw(80) << std::left << "" << std::right << std::setw(10) << "[1]" << " List Users\n";
+        std::cout << std::setw(80) << std::left << "" << std::right << std::setw(10) << "[2]" << " Add New User\n";
+        std::cout << std::setw(80) << std::left << "" << std::right << std::setw(10) << "[3]" << " Delete User\n";
+        std::cout << std::setw(80) << std::left << "" << std::right << std::setw(10) << "[4]" << " Update User\n";
+        std::cout << std::setw(80) << std::left << "" << std::right << std::setw(10) << "[5]" << " Find User\n";
+        std::cout << std::setw(80) << std::left << "" << std::right << std::setw(10) << "[6]" << " Return to Main Menu\n";
 
-        std::cout << pad << std::right << std::setw(10) << "[1]" << " List Users\n";
-        std::cout << pad << std::right << std::setw(10) << "[2]" << " Add New User\n";
-        std::cout << pad << std::right << std::setw(10) << "[3]" << " Delete User\n";
-        std::cout << pad << std::right << std::setw(10) << "[4]" << " Update User\n";
-        std::cout << pad << std::right << std::setw(10) << "[5]" << " Find User\n";
-        std::cout << pad << std::right << std::setw(10) << "[6]" << " Return to Main Menu\n";
-
-        std::cout << pad << UI_LINE_BOUNDS << "\n";
+        std::cout << std::setw(80) << std::left << "" << UI_LINE_BOUNDS << "\n";
     }
 
     bool IsChoiceExist(enUserMenuChoice choice)

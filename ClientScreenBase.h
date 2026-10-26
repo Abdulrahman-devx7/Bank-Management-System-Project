@@ -115,13 +115,12 @@ protected:
 
     static void PrintInfoCard(const Client& client)
     {
-        const int cardWidth = (int)UI_LINE_BOUNDS.length();
-        const int indentWidth = GetCenterIndent(cardWidth);
+        const int indentWidth = 40;
         const int labelWidth = 18;
         const std::string indent(indentWidth, ' ');
 
         std::cout << "\n" << indent << UI_LINE_BOUNDS << "\n";
-        std::cout << indent << CenterText("Client Card Details", cardWidth) << "\n";
+        std::cout << indent << std::setw(labelWidth + 12) << "Client Card Details" << "\n";
         std::cout << indent << UI_LINE_BOUNDS << "\n";
 
         std::cout << indent << std::left << std::setw(labelWidth) << "Account Number"

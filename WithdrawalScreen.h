@@ -91,7 +91,7 @@ public:
 			ResetScreen();
 			IScreen::PrintScreenHeader("WITHDRAWAL SCREEN");
 
-			cout << GetIndentPadding() << "Please, enter the account number: ";
+			cout << "Please, enter the account number: ";
 			string accountNumber = ReadAccountNumber();
 			_WithdrawalUIProcess(accountNumber);
 		}

@@ -134,10 +134,12 @@ public:
 			{
 				login.setAuthStatus(UserDataManager::enAuthStatus::Normal);
 				login.Execute();
+
+				IScreen::SetActiveUser(_activeUser);
 				startupScreen.Execute();
+				IScreen::ClearActiveUser();
 			}
 
 		}
 	}
 };
-

@@ -59,19 +59,19 @@ private:
 	stLoginCredentials _ReadLoginCredentials()
 	{
 		stLoginCredentials loginData;
-		string pad = GetIndentPadding();
 
-		cout << pad << "Username: ";
+		cout << "\nUsername: ";
 		loginData.inputUsername = ReadUsername();
 
 		InputValidate::NormalizeUsername(loginData.inputUsername);
 		// 🚨🚨 This will be added later via including a library dedicated for input validation and normalization
 		// ConvertToLowerCase(loginData.inputUsername);
 
-		cout << "\n" << pad << "Password: ";
+		cout << "\nPassword: ";
 		loginData.inputPassword = ReadPassword();
 
 		return loginData;
+
 	}
 
 public:

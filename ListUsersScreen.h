@@ -13,42 +13,39 @@ private:
     const UserDataManager& _manager;
     const User& _activeUser;
 
-    inline static const int USER_TABLE_WIDTH = 132;
-
     static void PrintUsersTableHeader(size_t userCount)
     {
-        int indent = GetCenterIndent(USER_TABLE_WIDTH);
-        const std::string pad(indent, ' ');
+        const std::string indent(SCREEN_INDENT, ' ');
 
-        std::cout << "\n" << pad
-            << CenterText("User List: (" + std::to_string(userCount) + ") User(s)", USER_TABLE_WIDTH) << "\n";
+        std::cout << "\n" << indent
+            << std::setw((SCREEN_WIDTH + 24) / 2) << std::right
+            << "User List: (" + std::to_string(userCount) + ") User(s)\n";
 
-        std::cout << pad << std::string(USER_TABLE_WIDTH, '-') << "\n";
+        std::cout << indent << std::string(SCREEN_WIDTH, '-') << "\n";
 
-        // Widths sum: 2 + 16 + 2 + 15 + 2 + 32 + 2 + 30 + 2 + 14 + 2 + 12 + 1 = 132
-        std::cout << pad << "| " << std::left
+        // Widths sum: 2 + 16 + 2 + 12 + 2 + 25 + 2 + 28 + 2 + 14 + 2 + 10 + 1 = 118
+        std::cout << indent << "| " << std::left
             << std::setw(16) << "Username" << "| "
-            << std::setw(15) << "Password" << "| "
-            << std::setw(32) << "Full Name" << "| "
-            << std::setw(30) << "Email" << "| "
+            << std::setw(12) << "Password" << "| "
+            << std::setw(25) << "Full Name" << "| "
+            << std::setw(28) << "Email" << "| "
             << std::setw(14) << "Phone Number" << "| "
-            << std::setw(12) << "Permission" << "|\n";
+            << std::setw(10) << "Permission" << "|\n";
 
-        std::cout << pad << std::string(USER_TABLE_WIDTH, '-') << "\n";
+        std::cout << indent << std::string(SCREEN_WIDTH, '-') << "\n";
     }
 
     static void PrintIndividualUserRow(const User& user)
     {
-        int indent = GetCenterIndent(USER_TABLE_WIDTH);
-        const std::string pad(indent, ' ');
+        const std::string indent(SCREEN_INDENT, ' ');
 
-        std::cout << pad << "| " << std::left
-            << std::setw(16) << FormatCell(user.Username(), 16) << "| "
-            << std::setw(15) << FormatCell(user.Password(), 15) << "| "
-            << std::setw(32) << FormatCell(user.FullName(), 32) << "| "
-            << std::setw(30) << FormatCell(user.Email(), 30) << "| "
-            << std::setw(14) << FormatCell(user.PhoneNumber(), 14) << "| "
-            << std::setw(12) << user.getPermissions() << "|\n";
+        std::cout << indent << "| " << std::left
+            << std::setw(16) << user.Username() << "| "
+            << std::setw(12) << user.Password() << "| "
+            << std::setw(25) << user.FullName() << "| "
+            << std::setw(28) << user.Email() << "| "
+            << std::setw(14) << user.PhoneNumber() << "| "
+            << std::setw(10) << user.getPermissions() << "|\n";
     }
 
     void PrintUsersTable()
@@ -57,13 +54,11 @@ private:
 
         PrintUsersTableHeader(userMap.size());
 
-        int indent = GetCenterIndent(USER_TABLE_WIDTH);
-        const std::string pad(indent, ' ');
-
         if (userMap.empty())
         {
-            std::cout << pad << "| " << std::left
-                << std::setw(USER_TABLE_WIDTH - 4) << "No users available in the system." << " |\n";
+            const std::string indent(SCREEN_INDENT, ' ');
+            std::cout << indent << "| " << std::left
+                << std::setw(SCREEN_WIDTH - 4) << "No users available in the system." << " |\n";
         }
         else
         {
@@ -73,7 +68,8 @@ private:
             }
         }
 
-        std::cout << pad << std::string(USER_TABLE_WIDTH, '-') << "\n\n";
+        const std::string indent(SCREEN_INDENT, ' ');
+        std::cout << indent << std::string(SCREEN_WIDTH, '-') << "\n\n";
     }
 
 public:
