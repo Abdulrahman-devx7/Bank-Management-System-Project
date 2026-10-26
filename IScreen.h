@@ -4,11 +4,15 @@
 #include <iomanip>
 
 #include "User.h"
+#include "Date.h"
 
 using namespace std;
 
 class IScreen
 {
+private:
+    inline static User _currentActiveUser = User::getEmptyUser();
+
 protected:
 
     inline static const std::string UI_LINE_BOUNDS = std::string(44, '=');    
@@ -28,18 +32,33 @@ protected:
     }
 
 public:
+    static void SetActiveUser(const User& user)
+    {
+        _currentActiveUser = user;
+    }
+
+    static void ClearActiveUser()
+    {
+        _currentActiveUser = User::getEmptyUser();
+    }
+
     static void PrintScreenHeader(const string& ScreenTitle, const string& SubTitle = "")
     {
         cout << setw(80) << left << "" << string(45, '-') << "\n";
         cout << setw(80) << left << "" << right << setw(30) << ScreenTitle << "\n";
-        cout << setw(80) << left << "" << string(45, '-') << "\n\n";
+        cout << setw(80) << left << "" << string(45, '-') << "\n";
 
         if (SubTitle != "")
         {
-            cout << setw(80) << left << "" << string(45, '-') << "\n";
             cout << setw(80) << left << "" << right << setw(30) << SubTitle << "\n";
             cout << setw(80) << left << "" << string(45, '-') << "\n";
         }
+        cout << "\n";
+
+        cout << setw(80) << left << "" << "User: " << _currentActiveUser.Username() << "\n";
+
+        cout << setw(80) << left << "" << "Date: " << Date::FormatDate(Date::GetSystemDate()) << "\n";
+        cout << setw(80) << left << "" << string(45, '-') << "\n";
     }
 
     static void PromptUser(const string& message)
@@ -58,4 +77,3 @@ public:
     virtual ~IScreen() = default;
 
 };
-
