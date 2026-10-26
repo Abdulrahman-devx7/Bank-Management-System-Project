@@ -14,33 +14,33 @@ private:
     User& _activeUser;
 
     inline static const int BALANCES_TABLE_WIDTH = 77;
+    inline static const int BALANCES_INDENT = SCREEN_INDENT + ((SCREEN_WIDTH - BALANCES_TABLE_WIDTH) / 2);
 
     static void PrintClientBalancesHeader(size_t clientCount)
     {
-        int indent = GetCenterIndent(BALANCES_TABLE_WIDTH);
-        const std::string pad(indent, ' ');
+        const std::string indent(BALANCES_INDENT, ' ');
 
-        std::cout << "\n" << pad
-            << CenterText("Balances List: (" + std::to_string(clientCount) + ") Client(s)", BALANCES_TABLE_WIDTH) << "\n";
+        std::cout << "\n" << indent
+            << std::setw((BALANCES_TABLE_WIDTH + 28) / 2) << std::right
+            << "Balances List: (" + std::to_string(clientCount) + ") Client(s)\n";
 
-        std::cout << pad << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
+        std::cout << indent << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
 
-        std::cout << pad << "| " << std::left
+        std::cout << indent << "| " << std::left
             << std::setw(16) << "Account Number" << "| "
             << std::setw(40) << "Full Name" << "| "
             << std::setw(14) << "Balance (USD)" << "|\n";
 
-        std::cout << pad << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
+        std::cout << indent << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
     }
 
     static void PrintIndividualClientBalanceRow(const Client& client)
     {
-        int indent = GetCenterIndent(BALANCES_TABLE_WIDTH);
-        const std::string pad(indent, ' ');
+        const std::string indent(BALANCES_INDENT, ' ');
 
-        std::cout << pad << "| " << std::left
-            << std::setw(16) << FormatCell(client.account().AccountNumber(), 16) << "| "
-            << std::setw(40) << FormatCell(client.FullName(), 40) << "| "
+        std::cout << indent << "| " << std::left
+            << std::setw(16) << client.account().AccountNumber() << "| "
+            << std::setw(40) << client.FullName() << "| "
             << std::setw(14) << std::fixed << std::setprecision(2) << client.account().Balance() << "|\n";
     }
 
@@ -51,12 +51,10 @@ private:
 
         PrintClientBalancesHeader(clientMap.size());
 
-        int indent = GetCenterIndent(BALANCES_TABLE_WIDTH);
-        const std::string pad(indent, ' ');
-
         if (clientMap.empty())
         {
-            std::cout << pad << "| " << std::left
+            const std::string indent(BALANCES_INDENT, ' ');
+            std::cout << indent << "| " << std::left
                 << std::setw(BALANCES_TABLE_WIDTH - 4) << "No clients available in the system." << " |\n";
         }
         else
@@ -68,9 +66,10 @@ private:
             }
         }
 
-        std::cout << pad << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
+        const std::string indent(BALANCES_INDENT, ' ');
+        std::cout << indent << std::string(BALANCES_TABLE_WIDTH, '-') << "\n";
 
-        std::cout << pad << std::setw(BALANCES_TABLE_WIDTH - 15) << std::right << "Total Balances = $"
+        std::cout << indent << std::setw(BALANCES_TABLE_WIDTH - 15) << std::right << "Total Balances = $"
             << std::left << std::fixed << std::setprecision(2) << totalBalances << "\n\n";
     }
 

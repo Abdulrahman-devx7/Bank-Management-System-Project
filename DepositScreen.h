@@ -55,7 +55,7 @@ public:
 			ResetScreen();
 			IScreen::PrintScreenHeader("DEPOSIT SCREEN");
 
-			cout << GetIndentPadding() << "Please, enter the account number: ";
+			cout << "Please, enter the account number";
 			string accountNumber = ReadAccountNumber();
 			_DepositUIProcess(accountNumber);
 		}

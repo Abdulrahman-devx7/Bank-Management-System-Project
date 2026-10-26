@@ -37,20 +37,16 @@ private:
 	{
 		PrintScreenHeader("MAIN MENU");
 
-		const int menuWidth = (int)UI_LINE_BOUNDS.length();
-		int indent = GetCenterIndent(menuWidth);
-		string pad(indent, ' ');
+		cout << setw(80) << left << "" << right << setw(10) << "[1]" << " Show Client List" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[2]" << " Add New Client" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[3]" << " Delete Client" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[4]" << " Update Client Info" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[5]" << " Find Client" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[6]" << " Transactions" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[7]" << " Manage Users" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[8]" << " Logout" << "\n";
 
-		cout << pad << right << setw(10) << "[1]" << " Show Client List" << "\n";
-		cout << pad << right << setw(10) << "[2]" << " Add New Client" << "\n";
-		cout << pad << right << setw(10) << "[3]" << " Delete Client" << "\n";
-		cout << pad << right << setw(10) << "[4]" << " Update Client Info" << "\n";
-		cout << pad << right << setw(10) << "[5]" << " Find Client" << "\n";
-		cout << pad << right << setw(10) << "[6]" << " Transactions" << "\n";
-		cout << pad << right << setw(10) << "[7]" << " Manage Users" << "\n";
-		cout << pad << right << setw(10) << "[8]" << " Logout" << "\n";
-
-		cout << pad << UI_LINE_BOUNDS << "\n";
+		cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
 	}
 
 	bool IsChoiceExist(enMainMenuChoice choice)
