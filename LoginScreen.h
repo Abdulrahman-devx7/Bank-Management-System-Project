@@ -1,11 +1,13 @@
 #pragma once
 #include "IScreen.h"
 #include "UserDataManager.h"
+#include "LoginDataRegistery.h"
 
 class LoginScreen : public IScreen
 {
 private:
 	short &_numTries;
+	const string LOGIN_REGISTERY_FILE_NAME = "registery_log.txt";
 	struct stLoginCredentials
 	{
 		string inputUsername;
@@ -130,6 +132,7 @@ public:
 		} while (_authStatus != UserDataManager::enAuthStatus::Success);
 
 		_authStatus = UserDataManager::enAuthStatus::Normal;
+		LoginDataRegistery::RecordLogin(LOGIN_REGISTERY_FILE_NAME, _activeUser);
 		PromptUser("Login Succeeded! Please, press any button to enter the main menu");
 	}
 

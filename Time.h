@@ -23,6 +23,15 @@ private:
 		_second = second;
 	}
 
+	void InvalidTimeFallBack()
+	{
+		if (!IsValidTime(*this))
+		{
+			cout << "INVALID DATE WARNING\nDATE HAS BEEN SET TO TODAY\'S DATE\n";
+			*this = GetSystemTime();
+		}
+	}
+
 public:
 
 	short Hour() const
@@ -54,12 +63,17 @@ public:
 			SetSecond(second);
 		}
 		else
-			*this = GetSystemTime();
+			InvalidTimeFallBack();
 	}
 
 	static bool IsValidTime(short hour, short minute, short second)
 	{
 		return ((hour >= 0) && (hour < 24)) && ((minute >= 0) && (minute < 60)) && ((second >= 0) && (second < 60));
+	}
+
+	static bool IsValidTime(const Time& time)
+	{
+		return IsValidTime(time.Hour(), time.Minute(), time.Second());
 	}
 
 	bool IsValidTime()
@@ -80,9 +94,33 @@ public:
 
 	}
 
+	static Time StringToTime(const string& line, const string delimiter = ":")
+	{
+		vector<string> timeElements = RichString::Split(line, delimiter);
+
+		short hour = stoi(timeElements[0]);
+		short minute = stoi(timeElements[1]);
+		short second = stoi(timeElements[2]);
+
+		return Time(hour, minute, second);
+	}
+
+	static string TimeToString(const Time &time, const string &delimiter = ":")
+	{
+		return to_string(time.Hour()) + delimiter +
+			to_string(time.Minute()) + delimiter +
+			to_string(time.Second());
+	}
+
+	string TimeToString(const string& delimiter = ":") const
+	{
+		return TimeToString(*this, delimiter);
+	}
+
 	void SetToSystemTime()
 	{
 		*this = GetSystemTime();
 	}
+
 };
 
