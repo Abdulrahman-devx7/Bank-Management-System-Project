@@ -10,6 +10,7 @@ class Session
 {
 private:
 	enum class SystemReadiness { Ready = 1, EssentialSystemFilesProblematic = 2, NoBootUp = 3 };
+	short _numTries = 3;
 
 	const string client_file_name = "clients.txt";
 	const string users_file_name = "users.txt";
@@ -54,6 +55,13 @@ private:
 	{
 		IScreen::PrintScreenHeader("ERROR OCCURRED", "Please, boot the system's\nessentials before trying to\n run the application.");
 		IScreen::PromptUser("Press any button to halt the application.\n");
+	}
+
+	void _HandleLockingUser()
+	{
+		IScreen::ResetScreen();
+		cout << "We have locked you out of the system due to security reasons. \n\n";
+		IScreen::PromptUser("");
 	}
 
 	UserDataManager& GetUserManager() { return _userManager; }
@@ -128,16 +136,25 @@ public:
 			// This is going to be encircled in while(true) loop to keep the program running.
 			// The login screen object would be connected to the session controller and potential checkers
 			// could be added here for extensibility inside this while(true) loop
-			LoginScreen login(_userManager, _activeUser);
+			LoginScreen login(_userManager, _activeUser, _numTries);
 			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager);
 			while (true)
 			{
 				login.setAuthStatus(UserDataManager::enAuthStatus::Normal);
 				login.Execute();
 
-				IScreen::SetActiveUser(_activeUser);
-				startupScreen.Execute();
-				IScreen::ClearActiveUser();
+				if (_numTries != 0)
+				{
+					IScreen::SetActiveUser(_activeUser);
+					startupScreen.Execute();
+					IScreen::ClearActiveUser();
+					_numTries = 3;
+				}
+				else
+				{
+					_HandleLockingUser();
+					break;
+				}
 			}
 
 		}

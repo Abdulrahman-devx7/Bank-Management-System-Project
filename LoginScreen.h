@@ -5,11 +5,21 @@
 class LoginScreen : public IScreen
 {
 private:
+	short &_numTries;
 	struct stLoginCredentials
 	{
 		string inputUsername;
 		string inputPassword;
 	};
+
+	UserDataManager::enAuthStatus _authStatus = UserDataManager::enAuthStatus::Normal;
+	enum class LockStatus { Locked, NotLocked };
+	LockStatus _Locked = LockStatus::NotLocked;
+
+	stLoginCredentials _credentials;
+
+	UserDataManager& _usersManager;
+	User& _activeUser;
 
 	string ReadUsername()
 	{
@@ -29,12 +39,6 @@ private:
 		return password;
 	}
 
-	UserDataManager::enAuthStatus _authStatus = UserDataManager::enAuthStatus::Normal;
-	stLoginCredentials _credentials;
-
-	UserDataManager& _usersManager;
-	User& _activeUser;
-
 	void _ScreenHeaderMessage()
 	{
 		ResetScreen();
@@ -45,7 +49,10 @@ private:
 			break;
 
 		case UserDataManager::enAuthStatus::InvalidCredentials:
-			PrintScreenHeader("LOGIN SCREEN", "Invalid username or password!");
+		{
+			string Subtitle = "Invalid username or password! You have " + to_string(_numTries) + " tries left!";
+			PrintScreenHeader("LOGIN SCREEN", Subtitle);
+		}
 			break;
 
 		case UserDataManager::enAuthStatus::Success:
@@ -64,8 +71,6 @@ private:
 		loginData.inputUsername = ReadUsername();
 
 		InputValidate::NormalizeUsername(loginData.inputUsername);
-		// 🚨🚨 This will be added later via including a library dedicated for input validation and normalization
-		// ConvertToLowerCase(loginData.inputUsername);
 
 		cout << "\nPassword: ";
 		loginData.inputPassword = ReadPassword();
@@ -74,12 +79,28 @@ private:
 
 	}
 
+	void ManageAuthAction(const stLoginCredentials &loginData)
+	{
+		if (_authStatus == UserDataManager::enAuthStatus::Success)
+			_activeUser = *_usersManager.Find(loginData.inputUsername, loginData.inputPassword);
+
+		else if (_authStatus == UserDataManager::enAuthStatus::InvalidCredentials)
+			_numTries--;	
+
+		if (_numTries == 0)
+		{
+			_Locked = LockStatus::Locked;
+			return;
+		}
+
+	}
+
 public:
 	// Could add a counter to lock the user after a certain time of wrong password or invalid entries 
 	// No details for now
 	// If this were to extend, we could just bundle the necessary state vars into a struct and pass them along
-	LoginScreen(UserDataManager &manager, User &activeUser)
-		: _usersManager(manager), _activeUser(activeUser) {}
+	LoginScreen(UserDataManager &manager, User &activeUser, short &numTries)
+		: _usersManager(manager), _activeUser(activeUser), _numTries(numTries) {}
 
 	UserDataManager::enAuthStatus AuthStatus()
 	{
@@ -95,17 +116,20 @@ public:
 	{
 		do
 		{
+
 			ResetScreen();
 			_ScreenHeaderMessage();
 
 			stLoginCredentials loginData = _ReadLoginCredentials();
 			_authStatus = _usersManager.Authenticate(loginData.inputUsername, loginData.inputPassword);
 
-			if (_authStatus == UserDataManager::enAuthStatus::Success)
-				_activeUser = *_usersManager.Find(loginData.inputUsername, loginData.inputPassword);
+			ManageAuthAction(loginData);
+			if (_Locked == LockStatus::Locked)
+				return;
 
 		} while (_authStatus != UserDataManager::enAuthStatus::Success);
 
+		_authStatus = UserDataManager::enAuthStatus::Normal;
 		PromptUser("Login Succeeded! Please, press any button to enter the main menu");
 	}
 
