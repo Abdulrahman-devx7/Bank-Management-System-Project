@@ -5,6 +5,8 @@
 #include "ClientDataManager.h"
 #include "LoginScreen.h"
 #include "MainMenuScreen.h"
+#include "LoginDataRegistery.h"
+#include "RegisterLine.h"
 
 class Session
 {
@@ -12,15 +14,17 @@ private:
 	enum class SystemReadiness { Ready = 1, EssentialSystemFilesProblematic = 2, NoBootUp = 3 };
 	short _numTries = 3;
 
-	const string client_file_name = "clients.txt";
-	const string users_file_name = "users.txt";
+	const string CLIENT_FILE_NAME = "clients.txt";
+	const string USERS_FILE_NAME = "users.txt";
+	const string LOGIN_LOG_NAME = "registery_log.txt";
 
 	// We are thinking of delegating these containers to the managers later on after finishing the program files.
 	unordered_map<string, Client> _clientMap;
 	unordered_map<string, User> _userMap;
+	vector<RegisterLine> _LoginRegistry;
 
-	UserDataManager _userManager{ _userMap, users_file_name };
-	ClientDataManager _clientManager{ _clientMap, client_file_name };
+	UserDataManager _userManager{ _userMap, USERS_FILE_NAME };
+	ClientDataManager _clientManager{ _clientMap, CLIENT_FILE_NAME };
 
 	User _activeUser = User::getEmptyUser();
 
@@ -32,7 +36,6 @@ private:
 
 	SystemReadiness _systemState = SystemReadiness::NoBootUp;
 
-	// POSITION OF THIS FUNCTION IS TEMPORARY UNTIL IT COULD GET DELEGATED TO THE BUSINESS LOGIC LAYER FOR USERS
 	void _HandleUsersFileNotFound()
 	{
 		IScreen::PrintScreenHeader("ERROR OCCURRED", "The user database connected to\nthe system isn't found!\nPlease, contact your admin to resolve\n the issue");
@@ -64,26 +67,6 @@ private:
 		IScreen::PromptUser("");
 	}
 
-	UserDataManager& GetUserManager() { return _userManager; }
-
-	ClientDataManager& GetClientManager() { return _clientManager; }
-
-	ClientDataAccess::enDataStatus getClientFileStatus() const
-	{
-		return _clientFileStatus;
-	}
-
-	UserDataAccess::enDataStatus getUserFileStatus() const 
-	{
-		return _userFileStatus;
-	}
-
-	// Read-only getter for system readiness
-	SystemReadiness GetSystemReadiness() const
-	{
-		return _systemState;
-	}
-
 public:
 
 	Session()
@@ -98,22 +81,23 @@ public:
 	
 	void Boot()
 	{
-		_clientFileStatus = ClientDataAccess::LoadData(client_file_name, _clientMap, "#//#");
-		_userFileStatus = UserDataAccess::LoadData(users_file_name, _userMap, "#//#");
+		_clientFileStatus = ClientDataAccess::LoadData(CLIENT_FILE_NAME, _clientMap, "#//#");
+		_userFileStatus = UserDataAccess::LoadData(USERS_FILE_NAME, _userMap, "#//#");
+		LoginDataRegistery::LoadLog(LOGIN_LOG_NAME, _LoginRegistry, "#//#");
 
-		if (getUserFileStatus() != UserDataAccess::enDataStatus::eFileNotFound)
+		if (_userFileStatus != UserDataAccess::enDataStatus::eFileNotFound)
 		{
-			if (getUserFileStatus() == UserDataAccess::enDataStatus::eFileEmpty)
+			if (_userFileStatus == UserDataAccess::enDataStatus::eFileEmpty)
 				_HandleEmptyUsersFile();
 
-			if (getClientFileStatus() == ClientDataAccess::enDataStatus::eFileNotFound)
+			if (_clientFileStatus == ClientDataAccess::enDataStatus::eFileNotFound)
 				_HandleClientFileNotFound();
 		}
 		else
 			_HandleUsersFileNotFound();
 
-		if (getUserFileStatus() != UserDataAccess::enDataStatus::eFileNotFound
-			&& getClientFileStatus() != ClientDataAccess::enDataStatus::eFileNotFound)
+		if (_userFileStatus != UserDataAccess::enDataStatus::eFileNotFound
+			&& _clientFileStatus != ClientDataAccess::enDataStatus::eFileNotFound)
 
 			_systemState = SystemReadiness::Ready;
 		else
@@ -122,22 +106,13 @@ public:
 
 	void Run()
 	{
-        if (GetSystemReadiness() == SystemReadiness::NoBootUp)
+        if (_systemState == SystemReadiness::NoBootUp)
 			_HandleRunWithoutBoot();
 
-		else if (GetSystemReadiness() == SystemReadiness::Ready)
+		else if (_systemState == SystemReadiness::Ready)
 		{
-			// Instantiate a login screen object with the session dep. injection
-			// With the login screen object having a dependency injection, it could access the 
-			// integer indicating the number of false credentials entering. This means that 
-			// our fellow login screen object would be changing an important indicator here.
-			// Thus take an action from here and onward when extending the system. 
-			// The auth would be done here normally followed by instantiating the main menu class with the dep. injection
-			// This is going to be encircled in while(true) loop to keep the program running.
-			// The login screen object would be connected to the session controller and potential checkers
-			// could be added here for extensibility inside this while(true) loop
 			LoginScreen login(_userManager, _activeUser, _numTries);
-			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager);
+			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager, _LoginRegistry);
 			while (true)
 			{
 				login.setAuthStatus(UserDataManager::enAuthStatus::Normal);

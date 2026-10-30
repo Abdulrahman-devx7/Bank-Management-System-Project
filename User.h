@@ -18,7 +18,7 @@ private:
 public: 
 	enum Permissions : int32_t {
 		None = 0, All = -1, ListClients = 1, AddNewClient = 2, DeleteClient = 4, UpdateClients = 8,
-		FindClient = 16, Transactions = 32, ManageUsers = 64
+		FindClient = 16, Transactions = 32, ManageUsers = 64, LoginRegisteryLog = 128
 	};
 
 	User(Mode mode, const string& fullName, const string& email, const string& phoneNumber, const string& username, const string& password, int32_t permissions)

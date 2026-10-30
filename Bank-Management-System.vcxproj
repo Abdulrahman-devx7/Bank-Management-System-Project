@@ -148,6 +148,7 @@
     <ClInclude Include="FindUserScreen.h" />
     <ClInclude Include="InputValidate.h" />
     <ClInclude Include="ListUsersScreen.h" />
+    <ClInclude Include="LoginRegisteryScreen.h" />
     <ClInclude Include="LoginScreen.h" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="RegisterLine.h" />
@@ -170,6 +171,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Bank-Management-System.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="registery_log.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

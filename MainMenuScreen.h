@@ -11,6 +11,7 @@
 #include "FindClientScreen.h"
 #include "TransactionMenu.h"
 #include "UserManagementMenu.h"
+#include "LoginRegisteryScreen.h"
 
 class MainMenuScreen : IScreen
 {
@@ -24,12 +25,16 @@ private:
 		FindClient = 5,
 		Transactions = 6,
 		ManageUsers = 7,
-		Logout = 8
+		LoginRegisterLog = 8 ,
+		Logout = 9
 	};
 
+
+	
 	User &_activeUser;
 	ClientDataManager &_clientManager;
 	UserDataManager &_userManager;
+	vector<RegisterLine>& _loginRegister;
 
 	std::unordered_map<enMainMenuChoice, std::unique_ptr<IScreen>> _screens;
 
@@ -44,7 +49,8 @@ private:
 		cout << setw(80) << left << "" << right << setw(10) << "[5]" << " Find Client" << "\n";
 		cout << setw(80) << left << "" << right << setw(10) << "[6]" << " Transactions" << "\n";
 		cout << setw(80) << left << "" << right << setw(10) << "[7]" << " Manage Users" << "\n";
-		cout << setw(80) << left << "" << right << setw(10) << "[8]" << " Logout" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[8]" << " Login Register Log" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[9]" << " Logout" << "\n";
 
 		cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
 	}
@@ -55,8 +61,8 @@ private:
 	}
 
 public:
-	MainMenuScreen(User& activeUser, ClientDataManager& clientManager, UserDataManager& userManager) :
-		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager)
+	MainMenuScreen(User& activeUser, ClientDataManager& clientManager, UserDataManager& userManager, vector<RegisterLine> &loginLog) :
+		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager), _loginRegister(loginLog)
 	{
 		_screens[enMainMenuChoice::ClientList] = std::make_unique<ClientListScreen>(_clientManager.GetClientMap(), _activeUser);
 		_screens[enMainMenuChoice::AddClient] = std::make_unique<AddClientScreen>(_clientManager, _activeUser);
@@ -64,6 +70,7 @@ public:
 		_screens[enMainMenuChoice::UpdateClient] = std::make_unique<UpdateClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::FindClient] = std::make_unique<FindClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::Transactions] = std::make_unique<TransactionMenu>(_activeUser, _clientManager);
+		_screens[enMainMenuChoice::LoginRegisterLog] = std::make_unique<LoginRegistryScreen>(_loginRegister, _activeUser);
 		_screens[enMainMenuChoice::ManageUsers] = std::make_unique<UserManagementMenu>(_activeUser, _userManager);
 	}
 	
@@ -74,7 +81,7 @@ public:
 		{
 			ResetScreen();
 			_PrintMainMenuUI();
-			MenuChoice = static_cast<enMainMenuChoice>(InputValidate::ReadIntegerBetween(1, 8));
+			MenuChoice = static_cast<enMainMenuChoice>(InputValidate::ReadIntegerBetween(1, 9));
 
 			if (IsChoiceExist(MenuChoice))
 			{

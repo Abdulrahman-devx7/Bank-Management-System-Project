@@ -8,9 +8,6 @@
 
 class LoginDataRegistery
 {
-public:
-	enum class enDataStatus { eSuccess = 0, eFileNotFound = 1, eFileEmpty = 2 };
-
 private:
 
     static RegisterLine registerLine;
@@ -77,11 +74,11 @@ public:
         _AddDataLineToFile(fileName, _ConvertRegisterLineToRecord(line));
     }
 
-    static enDataStatus LoadLog(const string& fileName, vector<RegisterLine> &log, const string& delimiter = "#//#")
+    static void LoadLog(const string& fileName, vector<RegisterLine> &log, const string& delimiter = "#//#")
     {
         fstream logFile;
 
-        logFile.open(fileName, ios::in);
+        logFile.open(fileName, ios::in | ios::out | ios::app);
 
         if (logFile.is_open())
         {
@@ -98,15 +95,7 @@ public:
 
             }
             logFile.close();
-
-            if (log.size() == 0)
-                return enDataStatus::eFileEmpty;
-            else
-                return enDataStatus::eSuccess;
-
         }
-        else
-            return enDataStatus::eFileNotFound;
     }
 
     static void SaveLog(const string &fileName, const vector<RegisterLine>& log)
