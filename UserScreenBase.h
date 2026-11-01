@@ -195,6 +195,12 @@ protected:
 
         cout << "\n";
 
+        if (toupper(InputValidate::DetermineAgain("Do you want to give this user access to showing login the register's screen  (Y/N)?\n")) == 'Y')
+            permissions = permissions | static_cast<int>(User::Permissions::LoginRegisteryLog);
+
+        cout << "\n";
+
+
         user.setPermissions(permissions);
     }
 
