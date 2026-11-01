@@ -1,4 +1,4 @@
-# The Bank Management System
+# The Bank Management System (README file is outdated)
 A simple and modular bank management system that simulates basic bank functionalities to interact with clients.
 ## 📝 The Objectives
 - Practice clean code principles on a larger, closer to real-world scale.
