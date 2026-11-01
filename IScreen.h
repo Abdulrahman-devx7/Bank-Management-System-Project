@@ -26,6 +26,7 @@ protected:
 
         else
         {
+            IScreen::ResetScreen();
             PrintScreenHeader("ACCESS DENIED", "You currently have no access\n to this page.\nPlease, contact your admin.");
             return false;
         }
