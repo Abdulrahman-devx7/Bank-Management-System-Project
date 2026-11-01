@@ -117,6 +117,7 @@ public:
 			{
 				login.setAuthStatus(UserDataManager::enAuthStatus::Normal);
 				login.Execute();
+				LoginDataRegistery::LoadLog(LOGIN_LOG_NAME, _LoginRegistry);
 
 				if (_numTries != 0)
 				{
