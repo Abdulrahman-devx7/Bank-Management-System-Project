@@ -2,6 +2,7 @@
 #include <string>
 #include <stdexcept>
 #include "InputValidate.h"
+#include "Client.h"
 using namespace std;
 
 class Account
@@ -85,18 +86,19 @@ public:
 		_balance += amount;
 	}
 
-	TransferStatus Transfer(Client &receiver, float amount)
+	TransferStatus Transfer(Account& receiver, double amount)
 	{
-		if (receiver.account() == *this)
+		if (receiver == *this)
 			return TransferStatus::SameAccount;
 
-		else if (amount > receiver.account().Balance())
+		if (amount > _balance)
 			return TransferStatus::InsufficientBalance;
-		
+
 		this->Withdraw(amount);
-		receiver.account().Deposit(amount);
+		receiver.Deposit(amount);
 
 		return TransferStatus::Normal;
 	}
+
 };
 

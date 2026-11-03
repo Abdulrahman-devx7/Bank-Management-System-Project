@@ -156,6 +156,7 @@
     <ClInclude Include="RichString.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="TransactionMenu.h" />
+    <ClInclude Include="TransferScreen.h" />
     <ClInclude Include="UpdateClientScreen.h" />
     <ClInclude Include="UpdateUserScreen.h" />
     <ClInclude Include="UserBatchSearch.h" />
