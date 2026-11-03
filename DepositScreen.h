@@ -8,12 +8,12 @@ private:
 	ClientDataManager& _manager;
 	User& _activeUser;
 
-	float _ReadDepositNumber()
+	float _ReadTransferAmount()
 	{
 		return InputValidate::ReadFloatBetween(0, FLT_MAX, "\nPlease, enter a valid positive numeric input to withdraw!\n");
 	}
 
-	bool _VerifyDeposit(const long double depositAmount, Client &client)
+	bool _verifyTransfer(const long double depositAmount, Client &client)
 	{
 		if (toupper(InputValidate::DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
 		{
@@ -32,9 +32,9 @@ private:
 		{
 			cout << "\nThe following are the client data: \n\n";
 			PrintInfoCard(*foundClient);
-			long double depositAmount = _ReadDepositNumber();
+			long double depositAmount = _ReadTransferAmount();
 
-			if (_VerifyDeposit(depositAmount, *foundClient))
+			if (_verifyTransfer(depositAmount, *foundClient))
 				cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
 				<< foundClient->account().Balance() << " USD\n\n";
 			else

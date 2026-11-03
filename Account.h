@@ -2,6 +2,7 @@
 #include <string>
 #include <stdexcept>
 #include "InputValidate.h"
+#include "Client.h"
 using namespace std;
 
 class Account
@@ -17,6 +18,14 @@ private:
 	double _balance = 0.0;
 
 public:
+
+	enum class TransferStatus {Normal, SameAccount, InsufficientBalance};
+
+	bool operator==(const Account& other) const
+	{
+		return this->AccountNumber() == other.AccountNumber();
+	}
+
 	const string& AccountNumber() const
 	{
 		return _accountNumber;
@@ -64,7 +73,7 @@ public:
 
 	bool Withdraw(double amount)
 	{
-		if (amount > _balance)
+		if (amount < _balance)
 		{
 			_balance -= amount;
 			return true;
@@ -76,5 +85,20 @@ public:
 	{
 		_balance += amount;
 	}
+
+	TransferStatus Transfer(Account& receiver, double amount)
+	{
+		if (receiver == *this)
+			return TransferStatus::SameAccount;
+
+		if (amount > _balance)
+			return TransferStatus::InsufficientBalance;
+
+		this->Withdraw(amount);
+		receiver.Deposit(amount);
+
+		return TransferStatus::Normal;
+	}
+
 };
 
