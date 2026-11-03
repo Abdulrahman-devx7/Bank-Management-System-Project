@@ -22,11 +22,31 @@ private:
 		}
 	}
 
+	bool _handleAccountExistence(const Client *target)
+	{
+		if (target != nullptr)
+			PrintInfoCard(*target);
+		else
+		{
+			cout << "\nThis account doesn't exist in our database!\n";
+			return false;
+		}
 
-	void _transferUIProcess(string &senderAccountNumber, string &receiverAccountNumber)
+		return true;
+	}
+
+	void _transferUIProcess()
 	{
 		cout << "Please, enter the account number to transfer from: ";
-		string accountNumber = ReadAccountNumber();
+		string senderAccountNumber = ReadAccountNumber();
+
+		Client* sender = _manager.Find(senderAccountNumber);
+		if (!_handleAccountExistence(sender))
+			return;
+
+		cout << "Please, enter the account number to transfer from: ";
+		string receiverAccountNumber = ReadAccountNumber();
+
 
 	}
 
