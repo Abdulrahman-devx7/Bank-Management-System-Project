@@ -73,7 +73,7 @@ public:
 
 	bool Withdraw(double amount)
 	{
-		if (amount > _balance)
+		if (amount < _balance)
 		{
 			_balance -= amount;
 			return true;
