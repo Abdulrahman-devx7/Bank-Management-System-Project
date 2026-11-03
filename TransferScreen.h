@@ -27,15 +27,18 @@ private:
 		case Account::TransferStatus::InsufficientBalance:
 			std::cout << "\nError: Amount exceeds available balance.\n";
 			break;
+		case Account::TransferStatus::Cancelled:
+			std::cout << "\nTransfer Cancelled.\n";
+			break;
 		}
 	}
 
 	Account::TransferStatus _verifyTransfer(const float transferAmount, Client& sender, Client &receiver)
 	{
 		if (toupper(InputValidate::DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
-		{
 			return sender.account().Transfer(receiver.account(), transferAmount);
-		}
+		else
+			return Account::TransferStatus::Cancelled;
 	}
 
 	bool _handleAccountExistence(const Client *target)
