@@ -17,6 +17,14 @@ private:
 	double _balance = 0.0;
 
 public:
+
+	enum class TransferStatus {Normal, SameAccount, InsufficientBalance};
+
+	bool operator==(const Account& other) const
+	{
+		return this->AccountNumber() == other.AccountNumber();
+	}
+
 	const string& AccountNumber() const
 	{
 		return _accountNumber;
@@ -75,6 +83,20 @@ public:
 	void Deposit(double amount)
 	{
 		_balance += amount;
+	}
+
+	TransferStatus Transfer(Client &receiver, float amount)
+	{
+		if (receiver.account() == *this)
+			return TransferStatus::SameAccount;
+
+		else if (amount > receiver.account().Balance())
+			return TransferStatus::InsufficientBalance;
+		
+		this->Withdraw(amount);
+		receiver.account().Deposit(amount);
+
+		return TransferStatus::Normal;
 	}
 };
 
