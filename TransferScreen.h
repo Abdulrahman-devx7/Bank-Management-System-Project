@@ -19,8 +19,11 @@ private:
 		switch (status)
 		{
 		case Account::TransferStatus::Normal:
+		{
+			ClientDataAccess::SaveData(_manager.getSourceFileName(), _manager.GetClientMap());
 			std::cout << "\nTransfer completed successfully.\n";
 			break;
+		}
 		case Account::TransferStatus::SameAccount:
 			std::cout << "\nError: Target account is identical to source account.\n";
 			break;

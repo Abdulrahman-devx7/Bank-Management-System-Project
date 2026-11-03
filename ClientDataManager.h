@@ -18,6 +18,11 @@ public:
 		:_clientMap(injectedMap), _sourceFile(sourceFileName) {
 	}
 
+	const string &getSourceFileName() const
+	{
+		return _sourceFile;
+	}
+
 	enSaveResult Add(Client &target)
 	{
 		if (target.Status() == Client::Mode::New)

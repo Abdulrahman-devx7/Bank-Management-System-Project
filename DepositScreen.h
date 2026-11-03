@@ -35,8 +35,11 @@ private:
 			long double depositAmount = _ReadTransferAmount();
 
 			if (_verifyTransfer(depositAmount, *foundClient))
+			{
 				cout << "\n\nDone! Your deposit of " << depositAmount << " has been added successfully. Your new balance is: "
-				<< foundClient->account().Balance() << " USD\n\n";
+					<< foundClient->account().Balance() << " USD\n\n";
+				ClientDataAccess::SaveData(_manager.getSourceFileName(), _manager.GetClientMap());
+			}
 			else
 				cout << "\n\nTransaction has been canceled.\n\n";
 		}

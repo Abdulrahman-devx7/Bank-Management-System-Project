@@ -31,9 +31,12 @@ private:
 		switch (status)
 		{
 		case WithdrawalStatus::Succeeded:
+		{
 			cout << "\n\nDone! Your withdrawal of " << amount << " has been done successfully. Your new balance is: "
 				<< _foundClient->account().Balance() << " USD\n\n";
+			ClientDataAccess::SaveData(_manager.getSourceFileName(), _manager.GetClientMap());
 			break;
+		}
 
 		case WithdrawalStatus::Canceled: 
 			cout << "\n\nTransaction has been canceled.";
