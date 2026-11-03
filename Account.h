@@ -19,7 +19,7 @@ private:
 
 public:
 
-	enum class TransferStatus {Normal, SameAccount, InsufficientBalance};
+	enum class TransferStatus {Normal, SameAccount, InsufficientBalance, Cancelled};
 
 	bool operator==(const Account& other) const
 	{
