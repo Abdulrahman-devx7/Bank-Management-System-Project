@@ -40,7 +40,14 @@ class MoneyTransferRegistery
     static TransferRecordStruct _ConvertRecordToTransferToDTO(const string& line, const string delimiter = "#//#")
     {
         vector<string> registerData = RichString::Split(line, delimiter);
+
+        if (registerData.size() < 7)
+            return TransferRecordStruct();
+
         vector<string> timeData = RichString::Split(registerData[0], "-");
+
+        if (timeData.size() < 2)
+            return TransferRecordStruct();
 
         Date transferDate = Date::StringToDate(timeData[0]);
         Time transferTime = Time::StringToTime(timeData[1]);

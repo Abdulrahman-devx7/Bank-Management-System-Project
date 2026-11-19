@@ -1,6 +1,7 @@
 #pragma once
 #include "ClientScreenBase.h"
 #include "ClientDataManager.h"
+#include "MoneyTransferRegistery.h"
 
 class TransferScreen : public ClientScreenBase
 {
@@ -8,6 +9,7 @@ private:
 
 	ClientDataManager& _manager;
 	User& _activeUser;
+	const string TRANSFER_LOG_FILE_NAME = "transfer_log.txt";
 
 	float _readTransferAmount()
 	{
@@ -39,7 +41,16 @@ private:
 	Account::TransferStatus _verifyTransfer(const float transferAmount, Client& sender, Client &receiver)
 	{
 		if (toupper(InputValidate::DetermineAgain("\nAre you sure you want to perform this transaction (Y/N)? ")) == 'Y')
+		{
+			MoneyTransferRegistery::RecordTransfer(TRANSFER_LOG_FILE_NAME,
+				TransferRecordStruct(Date::GetSystemDate(), Time::GetSystemTime(),
+					sender.account().AccountNumber(),
+					receiver.account().AccountNumber(),
+					transferAmount, sender.account().Balance(), receiver.account().Balance(), _activeUser.Username()));
+
+
 			return sender.account().Transfer(receiver.account(), transferAmount);
+		}
 		else
 			return Account::TransferStatus::Cancelled;
 	}

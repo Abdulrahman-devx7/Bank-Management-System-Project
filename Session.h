@@ -6,7 +6,9 @@
 #include "LoginScreen.h"
 #include "MainMenuScreen.h"
 #include "LoginDataRegistery.h"
+#include "MoneyTransferRegistery.h"
 #include "RegisterLine.h"
+#include "TransferRecordStruct.h"
 
 class Session
 {
@@ -17,11 +19,13 @@ private:
 	const string CLIENT_FILE_NAME = "clients.txt";
 	const string USERS_FILE_NAME = "users.txt";
 	const string LOGIN_LOG_NAME = "registery_log.txt";
+	const string TRANSFER_LOG_NAME = "transfer_log.txt";
 
 	// We are thinking of delegating these containers to the managers later on after finishing the program files.
 	unordered_map<string, Client> _clientMap;
 	unordered_map<string, User> _userMap;
 	vector<RegisterLine> _LoginRegistry;
+	vector<TransferRecordStruct> _transferRegistry;
 
 	UserDataManager _userManager{ _userMap, USERS_FILE_NAME };
 	ClientDataManager _clientManager{ _clientMap, CLIENT_FILE_NAME };
@@ -69,11 +73,6 @@ private:
 
 public:
 
-	Session()
-	{
-
-	}
-
 	const User& GetActiveUser() const
 	{
 		return _activeUser;
@@ -83,7 +82,8 @@ public:
 	{
 		_clientFileStatus = ClientDataAccess::LoadData(CLIENT_FILE_NAME, _clientMap, "#//#");
 		_userFileStatus = UserDataAccess::LoadData(USERS_FILE_NAME, _userMap, "#//#");
-		LoginDataRegistery::LoadLog(LOGIN_LOG_NAME, _LoginRegistry, "#//#");
+		LoginDataRegistery::LoadRegisterLog(LOGIN_LOG_NAME, _LoginRegistry, "#//#");
+		MoneyTransferRegistery::LoadTransferLog(TRANSFER_LOG_NAME, _transferRegistry, "#//#");
 
 		if (_userFileStatus != UserDataAccess::enDataStatus::eFileNotFound)
 		{
@@ -112,12 +112,12 @@ public:
 		else if (_systemState == SystemReadiness::Ready)
 		{
 			LoginScreen login(_userManager, _activeUser, _numTries);
-			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager, _LoginRegistry);
+			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager, _LoginRegistry, _transferRegistry);
+
 			while (true)
 			{
 				login.setAuthStatus(UserDataManager::enAuthStatus::Normal);
 				login.Execute();
-				LoginDataRegistery::LoadLog(LOGIN_LOG_NAME, _LoginRegistry);
 
 				if (_numTries != 0)
 				{
