@@ -1,6 +1,7 @@
 #pragma once
 #include "RichString.h"
 #include "Client.h"
+#include "Util.h"
 #include <fstream>
 #include <unordered_map>
 
@@ -10,6 +11,8 @@ public:
     enum class enDataStatus { eSuccess = 0, eFileNotFound = 1 };
 
 private:
+
+    static const short ENCRYPT_KEY = 14;
 
     static void AddDataLineToFile(const string& fileName, const string& dataLine)
     {
@@ -38,7 +41,7 @@ private:
         }
     }
 
-    static Client ConvertClientLineToRecord(const string& Line, const string& delimiter = "#//#")
+    static Client ConvertRecordToClient(const string& Line, const string& delimiter = "#//#")
     {
         vector<string> ClientData = RichString::Split(Line, delimiter);
 
@@ -46,7 +49,7 @@ private:
             return Client::getEmptyClient();
 
         Client parsedClient(Client::Mode::Update, ClientData[0], ClientData[1], ClientData[2],
-            ClientData[3], ClientData[4], stod(ClientData[5]));
+            ClientData[3], Util::DecryptText(ClientData[4], ENCRYPT_KEY), stod(ClientData[5]));
 
         if (ClientData[6] == "1") 
             parsedClient.MarkForDeletion();
@@ -54,7 +57,7 @@ private:
         return parsedClient;
     }
 
-    static string ConvertRecordToLine(const Client& client, const string& delimiter = "#//#")
+    static string ConvertClientToRecord(const Client& client, const string& delimiter = "#//#")
     {
         string recordLine = "";
 
@@ -63,7 +66,7 @@ private:
         recordLine += client.PhoneNumber() + delimiter;
 
         recordLine += client.account().AccountNumber() + delimiter;
-        recordLine += client.account().PIN() + delimiter;
+        recordLine += Util::EncryptText(client.account().PIN(), ENCRYPT_KEY) + delimiter;
         recordLine += to_string(client.account().Balance()) + delimiter;
         recordLine += (client.IsMarkedForDeletion() ? "1" : "0");
 
@@ -74,7 +77,7 @@ public:
 
     static void AppendUserRecord(const Client& target, const string& filename, const string& delimiter = "#//#")
     {
-        AddDataLineToFile(filename, ConvertRecordToLine(target, delimiter));
+        AddDataLineToFile(filename, ConvertClientToRecord(target, delimiter));
     }
 
 
@@ -93,7 +96,7 @@ public:
                 if (line.empty())
                     continue;
 
-                client = ConvertClientLineToRecord(line, delimiter);
+                client = ConvertRecordToClient(line, delimiter);
 
                 if (!client.IsEmpty() && !client.IsMarkedForDeletion())
                     clients.insert({ client.account().AccountNumber(), client });
@@ -114,7 +117,7 @@ public:
         {
             for (const auto& [accountNumber, client] : clients)
             {
-                string line = ConvertRecordToLine(client);
+                string line = ConvertClientToRecord(client);
 
                 clientFile << line << "\n";
             }
