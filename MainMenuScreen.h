@@ -12,6 +12,7 @@
 #include "TransactionMenu.h"
 #include "UserManagementMenu.h"
 #include "LoginRegisteryScreen.h"
+#include "TransferRecordStruct.h"
 
 class MainMenuScreen : IScreen
 {
@@ -35,6 +36,7 @@ private:
 	ClientDataManager &_clientManager;
 	UserDataManager &_userManager;
 	vector<RegisterLine>& _loginRegister;
+	vector<TransferRecordStruct>& _transferRegistry;
 
 	std::unordered_map<enMainMenuChoice, std::unique_ptr<IScreen>> _screens;
 
@@ -61,15 +63,15 @@ private:
 	}
 
 public:
-	MainMenuScreen(User& activeUser, ClientDataManager& clientManager, UserDataManager& userManager, vector<RegisterLine> &loginLog) :
-		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager), _loginRegister(loginLog)
+	MainMenuScreen(User& activeUser, ClientDataManager& clientManager, UserDataManager& userManager, vector<RegisterLine> &loginLog, vector<TransferRecordStruct>& transferRegistry) :
+		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager), _loginRegister(loginLog), _transferRegistry(transferRegistry)
 	{
 		_screens[enMainMenuChoice::ClientList] = std::make_unique<ClientListScreen>(_clientManager.GetClientMap(), _activeUser);
 		_screens[enMainMenuChoice::AddClient] = std::make_unique<AddClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::DeleteClient] = std::make_unique<DeleteClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::UpdateClient] = std::make_unique<UpdateClientScreen>(_clientManager, _activeUser);
 		_screens[enMainMenuChoice::FindClient] = std::make_unique<FindClientScreen>(_clientManager, _activeUser);
-		_screens[enMainMenuChoice::Transactions] = std::make_unique<TransactionMenu>(_activeUser, _clientManager);
+		_screens[enMainMenuChoice::Transactions] = std::make_unique<TransactionMenu>(_activeUser, _clientManager, _transferRegistry);
 		_screens[enMainMenuChoice::LoginRegisterLog] = std::make_unique<LoginRegistryScreen>(_loginRegister, _activeUser);
 		_screens[enMainMenuChoice::ManageUsers] = std::make_unique<UserManagementMenu>(_activeUser, _userManager);
 	}

@@ -50,13 +50,13 @@ public:
 		_PIN = pin;
 	}
 
-	void SetBalance(double amount)
+	void SetBalance(double transferredAmount)
 	{
-		if (amount < 0.0)
+		if (transferredAmount < 0.0)
 		{
 			throw std::invalid_argument("SetBalance failed: Account balance cannot be negative.");
 		}
-		_balance = amount;
+		_balance = transferredAmount;
 	}
 
 	void SetAccountNumber(const std::string& accountNumber)
@@ -71,31 +71,31 @@ public:
 	Account(const string& accountNumber, const string& PIN, double balance) 
 		: _accountNumber(accountNumber), _PIN(PIN), _balance(balance) {}
 
-	bool Withdraw(double amount)
+	bool Withdraw(double transferredAmount)
 	{
-		if (amount < _balance)
+		if (transferredAmount < _balance)
 		{
-			_balance -= amount;
+			_balance -= transferredAmount;
 			return true;
 		}
 		else return false;
 	}
 
-	void Deposit(double amount)
+	void Deposit(double transferredAmount)
 	{
-		_balance += amount;
+		_balance += transferredAmount;
 	}
 
-	TransferStatus Transfer(Account& receiver, double amount)
+	TransferStatus Transfer(Account& receiver, double transferredAmount)
 	{
 		if (receiver == *this)
 			return TransferStatus::SameAccount;
 
-		if (amount > _balance)
+		if (transferredAmount > _balance)
 			return TransferStatus::InsufficientBalance;
 
-		this->Withdraw(amount);
-		receiver.Deposit(amount);
+		this->Withdraw(transferredAmount);
+		receiver.Deposit(transferredAmount);
 
 		return TransferStatus::Normal;
 	}

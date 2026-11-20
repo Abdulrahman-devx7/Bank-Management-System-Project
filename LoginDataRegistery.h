@@ -74,7 +74,7 @@ public:
         _AddDataLineToFile(fileName, _ConvertRegisterLineToRecord(line));
     }
 
-    static void LoadLog(const string& fileName, vector<RegisterLine> &log, const string& delimiter = "#//#")
+    static void LoadRegisterLog(const string& fileName, vector<RegisterLine> &log, const string& delimiter = "#//#")
     {
         fstream logFile;
 

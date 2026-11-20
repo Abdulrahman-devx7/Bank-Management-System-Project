@@ -26,13 +26,13 @@ private:
 		return (withdrawalAmount > _foundClient->account().Balance());
 	}
 
-	void _PrintWithdrawalStatus(const WithdrawalStatus status, long double amount)
+	void _PrintWithdrawalStatus(const WithdrawalStatus status, long double transferredAmount)
 	{
 		switch (status)
 		{
 		case WithdrawalStatus::Succeeded:
 		{
-			cout << "\n\nDone! Your withdrawal of " << amount << " has been done successfully. Your new balance is: "
+			cout << "\n\nDone! Your withdrawal of " << transferredAmount << " has been done successfully. Your new balance is: "
 				<< _foundClient->account().Balance() << " USD\n\n";
 			ClientDataAccess::SaveData(_manager.getSourceFileName(), _manager.GetClientMap());
 			break;

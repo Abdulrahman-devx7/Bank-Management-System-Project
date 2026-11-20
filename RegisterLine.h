@@ -4,7 +4,6 @@
 #include "Time.h"
 
 using namespace std;
-
 class RegisterLine
 {
 private:
