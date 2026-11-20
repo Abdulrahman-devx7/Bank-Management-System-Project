@@ -1,6 +1,6 @@
 #pragma once
 #include "RichString.h"
-#include "Currrency.h"
+#include "Currency.h"
 #include <fstream>
 #include <unordered_map>
 

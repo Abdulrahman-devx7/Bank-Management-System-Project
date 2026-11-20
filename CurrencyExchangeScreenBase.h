@@ -3,7 +3,7 @@
 #include "IScreen.h"
 #include "RichString.h"
 #include "InputValidate.h"
-#include "Currrency.h"
+#include "Currency.h"
 #include <iostream>
 
 using namespace std;
