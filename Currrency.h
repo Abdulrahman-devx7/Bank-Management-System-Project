@@ -17,15 +17,15 @@ private:
 	// These properties must remain read-only properties
 	string _country;
 	string _currencyCode;
-	string _currencyName;
+	string _currencyCountryName;
 
 	float _ratePerUSD = 0.0;
 	enMode _mode;
 
 public:
 
-	Currency(enMode mode, string country, string currencyCode, string currencyName, float rate) :
-		_country(country), _currencyCode(currencyCode), _currencyName(currencyName), _ratePerUSD(rate), _mode(mode)
+	Currency(enMode mode, string country, string currencyCode, string currencyCountryName, float rate) :
+		_country(country), _currencyCode(currencyCode), _currencyCountryName(currencyCountryName), _ratePerUSD(rate), _mode(mode)
 	{
 	}
 
@@ -41,7 +41,7 @@ public:
 
 	const string& GetCurrencyName() const
 	{
-		return _currencyName;
+		return _currencyCountryName;
 	}
 
 	enMode GetMode() const
@@ -62,6 +62,16 @@ public:
 	void SetRatePerUSD(float rate)
 	{
 		_ratePerUSD = rate;
+	}
+
+	static Currency getEmptyCurrency()
+	{
+		return Currency(enMode::Empty, "", "", "", 0.0f);
+	}
+
+	bool IsEmpty() const
+	{
+		return _mode == enMode::Empty;
 	}
 
 };

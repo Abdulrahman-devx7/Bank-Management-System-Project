@@ -141,6 +141,8 @@
     <ClInclude Include="ClientListScreen.h" />
     <ClInclude Include="ClientScreenBase.h" />
     <ClInclude Include="Currency.h" />
+    <ClInclude Include="CurrencyExchangeDataAccess.h" />
+    <ClInclude Include="CurrencyExchangeManager.h" />
     <ClInclude Include="CurrencyExchangeMenu.h" />
     <ClInclude Include="CurrencyExchangeScreenBase.h" />
     <ClInclude Include="Date.h" />
