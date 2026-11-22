@@ -9,6 +9,7 @@
 #include "MoneyTransferRegistery.h"
 #include "RegisterLine.h"
 #include "TransferRecordStruct.h"
+#include "CurrencyExchangeDataAccess.h"
 
 class Session
 {
@@ -20,12 +21,15 @@ private:
 	const string USERS_FILE_NAME = "users.txt";
 	const string LOGIN_LOG_NAME = "registery_log.txt";
 	const string TRANSFER_LOG_NAME = "transfer_log.txt";
+	const string CURRENCY_FILE_NAME = "currencies.txt";
 
 	// We are thinking of delegating these containers to the managers later on after finishing the program files.
 	unordered_map<string, Client> _clientMap;
 	unordered_map<string, User> _userMap;
 	vector<RegisterLine> _LoginRegistry;
 	vector<TransferRecordStruct> _transferRegistry;
+	unordered_map<string, Currency> _currencyMapByCode;
+	unordered_map<string, Currency*> _currencyMapByCountry;
 
 	UserDataManager _userManager{ _userMap, USERS_FILE_NAME };
 	ClientDataManager _clientManager{ _clientMap, CLIENT_FILE_NAME };
@@ -84,6 +88,7 @@ public:
 		_userFileStatus = UserDataAccess::LoadData(USERS_FILE_NAME, _userMap, "#//#");
 		LoginDataRegistery::LoadRegisterLog(LOGIN_LOG_NAME, _LoginRegistry, "#//#");
 		MoneyTransferRegistery::LoadTransferLog(TRANSFER_LOG_NAME, _transferRegistry, "#//#");
+		CurrencyExchangeDataAccess::LoadData(CURRENCY_FILE_NAME, _currencyMapByCode, _currencyMapByCountry, "#//#");
 
 		if (_userFileStatus != UserDataAccess::enDataStatus::eFileNotFound)
 		{
@@ -112,7 +117,7 @@ public:
 		else if (_systemState == SystemReadiness::Ready)
 		{
 			LoginScreen login(_userManager, _activeUser, _numTries);
-			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager, _LoginRegistry, _transferRegistry);
+			MainMenuScreen startupScreen(_activeUser, _clientManager, _userManager, _LoginRegistry, _transferRegistry, _currencyMapByCode, _currencyMapByCountry);
 
 			while (true)
 			{
