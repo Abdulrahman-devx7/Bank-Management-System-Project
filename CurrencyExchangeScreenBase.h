@@ -7,9 +7,9 @@
 #include <iostream>
 
 using namespace std;
-class CurrencyExchangeScreenBase : IScreen
+class CurrencyExchangeScreenBase : public IScreen
 {
-private:
+protected:
 	CurrencyExchangeScreenBase() {}
 
 public:

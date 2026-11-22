@@ -6,7 +6,12 @@
 #include "IScreen.h"
 #include "User.h"
 #include "Currency.h"
+#include "CurrencyExchangeManager.h"
 #include "InputValidate.h"
+#include "CurrenciesListScreen.h"
+#include "FindCurrencyScreen.h"
+#include "UpdateCurrencyRateScreen.h"
+#include "CurrencyCalculatorScreen.h"
 
 class CurrencyExchangeMenu : public IScreen
 {
@@ -23,6 +28,7 @@ private:
 	User& _activeUser;
 	unordered_map<string, Currency>& _currencyMapByCode;
 	unordered_map<string, Currency*>& _currencyMapByCountry;
+	CurrencyExchangeManager _currencyManager;
 
 	std::unordered_map<enMenuChoice, std::unique_ptr<IScreen>> _screens;
 
@@ -46,9 +52,15 @@ private:
 
 public:
 	CurrencyExchangeMenu(User& activeUser, unordered_map<string, Currency>& currencyMapByCode, unordered_map<string, Currency*>& currencyMapByCountry) :
-		_activeUser(activeUser), _currencyMapByCode(currencyMapByCode), _currencyMapByCountry(currencyMapByCountry)
+		_activeUser(activeUser), 
+		_currencyMapByCode(currencyMapByCode), 
+		_currencyMapByCountry(currencyMapByCountry),
+		_currencyManager("currencies.txt", _currencyMapByCode, _currencyMapByCountry)
 	{
-		// Screens for menu options will be initialized here later
+		_screens[enMenuChoice::ListCurrencies] = std::make_unique<CurrenciesListScreen>(_currencyManager, _activeUser);
+		_screens[enMenuChoice::FindCurrency] = std::make_unique<FindCurrencyScreen>(_currencyManager, _activeUser);
+		_screens[enMenuChoice::UpdateCurrency] = std::make_unique<UpdateCurrencyRateScreen>(_currencyManager, _activeUser);
+		_screens[enMenuChoice::CurrencyCalculator] = std::make_unique<CurrencyCalculatorScreen>(_currencyManager, _activeUser);
 	}
 
 	void Execute() override
