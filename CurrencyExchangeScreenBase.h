@@ -25,10 +25,10 @@ public:
 		std::cout << indent << UI_LINE_BOUNDS << "\n";
 
 		std::cout << indent << std::left << std::setw(labelWidth) << "Country"
-			<< ": " << cur.GetCountry() << "\n";
+			<< ": " << RichString::StartWordsWithUppercase(cur.GetCountry(), " ") << "\n";
 
 		std::cout << indent << std::left << std::setw(labelWidth) << "Currency Code"
-			<< ": " << cur.GetCurrencyCode() << "\n";
+			<< ": " << RichString::ToUpper(cur.GetCurrencyCode()) << "\n";
 
 		std::cout << indent << std::left << std::setw(labelWidth) << "Currency Name"
 			<< ": " << cur.GetCurrencyName() << "\n";
@@ -39,24 +39,22 @@ public:
 		std::cout << indent << UI_LINE_BOUNDS << "\n\n";
 	}
 
+	// Wrappers that delegate to the shared input engine and apply field-specific casing.
+
 	string ReadCurrencyCode()
 	{
-		string input;
-		getline(std::cin, input);
-
-		RichString::Trim(input);
-		RichString::ToLower(input);
-		return input;
+		return _ReadInput();
 	}
 
 	string ReadCountryName()
 	{
-		string input;
-		getline(std::cin, input);
+		return _ReadInput();
+	}
 
-		RichString::Trim(input);
-		RichString::ToLower(input);
-		return input;
+private:
+	string _ReadInput()
+	{
+		return RichString::Trim(RichString::ToLower(InputValidate::ReadString()));
 	}
 };
 
