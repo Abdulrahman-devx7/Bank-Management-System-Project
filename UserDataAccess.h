@@ -1,6 +1,7 @@
 #pragma once
 #include "RichString.h"
 #include "User.h" 
+#include "Util.h"
 #include <fstream>
 #include <unordered_map>
 
@@ -10,6 +11,8 @@ public:
     enum class enDataStatus { eSuccess = 0, eFileNotFound = 1, eFileEmpty = 2 };
 
 private:
+
+    static const short ENCRYPT_KEY = 20;
 
     static void _AddDataLineToFile(const string& fileName, const string& dataLine)
     {
@@ -46,7 +49,7 @@ private:
             return User::getEmptyUser();
 
         User parsedUser(User::Mode::Update, UserData[0], UserData[1], UserData[2],
-            UserData[3], UserData[4], stoi(UserData[5]));
+            UserData[3], Util::DecryptText(UserData[4], ENCRYPT_KEY), stoi(UserData[5]));
 
         if (UserData[6] == "1")
             parsedUser.MarkForDeletion();
@@ -64,7 +67,7 @@ private:
         recordLine += user.PhoneNumber() + delimiter;
 
         recordLine += user.Username() + delimiter;
-        recordLine += user.Password() + delimiter;
+        recordLine += Util::EncryptText(user.Password(), ENCRYPT_KEY) + delimiter;
         recordLine += to_string(user.getPermissions()) + delimiter;
         recordLine += (user.IsMarkedForDeletion() ? "1" : "0");
 
@@ -131,4 +134,3 @@ public:
     }
 
 };
-

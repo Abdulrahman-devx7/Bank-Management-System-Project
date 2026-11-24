@@ -130,6 +130,7 @@
     <ClCompile Include="Bank-Management-System.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Randomization&amp;Encryption-Utility-Library\Util.h" />
     <ClInclude Include="Account.h" />
     <ClInclude Include="AddClientScreen.h" />
     <ClInclude Include="AddUserScreen.h" />
