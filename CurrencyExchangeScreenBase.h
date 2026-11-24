@@ -39,7 +39,8 @@ public:
 		std::cout << indent << UI_LINE_BOUNDS << "\n\n";
 	}
 
-	// Wrappers that delegate to the shared input engine and apply field-specific casing.
+	// The wrappers seem completely redundant, but they could be useful if we were to add more specific features to 
+	// reading these two inputs.
 
 	string ReadCurrencyCode()
 	{
