@@ -36,7 +36,7 @@ private:
         PrintCurrencyInfo(data.to);
 
         cout << "\n" << data.exchangeAmount << " " << data.from.GetCurrencyCode() << " = "
-            << data.from.GetRatePerUSD() * data.exchangeAmount * data.to.GetRatePerUSD() << data.to.GetCurrencyCode();
+            << (1.0/data.from.GetRatePerUSD()) * data.exchangeAmount * data.to.GetRatePerUSD() << data.to.GetCurrencyCode();
     }
 
     bool _isCurrencyExist(const Currency &currency)
