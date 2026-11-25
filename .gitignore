@@ -1,0 +1,65 @@
+# =========================================================================
+# Visual Studio / C++ .gitignore
+# =========================================================================
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][In]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio Intermediate build directories (e.g. ProjectName.5199d4ff/)
+*.????????/
+Bank-Man.*/
+
+# Visual Studio 2015+ cache / workspace directories
+.vs/
+
+# Compiler & Linker outputs
+*.obj
+*.ilk
+*.pdb
+*.tlog
+*.idb
+*.aps
+*.res
+*.pch
+*.ipch
+*.exp
+*.lib
+*.exe
+*.dll
+*.manifest
+
+# Visual Studio IntelliSense & Database cache
+*.VC.db
+*.VC.opendb
+
+# Windows system files
+desktop.ini
+Thumbs.db
+ehthumbs.db
+
+# Application runtime data files
+clients.txt
+users.txt
+registery_log.txt
+transfer_log.txt

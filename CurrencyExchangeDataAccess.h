@@ -89,7 +89,7 @@ public:
                 if (line.empty())
                     continue;
 
-                currency = ConvertRecordToCurrency(line, delimiter);
+                currency = ConvertRecordToCurrency(line, delimiter); // delimiter : #//#
 
                 if (!currency.IsEmpty())
                 {
