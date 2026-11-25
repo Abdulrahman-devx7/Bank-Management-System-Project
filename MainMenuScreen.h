@@ -13,6 +13,8 @@
 #include "UserManagementMenu.h"
 #include "LoginRegisteryScreen.h"
 #include "TransferRecordStruct.h"
+#include "CurrencyExchangeMenu.h"
+#include "Currency.h"
 
 class MainMenuScreen : IScreen
 {
@@ -26,8 +28,9 @@ private:
 		FindClient = 5,
 		Transactions = 6,
 		ManageUsers = 7,
-		LoginRegisterLog = 8 ,
-		Logout = 9
+		LoginRegisterLog = 8,
+		CurrencyExchange = 9,
+		Logout = 10
 	};
 
 
@@ -37,6 +40,8 @@ private:
 	UserDataManager &_userManager;
 	vector<RegisterLine>& _loginRegister;
 	vector<TransferRecordStruct>& _transferRegistry;
+	unordered_map<string, Currency>& _currencyMapByCode;
+	unordered_map<string, Currency*>& _currencyMapByCountry;
 
 	std::unordered_map<enMainMenuChoice, std::unique_ptr<IScreen>> _screens;
 
@@ -52,7 +57,8 @@ private:
 		cout << setw(80) << left << "" << right << setw(10) << "[6]" << " Transactions" << "\n";
 		cout << setw(80) << left << "" << right << setw(10) << "[7]" << " Manage Users" << "\n";
 		cout << setw(80) << left << "" << right << setw(10) << "[8]" << " Login Register Log" << "\n";
-		cout << setw(80) << left << "" << right << setw(10) << "[9]" << " Logout" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[9]" << " Currency Exchange" << "\n";
+		cout << setw(80) << left << "" << right << setw(10) << "[10]" << " Logout" << "\n";
 
 		cout << setw(80) << left << "" << UI_LINE_BOUNDS << "\n";
 	}
@@ -63,8 +69,13 @@ private:
 	}
 
 public:
-	MainMenuScreen(User& activeUser, ClientDataManager& clientManager, UserDataManager& userManager, vector<RegisterLine> &loginLog, vector<TransferRecordStruct>& transferRegistry) :
-		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager), _loginRegister(loginLog), _transferRegistry(transferRegistry)
+	MainMenuScreen(User& activeUser, ClientDataManager& clientManager, UserDataManager& userManager, 
+	               vector<RegisterLine> &loginLog, vector<TransferRecordStruct>& transferRegistry,
+	               unordered_map<string, Currency>& currencyMapByCode,
+	               unordered_map<string, Currency*>& currencyMapByCountry) :
+		_activeUser(activeUser), _clientManager(clientManager), _userManager(userManager), 
+		_loginRegister(loginLog), _transferRegistry(transferRegistry),
+		_currencyMapByCode(currencyMapByCode), _currencyMapByCountry(currencyMapByCountry)
 	{
 		_screens[enMainMenuChoice::ClientList] = std::make_unique<ClientListScreen>(_clientManager.GetClientMap(), _activeUser);
 		_screens[enMainMenuChoice::AddClient] = std::make_unique<AddClientScreen>(_clientManager, _activeUser);
@@ -74,6 +85,7 @@ public:
 		_screens[enMainMenuChoice::Transactions] = std::make_unique<TransactionMenu>(_activeUser, _clientManager, _transferRegistry);
 		_screens[enMainMenuChoice::LoginRegisterLog] = std::make_unique<LoginRegistryScreen>(_loginRegister, _activeUser);
 		_screens[enMainMenuChoice::ManageUsers] = std::make_unique<UserManagementMenu>(_activeUser, _userManager);
+		_screens[enMainMenuChoice::CurrencyExchange] = std::make_unique<CurrencyExchangeMenu>(_activeUser, _currencyMapByCode, _currencyMapByCountry);
 	}
 	
 	void Execute() override
@@ -83,7 +95,7 @@ public:
 		{
 			ResetScreen();
 			_PrintMainMenuUI();
-			MenuChoice = static_cast<enMainMenuChoice>(InputValidate::ReadIntegerBetween(1, 9));
+			MenuChoice = static_cast<enMainMenuChoice>(InputValidate::ReadIntegerBetween(1, 10));
 
 			if (IsChoiceExist(MenuChoice))
 			{
